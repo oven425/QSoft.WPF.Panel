@@ -39,6 +39,9 @@ namespace WpfApp1
             c3.Children.Add(cc3);
             cc1.Children.Add(ccc1);
             this._list.ItemsSource = root.Children;
+            this.qtreelistview.ItemsSource = root.Children;
+            ListView list = new ListView();
+            //list.View
         }
     }
 
