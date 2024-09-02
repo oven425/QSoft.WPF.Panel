@@ -47,6 +47,7 @@ namespace QSoft.WPF.TreeListView
     /// </summary>
     public class TreeListViewItem : TreeViewItem
     {
+        public GridViewColumnCollection ColumnCollection { get; set; }
         static TreeListViewItem()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(TreeListViewItem), new FrameworkPropertyMetadata(typeof(TreeListViewItem)));
@@ -64,6 +65,13 @@ namespace QSoft.WPF.TreeListView
                 }
                 return _level;
             }
+        }
+        public override void OnApplyTemplate()
+        {
+            var hp = this.GetTemplateChild("PART_Header") as GridViewRowPresenter;
+            //PART_Header
+            hp.Columns = this.ColumnCollection;
+            base.OnApplyTemplate();
         }
 
 

@@ -72,8 +72,10 @@ namespace QSoft.WPF.TreeListView
 
         protected override DependencyObject GetContainerForItemOverride()
         {
-            var bb = base.GetContainerForItemOverride();
-            return new TreeListViewItem();
+            var item = new TreeListViewItem();
+            var gridview = this.View as GridView;
+            item.ColumnCollection = gridview.Columns;
+            return item;
         }
 
         protected override bool IsItemItsOwnContainerOverride(object item)

@@ -15,7 +15,9 @@ namespace WpfApp1
         //这两个默认的是TreeViewItem
         protected override DependencyObject GetContainerForItemOverride()//创建或标识用于显示指定项的元素。 
         {
-            return new TreeListViewItem();
+            var item = new TreeListViewItem();
+            var ii = item.GetValue(GridView.ColumnCollectionProperty);
+            return item;
         }
 
         protected override bool IsItemItsOwnContainerOverride(object item)//确定指定项是否是（或可作为）其自己的 ItemContainer

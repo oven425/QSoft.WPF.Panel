@@ -151,15 +151,8 @@
             </local:TreeListView.ItemTemplate>
 
         </local:TreeListView>
-        <ListView Grid.Column="1">
-            <ListView.View>
-                <GridView>
-                    <GridView.Columns>
-                        <GridViewColumn/>
-                    </GridView.Columns>
-                </GridView>
-            </ListView.View>
-        </ListView>
+
+        
         <qtreelist:TreeListView x:Name="qtreelistview" Grid.Column="2">
             <qtreelist:TreeListView.ItemTemplate >
                 <HierarchicalDataTemplate ItemsSource="{Binding Children}" >
