@@ -65,8 +65,12 @@ namespace QSoft.WPF.TreeListView
             hp.Columns = new GridViewColumnCollection();
             var gridview = this.View as GridView;
             hp.Columns = gridview.Columns;
+            hp.Columns[0].DisplayMemberBinding = null;
+            var rr = this.Resources;
+            
+            hp.Columns[0].CellTemplate = FindResource("CellTemplate_Name11") as DataTemplate;
 
-            hp.Columns[0].CellTemplate = FindResource("CellTemplate_Name") as DataTemplate;
+
             base.OnApplyTemplate();
         }
 
