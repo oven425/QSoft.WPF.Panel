@@ -9,24 +9,38 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ToggleButton}">
-                    <Border Width="19"  Height="13"  Background="Transparent">
-                        <Border Width="9" Height="9"   BorderThickness="1"    BorderBrush="#FF7898B5"   CornerRadius="1"  SnapsToDevicePixels="true">
-                            <Border.Background>
-                                <LinearGradientBrush StartPoint="0,0"  EndPoint="1,1">
-                                    <LinearGradientBrush.GradientStops>
-                                        <GradientStop Color="White"     Offset=".2"/>
-                                        <GradientStop Color="#FFC0B7A6" Offset="1"/>
-                                    </LinearGradientBrush.GradientStops>
-                                </LinearGradientBrush>
-                            </Border.Background>
-                            <Path x:Name="ExpandPath" Margin="1,1,1,1" Fill="Black"
-              Data="M 0 2 L 0 3 L 2 3 L 2 5 L 3 5 L 3 3 L 5 3 L 5 2 L 3 2 L 3 0 L 2 0 L 2 2 Z"/>
-                        </Border>
+                    <Border Background="Transparent" Height="16" Padding="5,5,5,5" Width="16">
+                        <Path x:Name="ExpandPath"  Fill="#FFFFFFFF" Stroke="#FF818181">
+                            <Path.Data>
+                                <PathGeometry Figures="M0,0 L0,6 L6,0 z"/>
+                            </Path.Data>
+                            <Path.RenderTransform>
+                                <RotateTransform Angle="135" CenterX="3" CenterY="3"/>
+                            </Path.RenderTransform>
+                        </Path>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter Property="Data" TargetName="ExpandPath" Value="M 0 2 L 0 3 L 5 3 L 5 2 Z"/>
+                            <Setter Property="RenderTransform" TargetName="ExpandPath">
+                                <Setter.Value>
+                                    <RotateTransform Angle="180" CenterX="3" CenterY="3"/>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Fill" TargetName="ExpandPath" Value="#FF595959"/>
+                            <Setter Property="Stroke" TargetName="ExpandPath" Value="#FF262626"/>
                         </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Stroke" TargetName="ExpandPath" Value="#FF27C7F7"/>
+                            <Setter Property="Fill" TargetName="ExpandPath" Value="#FFCCEEFB"/>
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="True"/>
+                                <Condition Property="IsChecked" Value="True"/>
+                            </MultiTrigger.Conditions>
+                            <Setter Property="Stroke" TargetName="ExpandPath" Value="#FF1CC4F7"/>
+                            <Setter Property="Fill" TargetName="ExpandPath" Value="#FF82DFFB"/>
+                        </MultiTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>

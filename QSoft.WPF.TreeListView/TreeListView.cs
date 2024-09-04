@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -46,6 +47,7 @@ namespace QSoft.WPF.TreeListView
     /// </summary>
     public class TreeListView : TreeView
     {
+        
         public static readonly DependencyProperty ViewProperty;
         static TreeListView()
         {
@@ -61,24 +63,38 @@ namespace QSoft.WPF.TreeListView
 
         public override void OnApplyTemplate()
         {
-            var hp = this.GetTemplateChild("header") as GridViewHeaderRowPresenter;
-            hp.Columns = new GridViewColumnCollection();
-            var gridview = this.View as GridView;
-            hp.Columns = gridview.Columns;
-            hp.Columns[0].DisplayMemberBinding = null;
-            var rr = this.Resources;
-            
-            hp.Columns[0].CellTemplate = FindResource("CellTemplate_Name11") as DataTemplate;
+            if(this.View is GridView gridview && 
+                this.GetTemplateChild("header") is GridViewHeaderRowPresenter hp)
+            {
+                GridViewColumn column = new GridViewColumn { Header = "IM" };
+                DataTemplate template = new DataTemplate();
+
+                FrameworkElementFactory factory = new FrameworkElementFactory(typeof(DockPanel));
+                template.VisualTree = factory;
+                FrameworkElementFactory togglebuttonFactory = new FrameworkElementFactory(typeof(ToggleButton));
+                factory.AppendChild(togglebuttonFactory);
+
+                var textblockFactory = new FrameworkElementFactory(typeof(TextBlock));
+                textblockFactory.SetBinding (TextBlock.TextProperty, gridview.Columns[0].DisplayMemberBinding);
+                factory.AppendChild(textblockFactory);
 
 
+
+                hp.Columns = gridview.Columns;
+                hp.Columns[0].DisplayMemberBinding = null;
+                //hp.Columns[0].CellTemplate = FindResource("CellTemplate_Name11") as DataTemplate;
+                hp.Columns[0].CellTemplate = template;
+            }
             base.OnApplyTemplate();
         }
 
         protected override DependencyObject GetContainerForItemOverride()
         {
             var item = new TreeListViewItem();
-            var gridview = this.View as GridView;
-            item.ColumnCollection = gridview.Columns;
+            if (this.View is GridView gridview)
+            {
+                item.ColumnCollection = gridview.Columns;
+            }
             return item;
         }
 
