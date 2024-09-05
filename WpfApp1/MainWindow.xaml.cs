@@ -42,7 +42,27 @@ namespace WpfApp1
             this.qtreelistview.ItemsSource = root.Children;
             //ListView list = new ListView();
             //list.View
+
+            //this.qtreelistview1.ItemsSource = Enumerable.Range(1, 10).Select(x => new Group()
+            //{
+            //    Name = $"Group{x}",
+            //    IsGroup = true,
+            //    Items = new ObservableCollection<Item>(Enumerable.Range(x, x + 10).Select(x => new Item() { Name = $"Item{x}" }))
+            //});
         }
+    }
+
+    public class Item
+    {
+        public string Name { set; get; }
+        
+    }
+
+    public class Group
+    {
+        public string Name { set; get; }
+        public bool IsGroup { set; get; }
+        public ObservableCollection<Item> Items { set; get; } = [];
     }
 
     public class ObjForTest

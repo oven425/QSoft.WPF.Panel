@@ -9,6 +9,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
@@ -47,12 +48,14 @@ namespace QSoft.WPF.TreeListView
     /// </summary>
     public class TreeListView : TreeView
     {
-        
+        public static readonly DependencyProperty ExpenderStyleProperty;
         public static readonly DependencyProperty ViewProperty;
         static TreeListView()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(TreeListView), new FrameworkPropertyMetadata(typeof(TreeListView)));
             ViewProperty = DependencyProperty.Register("View", typeof(ViewBase), typeof(TreeListView));
+            ExpenderStyleProperty = DependencyProperty.Register("ExpenderStyle", typeof(Style), typeof(TreeListView));
+
         }
 
         public ViewBase View
@@ -61,25 +64,81 @@ namespace QSoft.WPF.TreeListView
             get {  return (ViewBase)GetValue(ViewProperty);}
         }
 
+        public Style ExpenderStyle
+        {
+            set { SetValue(ExpenderStyleProperty, value); }
+            get { return (Style)GetValue(ExpenderStyleProperty); }
+        }
+
         public override void OnApplyTemplate()
         {
             if(this.View is GridView gridview && 
                 this.GetTemplateChild("header") is GridViewHeaderRowPresenter hp)
             {
-                GridViewColumn column = new GridViewColumn { Header = "IM" };
                 DataTemplate template = new DataTemplate();
-
+                
                 FrameworkElementFactory factory = new FrameworkElementFactory(typeof(DockPanel));
                 template.VisualTree = factory;
                 FrameworkElementFactory togglebuttonFactory = new FrameworkElementFactory(typeof(ToggleButton));
+                togglebuttonFactory.SetValue(ToggleButton.StyleProperty, this.ExpenderStyle);
                 factory.AppendChild(togglebuttonFactory);
 
-                var textblockFactory = new FrameworkElementFactory(typeof(TextBlock));
-                textblockFactory.SetBinding (TextBlock.TextProperty, gridview.Columns[0].DisplayMemberBinding);
-                factory.AppendChild(textblockFactory);
+                //IsChecked="{Binding Path=IsExpanded,RelativeSource={RelativeSource AncestorType={x:Type local:TreeListViewItem}}}" ClickMode="Press" Style="{StaticResource ExpandCollapseToggleStyle}"/>
+                togglebuttonFactory.SetValue(ToggleButton.NameProperty, "Expander");
+                //template.RegisterName("Expander", togglebuttonFactory);
+                
+                togglebuttonFactory.SetBinding(ToggleButton.IsCheckedProperty, new Binding()
+                {
+                    Path = new PropertyPath("IsExpanded",null),
+                    RelativeSource = new RelativeSource(RelativeSourceMode.FindAncestor, typeof(TreeListViewItem), 1)
+                });
+                //Binding Level, Converter={StaticResource LevelToIndentConverter},RelativeSource={RelativeSource AncestorType={x:Type local:TreeListViewItem}
+                togglebuttonFactory.SetBinding(ToggleButton.MarginProperty, new Binding()
+                {
+                    Path = new PropertyPath("Level",null),
+                    Converter = new LevelToIndentConverter(),
+                    RelativeSource = new RelativeSource(RelativeSourceMode.FindAncestor, typeof(TreeListViewItem), 1)
+                });
 
 
+                var contentcontrolFactory = new FrameworkElementFactory(typeof(ContentControl));
+                if (gridview.Columns[0].DisplayMemberBinding != null)
+                {
+                    contentcontrolFactory.SetBinding(ContentControl.ContentProperty, gridview.Columns[0].DisplayMemberBinding);
+                }
+                else if (gridview.Columns[0].CellTemplate != null)
+                {
+                    contentcontrolFactory.SetBinding(ContentControl.ContentProperty, new Binding());
+                    contentcontrolFactory.SetValue(ContentControl.ContentTemplateProperty, gridview.Columns[0].CellTemplate);
+                }
+                else if (gridview.Columns[0].CellTemplateSelector != null)
+                {
+                    contentcontrolFactory.SetBinding(ContentControl.ContentProperty, new Binding());
+                    contentcontrolFactory.SetValue(ContentControl.ContentTemplateSelectorProperty, gridview.Columns[0].CellTemplateSelector);
 
+                }
+                factory.AppendChild(contentcontrolFactory);
+
+
+                var datatrigger = new DataTrigger()
+                {
+                    Binding = new Binding()
+                    {
+                        Path = new PropertyPath("HasItems", null),
+                        RelativeSource = new RelativeSource(RelativeSourceMode.FindAncestor, typeof(TreeListViewItem), 1)
+                    },
+                    Value = false,
+                };
+                datatrigger.Setters.Add(new Setter()
+                {
+                    TargetName = "Expander",
+                    Property = ToggleButton.VisibilityProperty,
+                    Value = Visibility.Hidden
+                });
+                template.Triggers.Add(datatrigger);
+                //var xw = XamlWriter.Save(template);
+                //xw = xw.Replace(" Name=", " x:Name=");
+                //var rr = (DataTemplate)XamlReader.Parse(xw);
                 hp.Columns = gridview.Columns;
                 hp.Columns[0].DisplayMemberBinding = null;
                 //hp.Columns[0].CellTemplate = FindResource("CellTemplate_Name11") as DataTemplate;
@@ -105,4 +164,5 @@ namespace QSoft.WPF.TreeListView
             return _isTreeLVI;
         }
     }
+
 }
