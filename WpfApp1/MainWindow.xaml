@@ -141,6 +141,30 @@
             </Setter>
         </Style>
 
+        <DataTemplate x:Key="group1">
+            <StackPanel Orientation="Horizontal">
+                <CheckBox/>
+                <TextBlock Text="{Binding Name}"/>
+            </StackPanel>
+        </DataTemplate>
+
+        <DataTemplate x:Key="item1">
+            <TextBlock Text="{Binding Name}"/>
+        </DataTemplate>
+        <local:TestItemSelector x:Key="ss" Group1="{StaticResource group1}" Item1="{StaticResource item1}"/>
+        <DataTemplate x:Key="opgroup">
+            <StackPanel Orientation="Horizontal">
+                <Button>Add item</Button>
+                <Button>Delete group</Button>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="opitem">
+            <StackPanel Orientation="Horizontal">
+                <Button>Edit item</Button>
+                <Button>Delete item</Button>
+            </StackPanel>
+        </DataTemplate>
+        <local:TestItemSelector x:Key="ss1" Group1="{StaticResource opgroup}" Item1="{StaticResource opitem}"/>
 
     </Window.Resources>
     <Grid>
@@ -158,10 +182,10 @@
             </local:TreeListView.ItemTemplate>
 
         </local:TreeListView>
-
+        <ToggleButton Style="{DynamicResource ExpandCollapseToggleStyle}"/>
         <qtreelist:TreeListView x:Name="qtreelistview" Grid.Column="1" ExpenderStyle="{DynamicResource ExpandCollapseToggleStyle}">
             <qtreelist:TreeListView.ItemTemplate >
-                <HierarchicalDataTemplate ItemsSource="{Binding Children}" >
+                <HierarchicalDataTemplate  ItemsSource="{Binding Children}" >
                 </HierarchicalDataTemplate>
 
             </qtreelist:TreeListView.ItemTemplate>
@@ -193,16 +217,19 @@
                 </GridView>
             </qtreelist:TreeListView.View>
         </qtreelist:TreeListView>
-        <!--<qtreelist:TreeListView x:Name="qtreelistview1" Grid.Column="2" ExpenderStyle="{DynamicResource ExpandCollapseToggleStyle}">
+        <qtreelist:TreeListView x:Name="qtreelistview1" Grid.Column="2">
             <qtreelist:TreeListView.ItemTemplate >
-                <HierarchicalDataTemplate ItemsSource="{Binding Items}" >
+                <HierarchicalDataTemplate 
+                    ItemTemplateSelector="{StaticResource ss}" 
+                            ItemsSource="{Binding Items}" 
+                                          >
                 </HierarchicalDataTemplate>
 
             </qtreelist:TreeListView.ItemTemplate>
             <qtreelist:TreeListView.View>
                 <GridView>
                     <GridView.Columns>
-                        --><!--<GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" />--><!--
+                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" />
                         <GridViewColumn Header="Name">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
@@ -210,7 +237,8 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn>
+                        <GridViewColumn CellTemplateSelector="{StaticResource ss1}"/>
+                        <!--<GridViewColumn>
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
@@ -219,10 +247,10 @@
                                     </StackPanel>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
+                        </GridViewColumn>-->
                     </GridView.Columns>
                 </GridView>
             </qtreelist:TreeListView.View>
-        </qtreelist:TreeListView>-->
+        </qtreelist:TreeListView>
     </Grid>
 </Window>

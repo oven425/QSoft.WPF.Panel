@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -55,7 +56,7 @@ namespace QSoft.WPF.TreeListView
             DefaultStyleKeyProperty.OverrideMetadata(typeof(TreeListView), new FrameworkPropertyMetadata(typeof(TreeListView)));
             ViewProperty = DependencyProperty.Register("View", typeof(ViewBase), typeof(TreeListView));
             ExpenderStyleProperty = DependencyProperty.Register("ExpenderStyle", typeof(Style), typeof(TreeListView));
-
+            
         }
 
         public ViewBase View
@@ -72,6 +73,57 @@ namespace QSoft.WPF.TreeListView
 
         public override void OnApplyTemplate()
         {
+            var str = @"<ResourceDictionary xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation""
+                    xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
+    <Style x:Key=""ExpandCollapseToggleStyle"" TargetType=""ToggleButton"">
+        <Setter Property=""Focusable""  Value=""False""/>
+        <Setter Property=""Width""      Value=""19""/>
+        <Setter Property=""Height""     Value=""13""/>
+        <Setter Property=""Template"">
+            <Setter.Value>
+                <ControlTemplate TargetType=""{x:Type ToggleButton}"">
+                    <Border Background=""Transparent"" Height=""16"" Padding=""5,5,5,5"" Width=""16"">
+                        <Path x:Name=""ExpandPath""  Fill=""#FFFFFFFF"" Stroke=""#FF818181"">
+                            <Path.Data>
+                                <PathGeometry Figures=""M0,0 L0,6 L6,0 z""/>
+                            </Path.Data>
+                            <Path.RenderTransform>
+                                <RotateTransform Angle=""135"" CenterX=""3"" CenterY=""3""/>
+                            </Path.RenderTransform>
+                        </Path>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property=""IsChecked"" Value=""True"">
+                            <Setter Property=""RenderTransform"" TargetName=""ExpandPath"">
+                                <Setter.Value>
+                                    <RotateTransform Angle=""180"" CenterX=""3"" CenterY=""3""/>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property=""Fill"" TargetName=""ExpandPath"" Value=""#FF595959""/>
+                            <Setter Property=""Stroke"" TargetName=""ExpandPath"" Value=""#FF262626""/>
+                        </Trigger>
+                        <Trigger Property=""IsMouseOver"" Value=""True"">
+                            <Setter Property=""Stroke"" TargetName=""ExpandPath"" Value=""#FF27C7F7""/>
+                            <Setter Property=""Fill"" TargetName=""ExpandPath"" Value=""#FFCCEEFB""/>
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property=""IsMouseOver"" Value=""True""/>
+                                <Condition Property=""IsChecked"" Value=""True""/>
+                            </MultiTrigger.Conditions>
+                            <Setter Property=""Stroke"" TargetName=""ExpandPath"" Value=""#FF1CC4F7""/>
+                            <Setter Property=""Fill"" TargetName=""ExpandPath"" Value=""#FF82DFFB""/>
+                        </MultiTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>";
+            var obj = XamlReader.Parse(str) as ResourceDictionary;
+            var aaaa = obj["ExpandCollapseToggleStyle"] as Style;
+
             if(this.View is GridView gridview && 
                 this.GetTemplateChild("header") is GridViewHeaderRowPresenter hp)
             {
@@ -80,19 +132,17 @@ namespace QSoft.WPF.TreeListView
                 FrameworkElementFactory factory = new FrameworkElementFactory(typeof(DockPanel));
                 template.VisualTree = factory;
                 FrameworkElementFactory togglebuttonFactory = new FrameworkElementFactory(typeof(ToggleButton));
-                togglebuttonFactory.SetValue(ToggleButton.StyleProperty, this.ExpenderStyle);
+                togglebuttonFactory.SetValue(ToggleButton.StyleProperty, aaaa);
                 factory.AppendChild(togglebuttonFactory);
 
-                //IsChecked="{Binding Path=IsExpanded,RelativeSource={RelativeSource AncestorType={x:Type local:TreeListViewItem}}}" ClickMode="Press" Style="{StaticResource ExpandCollapseToggleStyle}"/>
-                togglebuttonFactory.SetValue(ToggleButton.NameProperty, "Expander");
-                //template.RegisterName("Expander", togglebuttonFactory);
-                
+                togglebuttonFactory.Name = "Expander";
+                template.RegisterName(togglebuttonFactory.Name, togglebuttonFactory);
+
                 togglebuttonFactory.SetBinding(ToggleButton.IsCheckedProperty, new Binding()
                 {
                     Path = new PropertyPath("IsExpanded",null),
                     RelativeSource = new RelativeSource(RelativeSourceMode.FindAncestor, typeof(TreeListViewItem), 1)
                 });
-                //Binding Level, Converter={StaticResource LevelToIndentConverter},RelativeSource={RelativeSource AncestorType={x:Type local:TreeListViewItem}
                 togglebuttonFactory.SetBinding(ToggleButton.MarginProperty, new Binding()
                 {
                     Path = new PropertyPath("Level",null),
@@ -102,7 +152,13 @@ namespace QSoft.WPF.TreeListView
 
 
                 var contentcontrolFactory = new FrameworkElementFactory(typeof(ContentControl));
-                if (gridview.Columns[0].DisplayMemberBinding != null)
+                if(this.ItemTemplate is HierarchicalDataTemplate hd && hd.ItemTemplateSelector !=null)
+                {
+                    contentcontrolFactory.SetBinding(ContentControl.ContentProperty, new Binding());
+                    contentcontrolFactory.SetValue(ContentControl.ContentTemplateSelectorProperty, hd.ItemTemplateSelector);
+
+                }
+                else if (gridview.Columns[0].DisplayMemberBinding != null)
                 {
                     contentcontrolFactory.SetBinding(ContentControl.ContentProperty, gridview.Columns[0].DisplayMemberBinding);
                 }
@@ -128,17 +184,21 @@ namespace QSoft.WPF.TreeListView
                         RelativeSource = new RelativeSource(RelativeSourceMode.FindAncestor, typeof(TreeListViewItem), 1)
                     },
                     Value = false,
+                    Setters =
+                    {
+                        new Setter()
+                        {
+                            TargetName = "Expander",
+                            Property = ToggleButton.VisibilityProperty,
+                            Value = Visibility.Hidden
+                        }
+                    }
                 };
-                datatrigger.Setters.Add(new Setter()
-                {
-                    TargetName = "Expander",
-                    Property = ToggleButton.VisibilityProperty,
-                    Value = Visibility.Hidden
-                });
+
                 template.Triggers.Add(datatrigger);
-                //var xw = XamlWriter.Save(template);
+                var xw = XamlWriter.Save(template);
                 //xw = xw.Replace(" Name=", " x:Name=");
-                //var rr = (DataTemplate)XamlReader.Parse(xw);
+                var rr = (DataTemplate)XamlReader.Parse(xw);
                 hp.Columns = gridview.Columns;
                 hp.Columns[0].DisplayMemberBinding = null;
                 //hp.Columns[0].CellTemplate = FindResource("CellTemplate_Name11") as DataTemplate;

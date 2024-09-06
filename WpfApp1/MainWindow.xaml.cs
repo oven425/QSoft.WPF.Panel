@@ -43,12 +43,12 @@ namespace WpfApp1
             //ListView list = new ListView();
             //list.View
 
-            //this.qtreelistview1.ItemsSource = Enumerable.Range(1, 10).Select(x => new Group()
-            //{
-            //    Name = $"Group{x}",
-            //    IsGroup = true,
-            //    Items = new ObservableCollection<Item>(Enumerable.Range(x, x + 10).Select(x => new Item() { Name = $"Item{x}" }))
-            //});
+            this.qtreelistview1.ItemsSource = Enumerable.Range(1, 10).Select(x => new Group()
+            {
+                Name = $"Group{x}",
+                IsGroup = true,
+                Items = new ObservableCollection<Item>(Enumerable.Range(x, x + 10).Select(x => new Item() { Name = $"Item{x}" }))
+            });
         }
     }
 
@@ -63,6 +63,22 @@ namespace WpfApp1
         public string Name { set; get; }
         public bool IsGroup { set; get; }
         public ObservableCollection<Item> Items { set; get; } = [];
+    }
+
+    public class TestItemSelector : DataTemplateSelector
+    {
+        public DataTemplate? Group1 { set; get; }
+        public DataTemplate? Item1 { set; get; }
+        public override DataTemplate SelectTemplate(object item, DependencyObject container)
+        {
+            var dt = item switch
+            {
+                Group => Group1,
+                Item => Item1,
+                _ => null
+            };
+            return dt ?? base.SelectTemplate(item, container);
+        }
     }
 
     public class ObjForTest
