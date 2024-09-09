@@ -73,67 +73,18 @@ namespace QSoft.WPF.TreeListView
 
         public override void OnApplyTemplate()
         {
-            var str = @"<ResourceDictionary xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation""
-                    xmlns:x=""http://schemas.microsoft.com/winfx/2006/xaml"">
-    <Style x:Key=""ExpandCollapseToggleStyle"" TargetType=""ToggleButton"">
-        <Setter Property=""Focusable""  Value=""False""/>
-        <Setter Property=""Width""      Value=""19""/>
-        <Setter Property=""Height""     Value=""13""/>
-        <Setter Property=""Template"">
-            <Setter.Value>
-                <ControlTemplate TargetType=""{x:Type ToggleButton}"">
-                    <Border Background=""Transparent"" Height=""16"" Padding=""5,5,5,5"" Width=""16"">
-                        <Path x:Name=""ExpandPath""  Fill=""#FFFFFFFF"" Stroke=""#FF818181"">
-                            <Path.Data>
-                                <PathGeometry Figures=""M0,0 L0,6 L6,0 z""/>
-                            </Path.Data>
-                            <Path.RenderTransform>
-                                <RotateTransform Angle=""135"" CenterX=""3"" CenterY=""3""/>
-                            </Path.RenderTransform>
-                        </Path>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property=""IsChecked"" Value=""True"">
-                            <Setter Property=""RenderTransform"" TargetName=""ExpandPath"">
-                                <Setter.Value>
-                                    <RotateTransform Angle=""180"" CenterX=""3"" CenterY=""3""/>
-                                </Setter.Value>
-                            </Setter>
-                            <Setter Property=""Fill"" TargetName=""ExpandPath"" Value=""#FF595959""/>
-                            <Setter Property=""Stroke"" TargetName=""ExpandPath"" Value=""#FF262626""/>
-                        </Trigger>
-                        <Trigger Property=""IsMouseOver"" Value=""True"">
-                            <Setter Property=""Stroke"" TargetName=""ExpandPath"" Value=""#FF27C7F7""/>
-                            <Setter Property=""Fill"" TargetName=""ExpandPath"" Value=""#FFCCEEFB""/>
-                        </Trigger>
-                        <MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property=""IsMouseOver"" Value=""True""/>
-                                <Condition Property=""IsChecked"" Value=""True""/>
-                            </MultiTrigger.Conditions>
-                            <Setter Property=""Stroke"" TargetName=""ExpandPath"" Value=""#FF1CC4F7""/>
-                            <Setter Property=""Fill"" TargetName=""ExpandPath"" Value=""#FF82DFFB""/>
-                        </MultiTrigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-</ResourceDictionary>";
-            var obj = XamlReader.Parse(str) as ResourceDictionary;
-            var aaaa = obj["ExpandCollapseToggleStyle"] as Style;
-
             if(this.View is GridView gridview && 
                 this.GetTemplateChild("header") is GridViewHeaderRowPresenter hp)
             {
                 DataTemplate template = new DataTemplate();
-                
-                FrameworkElementFactory factory = new FrameworkElementFactory(typeof(DockPanel));
-                template.VisualTree = factory;
+                FrameworkElementFactory stackpanel = new FrameworkElementFactory(typeof(StackPanel));
+                //FrameworkElementFactory factory = new FrameworkElementFactory(typeof(DockPanel));
+                template.VisualTree = stackpanel;
+                stackpanel.SetValue(StackPanel.OrientationProperty, Orientation.Horizontal);
                 FrameworkElementFactory togglebuttonFactory = new FrameworkElementFactory(typeof(ToggleButton));
-                togglebuttonFactory.SetValue(ToggleButton.StyleProperty, aaaa);
-                factory.AppendChild(togglebuttonFactory);
+                togglebuttonFactory.SetValue(ToggleButton.StyleProperty, this.ExpenderStyle);
+                togglebuttonFactory.SetValue(ToggleButton.VerticalAlignmentProperty, VerticalAlignment.Stretch);
+                stackpanel.AppendChild(togglebuttonFactory);
 
                 togglebuttonFactory.Name = "Expander";
                 template.RegisterName(togglebuttonFactory.Name, togglebuttonFactory);
@@ -173,7 +124,7 @@ namespace QSoft.WPF.TreeListView
                     contentcontrolFactory.SetValue(ContentControl.ContentTemplateSelectorProperty, gridview.Columns[0].CellTemplateSelector);
 
                 }
-                factory.AppendChild(contentcontrolFactory);
+                stackpanel.AppendChild(contentcontrolFactory);
 
 
                 var datatrigger = new DataTrigger()

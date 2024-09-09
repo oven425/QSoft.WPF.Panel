@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
+        FontSize="22"
         xmlns:qtreelist ="clr-namespace:QSoft.WPF.TreeListView;assembly=QSoft.WPF.TreeListView"
         Title="MainWindow" Height="450" Width="800">
     <Window.Resources>
@@ -143,7 +144,7 @@
 
         <DataTemplate x:Key="group1">
             <StackPanel Orientation="Horizontal">
-                <CheckBox/>
+                <CheckBox VerticalAlignment="Center"/>
                 <TextBlock Text="{Binding Name}"/>
             </StackPanel>
         </DataTemplate>
@@ -165,6 +166,52 @@
             </StackPanel>
         </DataTemplate>
         <local:TestItemSelector x:Key="ss1" Group1="{StaticResource opgroup}" Item1="{StaticResource opitem}"/>
+        <Style x:Key="ExpandCollapseToggleStyleaa" TargetType="ToggleButton">
+            <Setter Property="Focusable"  Value="False"/>
+            <!--<Setter Property="Width"      Value="19"/>
+            <Setter Property="Height"     Value="13"/>-->
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Border Background="red" Height="100" Width="100">
+                            <Path x:Name="ExpandPath" Stretch="Fill"  Fill="#FFFFFFFF" Stroke="#FF818181">
+                                <Path.Data>
+                                    <PathGeometry Figures="M6,0 L11,3 L6,6 z"/>
+                                </Path.Data>
+                            </Path>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <!--<Setter Property="RenderTransform" TargetName="ExpandPath">
+                                    <Setter.Value>
+                                        <RotateTransform Angle="180" CenterX="3" CenterY="3"/>
+                                    </Setter.Value>
+                                </Setter>-->
+                                <Setter Property="Data" TargetName="ExpandPath">
+                                    <Setter.Value>
+                                        <PathGeometry Figures="M6,0 L6,6 L0,6 z"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="Fill" TargetName="ExpandPath" Value="#FF595959"/>
+                                <Setter Property="Stroke" TargetName="ExpandPath" Value="#FF262626"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Stroke" TargetName="ExpandPath" Value="#FF27C7F7"/>
+                                <Setter Property="Fill" TargetName="ExpandPath" Value="#FFCCEEFB"/>
+                            </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsMouseOver" Value="True"/>
+                                    <Condition Property="IsChecked" Value="True"/>
+                                </MultiTrigger.Conditions>
+                                <Setter Property="Stroke" TargetName="ExpandPath" Value="#FF1CC4F7"/>
+                                <Setter Property="Fill" TargetName="ExpandPath" Value="#FF82DFFB"/>
+                            </MultiTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
     </Window.Resources>
     <Grid>
@@ -182,8 +229,32 @@
             </local:TreeListView.ItemTemplate>
 
         </local:TreeListView>
-        <ToggleButton Style="{DynamicResource ExpandCollapseToggleStyle}"/>
-        <qtreelist:TreeListView x:Name="qtreelistview" Grid.Column="1" ExpenderStyle="{DynamicResource ExpandCollapseToggleStyle}">
+        <!--<StackPanel Grid.Column="1" Orientation="Horizontal">
+            <ToggleButton Style="{DynamicResource ExpandCollapseToggleStyleaa}"/>
+            <CheckBox>
+               
+            </CheckBox>
+            <TextBlock Text="123"/>
+        </StackPanel>-->
+        <DockPanel Grid.Column="1">
+            <!--<Border  Background="Transparent" Height="20" Width="20" >
+                <Path  Stretch="Fill" x:Name="ExpandPath"  Fill="#FFFFFFFF" Stroke="#FF818181">
+                    <Path.Data>
+                        <PathGeometry Figures="M0,0 L6,3 L0,6 z"/>
+                    </Path.Data>
+                </Path>
+            </Border>
+
+            <Border Background="Transparent" Height="20" Width="20" >
+                <Path  Stretch="Fill"   Fill="#FFFFFFFF" Stroke="#FF818181">
+                    <Path.Data>
+                        <PathGeometry Figures="M6,0 L6,6 L0,6 z"/>
+                    </Path.Data>
+                </Path>
+            </Border>-->
+        </DockPanel>
+        
+        <!--<qtreelist:TreeListView x:Name="qtreelistview" Grid.Column="1" ExpenderStyle="{DynamicResource ExpandCollapseToggleStyle}">
             <qtreelist:TreeListView.ItemTemplate >
                 <HierarchicalDataTemplate  ItemsSource="{Binding Children}" >
                 </HierarchicalDataTemplate>
@@ -192,7 +263,7 @@
             <qtreelist:TreeListView.View>
                 <GridView>
                     <GridView.Columns>
-                        <!--<GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" />-->
+                        --><!--<GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" />--><!--
                         <GridViewColumn Header="Name">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
@@ -216,7 +287,7 @@
                     </GridView.Columns>
                 </GridView>
             </qtreelist:TreeListView.View>
-        </qtreelist:TreeListView>
+        </qtreelist:TreeListView>-->
         <qtreelist:TreeListView x:Name="qtreelistview1" Grid.Column="2">
             <qtreelist:TreeListView.ItemTemplate >
                 <HierarchicalDataTemplate 
@@ -229,7 +300,7 @@
             <qtreelist:TreeListView.View>
                 <GridView>
                     <GridView.Columns>
-                        <GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" />
+                        <!--<GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" />-->
                         <GridViewColumn Header="Name">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
