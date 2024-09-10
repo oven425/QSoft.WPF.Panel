@@ -49,7 +49,24 @@ namespace WpfApp1
                 IsGroup = true,
                 Items = new ObservableCollection<Item>(Enumerable.Range(x, x + 10).Select(x => new Item() { Name = $"Item{x}" }))
             });
+
+            var names = Enum.GetNames<AAs>();
+            var calues = Enum.GetValues<AAs>();
+
+            foreach(var oo in calues)
+            {
+
+            }
         }
+    }
+
+    public enum AAs
+    {
+        One,
+        Two,
+        Three,
+        Four,
+        Five
     }
 
     public class Item

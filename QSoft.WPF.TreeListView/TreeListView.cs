@@ -77,14 +77,14 @@ namespace QSoft.WPF.TreeListView
                 this.GetTemplateChild("header") is GridViewHeaderRowPresenter hp)
             {
                 DataTemplate template = new DataTemplate();
-                FrameworkElementFactory stackpanel = new FrameworkElementFactory(typeof(StackPanel));
-                //FrameworkElementFactory factory = new FrameworkElementFactory(typeof(DockPanel));
-                template.VisualTree = stackpanel;
-                stackpanel.SetValue(StackPanel.OrientationProperty, Orientation.Horizontal);
+                //FrameworkElementFactory panel = new FrameworkElementFactory(typeof(StackPanel));
+                FrameworkElementFactory panel = new FrameworkElementFactory(typeof(DockPanel));
+                template.VisualTree = panel;
+                panel.SetValue(StackPanel.OrientationProperty, Orientation.Horizontal);
                 FrameworkElementFactory togglebuttonFactory = new FrameworkElementFactory(typeof(ToggleButton));
                 togglebuttonFactory.SetValue(ToggleButton.StyleProperty, this.ExpenderStyle);
-                togglebuttonFactory.SetValue(ToggleButton.VerticalAlignmentProperty, VerticalAlignment.Stretch);
-                stackpanel.AppendChild(togglebuttonFactory);
+                togglebuttonFactory.SetValue(ToggleButton.VerticalAlignmentProperty, VerticalAlignment.Center);
+                panel.AppendChild(togglebuttonFactory);
 
                 togglebuttonFactory.Name = "Expander";
                 template.RegisterName(togglebuttonFactory.Name, togglebuttonFactory);
@@ -124,7 +124,7 @@ namespace QSoft.WPF.TreeListView
                     contentcontrolFactory.SetValue(ContentControl.ContentTemplateSelectorProperty, gridview.Columns[0].CellTemplateSelector);
 
                 }
-                stackpanel.AppendChild(contentcontrolFactory);
+                panel.AppendChild(contentcontrolFactory);
 
 
                 var datatrigger = new DataTrigger()
@@ -147,9 +147,6 @@ namespace QSoft.WPF.TreeListView
                 };
 
                 template.Triggers.Add(datatrigger);
-                var xw = XamlWriter.Save(template);
-                //xw = xw.Replace(" Name=", " x:Name=");
-                var rr = (DataTemplate)XamlReader.Parse(xw);
                 hp.Columns = gridview.Columns;
                 hp.Columns[0].DisplayMemberBinding = null;
                 //hp.Columns[0].CellTemplate = FindResource("CellTemplate_Name11") as DataTemplate;

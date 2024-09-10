@@ -5,22 +5,27 @@
 
     <Style x:Key="ExpandCollapseToggleStyle" TargetType="ToggleButton">
         <Setter Property="Focusable"  Value="False"/>
-        <Setter Property="Width"      Value="20"/>
-        <Setter Property="Height"     Value="20"/>
+        <!--<Setter Property="Width"      Value="30"/>
+        <Setter Property="Height"     Value="30"/>-->
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ToggleButton}">
                     <Border Background="Transparent">
-                        <!--<Path x:Name="ExpandPath"  Fill="#FFFFFFFF" Stroke="#FF818181">
+                        <Path x:Name="ExpandPath"  Fill="#FFFFFFFF" Stroke="#FF818181">
                             <Path.Data>
                                 <PathGeometry Figures="M0,0 L0,6 L6,0 z"/>
                             </Path.Data>
                             <Path.RenderTransform>
                                 <RotateTransform Angle="135" CenterX="3" CenterY="3"/>
                             </Path.RenderTransform>
+                        </Path>
+                        <!--<Path  x:Name="ExpandPath" Stretch="Uniform" Fill="#FFFFFFFF" Stroke="#FF818181">
+                            <Path.Data>
+                                <PathGeometry Figures="M6,0 L11,3 L6,6 z"/>
+                            </Path.Data>
                         </Path>-->
-                        <StackPanel Orientation="Horizontal">
-                            <Path x:Name="ExpandPath" Stretch="Uniform" Fill="#FFFFFFFF" Stroke="#FF818181">
+                        <!--<StackPanel Orientation="Horizontal">
+                            <Path  x:Name="ExpandPath" Stretch="Uniform" Fill="#FFFFFFFF" Stroke="#FF818181">
                                 <Path.Data>
                                     <PathGeometry Figures="M6,0 L11,3 L6,6 z"/>
                                 </Path.Data>
@@ -30,21 +35,21 @@
                                     <PathGeometry Figures="M6,0 L11,3 L6,6 z"/>
                                 </Path.Data>
                             </Path>
-                        </StackPanel>
+                        </StackPanel>-->
 
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsChecked" Value="True">
-                            <!--<Setter Property="RenderTransform" TargetName="ExpandPath">
+                            <Setter Property="RenderTransform" TargetName="ExpandPath">
                                 <Setter.Value>
                                     <RotateTransform Angle="180" CenterX="3" CenterY="3"/>
                                 </Setter.Value>
-                            </Setter>-->
-                            <Setter Property="Data" TargetName="ExpandPath">
+                            </Setter>
+                            <!--<Setter Property="Data" TargetName="ExpandPath">
                                 <Setter.Value>
                                     <PathGeometry Figures="M6,0 L6,6 L0,6 z"/>
                                 </Setter.Value>
-                            </Setter>
+                            </Setter>-->
 
                             <Setter Property="Fill" TargetName="ExpandPath" Value="#FF595959"/>
                             <Setter Property="Stroke" TargetName="ExpandPath" Value="#FF262626"/>

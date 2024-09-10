@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        FontSize="22"
+
         xmlns:qtreelist ="clr-namespace:QSoft.WPF.TreeListView;assembly=QSoft.WPF.TreeListView"
         Title="MainWindow" Height="450" Width="800">
     <Window.Resources>
@@ -173,7 +173,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type ToggleButton}">
-                        <Border Background="red" Height="100" Width="100">
+                        <Border Background="red">
                             <Path x:Name="ExpandPath" Stretch="Fill"  Fill="#FFFFFFFF" Stroke="#FF818181">
                                 <Path.Data>
                                     <PathGeometry Figures="M6,0 L11,3 L6,6 z"/>
@@ -236,6 +236,7 @@
             </CheckBox>
             <TextBlock Text="123"/>
         </StackPanel>-->
+
         <DockPanel Grid.Column="1">
             <!--<Border  Background="Transparent" Height="20" Width="20" >
                 <Path  Stretch="Fill" x:Name="ExpandPath"  Fill="#FFFFFFFF" Stroke="#FF818181">
@@ -252,6 +253,8 @@
                     </Path.Data>
                 </Path>
             </Border>-->
+            <ToggleButton Style="{StaticResource ExpandCollapseToggleStyleaa}"/>
+            <CheckBox>aaaa</CheckBox>
         </DockPanel>
         
         <!--<qtreelist:TreeListView x:Name="qtreelistview" Grid.Column="1" ExpenderStyle="{DynamicResource ExpandCollapseToggleStyle}">
