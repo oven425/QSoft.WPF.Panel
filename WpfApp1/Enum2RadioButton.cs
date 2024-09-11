@@ -1,13 +1,23 @@
 ﻿using System.Globalization;
 using System.Windows.Data;
+using System.Linq;
 
 namespace QSoft.WPF.ValueConvert
 {
-    public class Enum2RadioButton<TEnum> : IValueConverter where TEnum : Enum
+    public enum Enum2RadioButtonMatches
     {
+        Name,
+        Value,
+        Index
+    }
+    public class Enum2RadioButton<TEnum> : IValueConverter where TEnum : struct,Enum
+    {
+        public Enum2RadioButtonMatches Match { set; get; } = Enum2RadioButtonMatches.Index;
         public Enum2RadioButton()
         {
-            var name = typeof(TEnum).GetEnumNames();
+            var names = Enum.GetNames<TEnum>();
+            var enums = Enum.GetValues<TEnum>();
+            var ints = Enum.GetValuesAsUnderlyingType<TEnum>();
         }
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -16,19 +26,34 @@ namespace QSoft.WPF.ValueConvert
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            var vv = Enum.GetValues(typeof(TEnum)).GetValue(0);
+            switch (this.Match)
+            {
+                case Enum2RadioButtonMatches.Name:
+                    {
+
+                    }
+                    break;
+                case Enum2RadioButtonMatches.Value:
+                    {
+
+                    }
+                    break;
+                case Enum2RadioButtonMatches.Index:
+                    {
+                        if(int.TryParse(parameter as string, out var index))
+                        {
+
+                            var ints = Enum.GetValuesAsUnderlyingType(typeof(TEnum));
+                        }
+                    }
+                    break;
+            }
+            return vv;
         }
     }
 
-    public enum AAs
-    {
-        One, Two, Three
-    }
 
-    public class Enum2RadioButton1:Enum2RadioButton<AAs>
-    {
-
-    }
         
 }
 

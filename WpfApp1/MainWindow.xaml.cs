@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using QSoft.WPF.ValueConvert;
+using System.Collections.ObjectModel;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -52,21 +53,35 @@ namespace WpfApp1
 
             var names = Enum.GetNames<AAs>();
             var calues = Enum.GetValues<AAs>();
+            var aas = Enum.GetValuesAsUnderlyingType<AAs>();
 
-            foreach(var oo in calues)
+            var aa = new QSoft.WPF.ValueConvert.Enum2RadioButton<AAs>();
+
+            foreach (var oo in calues)
             {
 
             }
         }
     }
 
+    [Flags]
+    enum MultiHue : short
+    {
+        None = 0,
+        Black = 1,
+        Red = 2,
+        Green = 4,
+        Blue = 4
+    };
+
+    [Flags]
     public enum AAs
     {
-        One,
-        Two,
+        One=100,
+        Two=101,
         Three,
-        Four,
-        Five
+        Four=50000,
+        Five=999999
     }
 
     public class Item
