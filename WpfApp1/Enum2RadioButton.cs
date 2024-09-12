@@ -13,11 +13,18 @@ namespace QSoft.WPF.ValueConvert
     public class Enum2RadioButton<TEnum> : IValueConverter where TEnum : struct,Enum
     {
         public Enum2RadioButtonMatches Match { set; get; } = Enum2RadioButtonMatches.Index;
+        string[] m_Names = Enum.GetNames<TEnum>();
+        TEnum[] enums = Enum.GetValues<TEnum>();
+
         public Enum2RadioButton()
         {
             var names = Enum.GetNames<TEnum>();
             var enums = Enum.GetValues<TEnum>();
-            var ints = Enum.GetValuesAsUnderlyingType<TEnum>();
+            var ints = Enum.GetValuesAsUnderlyingType<TEnum>().OfType<int>();
+            foreach(var oo in ints)
+            {
+
+            }
         }
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
