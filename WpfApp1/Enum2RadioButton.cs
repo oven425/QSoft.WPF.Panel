@@ -15,20 +15,33 @@ namespace QSoft.WPF.ValueConvert
         public Enum2RadioButtonMatches Match { set; get; } = Enum2RadioButtonMatches.Index;
         string[] m_Names = Enum.GetNames<TEnum>();
         TEnum[] enums = Enum.GetValues<TEnum>();
-
+        Dictionary<string, TEnum> m_String2Enum = new Dictionary<string, TEnum>();
         public Enum2RadioButton()
         {
             var names = Enum.GetNames<TEnum>();
             var enums = Enum.GetValues<TEnum>();
-            var ints = Enum.GetValuesAsUnderlyingType<TEnum>().OfType<int>();
-            foreach(var oo in ints)
+            var ints = Enum.GetValuesAsUnderlyingType<TEnum>().OfType<int>().ToArray();
+            
+            
+            for(int i=0; i<names.Length; i++)
             {
-
+                m_String2Enum[ints[i].ToString()] = enums[i];
             }
         }
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            TEnum enumValue = (TEnum)value;
+            var str = parameter as string;
+            if (str is null)
+            {
+                return false;
+            }
+            if(m_String2Enum.TryGetValue(str, out var result))
+            {
+                m_String2Enum.Where(x => x.Value == enumValue);
+                //return result == enumValue;
+            }
+            return false;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

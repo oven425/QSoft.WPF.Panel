@@ -5,11 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-
+        xmlns:qvalueconvert="clr-namespace:QSoft.WPF.ValueConvert"
         xmlns:qtreelist ="clr-namespace:QSoft.WPF.TreeListView;assembly=QSoft.WPF.TreeListView"
         Title="MainWindow" Height="450" Width="800">
     <Window.Resources>
-
+        <local:Enum2RadioButton x:Key="aas"/>
         <Style x:Key="ExpandCollapseToggleStyle" TargetType="{x:Type ToggleButton}">
             <Setter Property="Focusable"  Value="False"/>
             <Setter Property="Width"      Value="19"/>
@@ -220,7 +220,12 @@
             <ColumnDefinition/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <local:TreeListView x:Name="_list" ItemsSource="{Binding Children}"  BorderThickness="2">
+        <StackPanel>
+            <RadioButton IsChecked="{Binding AAs, Converter={StaticResource aas}, ConverterParameter=100}">One</RadioButton>
+            <RadioButton IsChecked="{Binding AAs, Converter={StaticResource aas}, ConverterParameter=101}">Two</RadioButton>
+            <RadioButton IsChecked="{Binding AAs, Converter={StaticResource aas}, ConverterParameter=102}">Three</RadioButton>
+        </StackPanel>
+        <local:TreeListView Visibility="Collapsed" x:Name="_list" ItemsSource="{Binding Children}"  BorderThickness="2">
             <local:TreeListView.ItemTemplate >
                 <HierarchicalDataTemplate ItemsSource="{Binding Children}" >
                     <TextBlock Text="{Binding}" Margin="2 0"/>

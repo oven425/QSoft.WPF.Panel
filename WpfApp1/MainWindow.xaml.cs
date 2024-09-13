@@ -51,28 +51,10 @@ namespace WpfApp1
                 Items = new ObservableCollection<Item>(Enumerable.Range(x, x + 10).Select(x => new Item() { Name = $"Item{x}" }))
             });
 
-            var names = Enum.GetNames<AAs>();
-            var calues = Enum.GetValues<AAs>();
-            var aas = Enum.GetValuesAsUnderlyingType<AAs>();
-
-            var aa = new QSoft.WPF.ValueConvert.Enum2RadioButton<AAs>();
-
-            foreach (var oo in calues)
-            {
-
-            }
+            this.DataContext = new MainUI();
         }
     }
 
-    [Flags]
-    enum MultiHue : short
-    {
-        None = 0,
-        Black = 1,
-        Red = 2,
-        Green = 4,
-        Blue = 4
-    };
 
     [Flags]
     public enum AAs
@@ -82,6 +64,11 @@ namespace WpfApp1
         Three,
         Four=50000,
         Five=999999
+    }
+
+    public class Enum2RadioButton:Enum2RadioButton<AAs>
+    {
+
     }
 
     public class Item
@@ -161,6 +148,9 @@ namespace WpfApp1
     }
 
 
-
+    public class MainUI
+    {
+        public AAs AAs { set; get; } = AAs.One;
+    }
     
 }
