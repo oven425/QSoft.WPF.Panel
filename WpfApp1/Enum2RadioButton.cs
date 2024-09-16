@@ -30,7 +30,8 @@ namespace QSoft.WPF.ValueConvert
         }
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            TEnum enumValue = (TEnum)value;
+            
+            var enumValue = (TEnum)value;
             var str = parameter as string;
             if (str is null)
             {
@@ -38,8 +39,8 @@ namespace QSoft.WPF.ValueConvert
             }
             if(m_String2Enum.TryGetValue(str, out var result))
             {
-                m_String2Enum.Where(x => x.Value == enumValue);
-                //return result == enumValue;
+                var bb = Enum.Equals(enumValue, result);
+                return bb;
             }
             return false;
         }
