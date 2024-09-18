@@ -12,21 +12,23 @@ namespace QSoft.WPF.ValueConvert
     }
     public class Enum2RadioButton<TEnum> : IValueConverter where TEnum : struct,Enum
     {
+        public TEnum Default { set; get; }
         public Enum2RadioButtonMatches Match { set; get; } = Enum2RadioButtonMatches.Index;
-        string[] m_Names = Enum.GetNames<TEnum>();
-        TEnum[] enums = Enum.GetValues<TEnum>();
-        Dictionary<string, TEnum> m_String2Enum = new Dictionary<string, TEnum>();
+        readonly Dictionary<string, TEnum> m_String2Enum;
         public Enum2RadioButton()
         {
             var names = Enum.GetNames<TEnum>();
             var enums = Enum.GetValues<TEnum>();
-            var ints = Enum.GetValuesAsUnderlyingType<TEnum>().OfType<int>().ToArray();
-            
-            
-            for(int i=0; i<names.Length; i++)
+            this.Default = enums.FirstOrDefault();
+            var ints = Enum.GetValuesAsUnderlyingType<TEnum>().OfType<int>().Select(x => x.ToString());
+            m_String2Enum = Match switch
             {
-                m_String2Enum[ints[i].ToString()] = enums[i];
-            }
+                Enum2RadioButtonMatches.Index => ints.Zip(enums).ToDictionary(x => x.First, y => y.Second),
+                Enum2RadioButtonMatches.Name=> names.Zip(enums).ToDictionary(x => x.First, y => y.Second),
+                Enum2RadioButtonMatches.Value=> enums.Zip(enums).ToDictionary(x => x.First.ToString(), y => y.Second),
+                _=>[]
+            };
+
         }
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -47,28 +49,10 @@ namespace QSoft.WPF.ValueConvert
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var vv = Enum.GetValues(typeof(TEnum)).GetValue(0);
-            switch (this.Match)
+            var vv = this.Default;
+            if(parameter is string str)
             {
-                case Enum2RadioButtonMatches.Name:
-                    {
-
-                    }
-                    break;
-                case Enum2RadioButtonMatches.Value:
-                    {
-
-                    }
-                    break;
-                case Enum2RadioButtonMatches.Index:
-                    {
-                        if(int.TryParse(parameter as string, out var index))
-                        {
-
-                            var ints = Enum.GetValuesAsUnderlyingType(typeof(TEnum));
-                        }
-                    }
-                    break;
+                vv = this.m_String2Enum[str];
             }
             return vv;
         }
