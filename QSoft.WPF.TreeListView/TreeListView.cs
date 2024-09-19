@@ -77,10 +77,8 @@ namespace QSoft.WPF.TreeListView
                 this.GetTemplateChild("header") is GridViewHeaderRowPresenter hp)
             {
                 DataTemplate template = new DataTemplate();
-                //FrameworkElementFactory panel = new FrameworkElementFactory(typeof(StackPanel));
                 FrameworkElementFactory panel = new FrameworkElementFactory(typeof(DockPanel));
                 template.VisualTree = panel;
-                panel.SetValue(StackPanel.OrientationProperty, Orientation.Horizontal);
                 FrameworkElementFactory togglebuttonFactory = new FrameworkElementFactory(typeof(ToggleButton));
                 togglebuttonFactory.SetValue(ToggleButton.StyleProperty, this.ExpenderStyle);
                 togglebuttonFactory.SetValue(ToggleButton.VerticalAlignmentProperty, VerticalAlignment.Center);
@@ -103,22 +101,26 @@ namespace QSoft.WPF.TreeListView
 
 
                 var contentcontrolFactory = new FrameworkElementFactory(typeof(ContentControl));
-                if(this.ItemTemplate is HierarchicalDataTemplate hd && hd.ItemTemplateSelector !=null)
+                if(this.ItemTemplate is HierarchicalDataTemplate hd && hd.ItemTemplateSelector is not null)
                 {
                     contentcontrolFactory.SetBinding(ContentControl.ContentProperty, new Binding());
                     contentcontrolFactory.SetValue(ContentControl.ContentTemplateSelectorProperty, hd.ItemTemplateSelector);
 
                 }
-                else if (gridview.Columns[0].DisplayMemberBinding != null)
+                else if(this.ItemTemplateSelector is not null)
+                {
+
+                }
+                else if (gridview.Columns[0].DisplayMemberBinding is not null)
                 {
                     contentcontrolFactory.SetBinding(ContentControl.ContentProperty, gridview.Columns[0].DisplayMemberBinding);
                 }
-                else if (gridview.Columns[0].CellTemplate != null)
+                else if (gridview.Columns[0].CellTemplate is not null)
                 {
                     contentcontrolFactory.SetBinding(ContentControl.ContentProperty, new Binding());
                     contentcontrolFactory.SetValue(ContentControl.ContentTemplateProperty, gridview.Columns[0].CellTemplate);
                 }
-                else if (gridview.Columns[0].CellTemplateSelector != null)
+                else if (gridview.Columns[0].CellTemplateSelector is not null)
                 {
                     contentcontrolFactory.SetBinding(ContentControl.ContentProperty, new Binding());
                     contentcontrolFactory.SetValue(ContentControl.ContentTemplateSelectorProperty, gridview.Columns[0].CellTemplateSelector);
