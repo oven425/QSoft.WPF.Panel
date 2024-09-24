@@ -3,9 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35208.52
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QSoft.WPF.TreeListView", "QSoft.WPF.TreeListView\QSoft.WPF.TreeListView.csproj", "{D90CC4D1-CAB9-46F3-A1E2-B616D51A399D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QSoft.WPF.TreeListView", "QSoft.WPF.TreeListView\QSoft.WPF.TreeListView.csproj", "{D90CC4D1-CAB9-46F3-A1E2-B616D51A399D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp1", "WpfApp1\WpfApp1.csproj", "{A191F763-2915-45F0-AE53-81130D2C1ECE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WpfApp1", "WpfApp1\WpfApp1.csproj", "{A191F763-2915-45F0-AE53-81130D2C1ECE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WpfApp_MVVM", "WpfApp_MVVM\WpfApp_MVVM.csproj", "{F5606D0C-5013-4ED8-81BE-FB33D4FE435B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QSoft.WPF.ValueConvert", "QSoft.WPF.ValueConvert\QSoft.WPF.ValueConvert.csproj", "{A8BCAC54-7CAA-45AB-9AA6-9C0A8EB54803}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{A191F763-2915-45F0-AE53-81130D2C1ECE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A191F763-2915-45F0-AE53-81130D2C1ECE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A191F763-2915-45F0-AE53-81130D2C1ECE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5606D0C-5013-4ED8-81BE-FB33D4FE435B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5606D0C-5013-4ED8-81BE-FB33D4FE435B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5606D0C-5013-4ED8-81BE-FB33D4FE435B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5606D0C-5013-4ED8-81BE-FB33D4FE435B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8BCAC54-7CAA-45AB-9AA6-9C0A8EB54803}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8BCAC54-7CAA-45AB-9AA6-9C0A8EB54803}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8BCAC54-7CAA-45AB-9AA6-9C0A8EB54803}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8BCAC54-7CAA-45AB-9AA6-9C0A8EB54803}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
