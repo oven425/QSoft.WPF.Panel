@@ -143,14 +143,14 @@
         </Style>
 
         <DataTemplate x:Key="group1">
-            <StackPanel Orientation="Horizontal" Background="Transparent">
+            <StackPanel Orientation="Horizontal" >
                 <CheckBox VerticalAlignment="Center"/>
                 <TextBlock Text="{Binding Name}"/>
             </StackPanel>
         </DataTemplate>
 
         <DataTemplate x:Key="item1">
-            <TextBlock Text="{Binding Name}" Background="Transparent"/>
+            <TextBlock Text="{Binding Name}" />
         </DataTemplate>
         <local:TestItemSelector x:Key="ss" Group1="{StaticResource group1}" Item1="{StaticResource item1}"/>
         <DataTemplate x:Key="opgroup">
@@ -258,8 +258,7 @@
                     </Path.Data>
                 </Path>
             </Border>-->
-            <ToggleButton Style="{StaticResource ExpandCollapseToggleStyleaa}"/>
-            <CheckBox>aaaa</CheckBox>
+
         </DockPanel>
         
         <!--<qtreelist:TreeListView x:Name="qtreelistview" Grid.Column="1" ExpenderStyle="{DynamicResource ExpandCollapseToggleStyle}">
