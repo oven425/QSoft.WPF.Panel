@@ -1,4 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using System.Collections;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Windows;
@@ -21,106 +24,83 @@ namespace WpfApp_MVVM
         public MainWindow()
         {
             InitializeComponent();
-            var pp = new VN1();
-            //pp.Aa = new Test();
-            var bb = pp.HasError();
-            //pp.Data.HasError();
-            //pp.HasError();
+            //this.DataContext = new VN1<Test>();
+            //this.DataContext = new VN2();
+            this.DataContext = new VN_VM();
+        }
+
+        private void radiobutton_1_Click(object sender, RoutedEventArgs e)
+        {
+            if(this.DataContext is VN1<Test> vn1)
+            {
+                vn1.Data = new Test() { Age = DateTime.Now.Second, Name = DateTime.Now.Second.ToString() };
+            }
+            else if(this.DataContext is VN_VM vn_vm)
+            {
+                vn_vm.VN1 = new VN1<Test>()
+                {
+                    Data = new Test() { Age = DateTime.Now.Second, Name = DateTime.Now.Second.ToString() }
+                };
+            }
         }
     }
 
 
-    public partial class VN : ObservableValidatorEx
+    public enum VNStates
+    {
+        one, two, three
+    }
+    public partial class VN_VM:ObservableObject
     {
         [ObservableProperty]
-        [Required]
-        Test aa;
-        
+        VN1<Test> vN1;
+
+        [ObservableProperty]
+        VN2 vN2;
     }
 
-    public partial class VN1 : ObservableValidatorEx<Test>
+    public partial class VN1<T> : ObservableObject
     {
-        //[ObservableProperty]
-        //[Required]
-        //Test data;
-
-        //public override bool HasError()
-        //{
-        //    this.ValidateAllProperties();
-        //    //if(Data is ObservableValidatorEx ex)
-        //    //{
-        //    //    ex.HasError();
-        //    //}
-
-        //    return this.HasErrors;
-        //}
-
-        //public override bool HasError()
-        //{
-        //    var a = base.HasError();
-        //    var b = true;
-        //    if(Data is not null)
-        //    {
-        //        b = Data.HasError();
-        //    }
-        //    if (a) return true;
-        //    else if (b) return true;
-        //    return false;
-        //}
+        [ObservableProperty]
+        T? data;
     }
 
-    //public partial class NewVN<T> : VN<T> 
-    //{
-    //    [ObservableProperty]
-    //    [Required]
-    //    string? name;
-    //    //public override bool HasError()
-    //    //{
-    //    //    var a = base.HasError();
-    //    //    var b = true;
-    //    //    if (Data is not null)
-    //    //    {
-    //    //        b = Data.HasError();
-    //    //    }
-    //    //    if (a) return true;
-    //    //    else if (b) return true;
-    //    //    return false;
-    //    //}
-    //}
-
-    public class Test
+    public partial class VN2: ObservableValidator
     {
         [Required]
         public string? Name { set; get; }
 
         [Required]
         public int Age { set; get; }
-    }
 
-    public partial class TestValidate(Test test): ObservableValidatorEx
-    {
-        [ObservableProperty]
-        [Required]
-        string? name = test.Name;
-
-        [ObservableProperty]
-        [Required]
-        int age = test.Age;
-    }
-
-    public class ObservableValidatorEx: ObservableValidator
-    {
-        virtual public bool HasError()
+        [RelayCommand]
+        void Save()
         {
             this.ValidateAllProperties();
-            return this.HasErrors;
+        }
+        [RelayCommand]
+        void Cancel()
+        {
+
         }
     }
 
-    public partial class ObservableValidatorEx<T>: ObservableValidatorEx
+
+    public class Test
     {
-        [ObservableProperty]
-        [Required]
-        T? value;
+        public string? Name { set; get; }
+
+        public int Age { set; get; }
     }
+
+    public class TestEdit(Test? data): ObservableValidator
+    {
+        [Required]
+        public string? Name { set; get; } = data?.Name ?? "";
+
+        [Required]
+        public int Age { set; get; }= data?.Age ?? 0;
+    }
+
+    
 }

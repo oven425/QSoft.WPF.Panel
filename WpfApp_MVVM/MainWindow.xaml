@@ -6,7 +6,45 @@
         xmlns:local="clr-namespace:WpfApp_MVVM"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
+    <TabControl>
+        <TabItem Header="V1">
+            <local:Validate1/>
+        </TabItem>
+        <TabItem Header="V2">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton x:Name="radiobutton_1" Click="radiobutton_1_Click">One</RadioButton>
+                    <RadioButton>Two</RadioButton>
+                </StackPanel>
+                <StackPanel Grid.Row="1">
+                    <TextBlock Text="Name"/>
+                    <TextBox Text="{Binding Data.Name}"/>
+                    <TextBlock Text="Age"/>
+                    <TextBox Text="{Binding Data.Age}"/>
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
 
-    </Grid>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                </StackPanel>
+                <StackPanel Grid.Row="1">
+                    <TextBlock Text="Name"/>
+                    <TextBox Text="{Binding Name}"/>
+                    <TextBlock Text="Age"/>
+                    <TextBox Text="{Binding Age}"/>
+                    <Button Command="{Binding SaveCommand}">Save</Button>
+                    <Button Command="{Binding CancelCommand}">Cancel</Button>
+                </StackPanel>
+
+            </Grid>
+
+        </TabItem>
+    </TabControl>
 </Window>
