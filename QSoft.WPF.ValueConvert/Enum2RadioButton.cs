@@ -14,20 +14,23 @@ namespace QSoft.WPF.ValueConvert
     {
         public TEnum Default { set; get; }
         public Enum2RadioButtonMatches Match { set; get; } = Enum2RadioButtonMatches.Index;
-        readonly Dictionary<string, TEnum> m_String2Enum;
+        Dictionary<string, TEnum>? m_String2Enum;
         public Enum2RadioButton()
         {
-            var names = Enum.GetNames<TEnum>();
-            var enums = Enum.GetValues<TEnum>();
-            this.Default = enums.FirstOrDefault();
-            var ints = Enum.GetValuesAsUnderlyingType<TEnum>().OfType<int>().Select(x => x.ToString());
-            m_String2Enum = Match switch
-            {
-                Enum2RadioButtonMatches.Index => ints.Zip(enums).ToDictionary(x => x.First, y => y.Second),
-                Enum2RadioButtonMatches.Name => names.Zip(enums).ToDictionary(x => x.First, y => y.Second),
-                Enum2RadioButtonMatches.Value => enums.Zip(enums).ToDictionary(x => x.First.ToString(), y => y.Second),
-                _ => []
-            };
+            var names = Enum.GetNames(typeof(TEnum));
+            var enums = Enum.GetValues(typeof(TEnum)).OfType<TEnum>();
+            this.Default = enums.First();
+            var tt = Enum.GetUnderlyingType(typeof(TEnum));
+            //var ints = enums.Select(x=> (int)x);
+            //var ints = Enum.GetValuesAsUnderlyingType<TEnum>().OfType<int>().Select(x => x.ToString());
+            //m_String2Enum = Match switch
+            //{
+            //    Enum2RadioButtonMatches.Index => ints.Zip(enums).ToDictionary(x => x.First, y => y.Second),
+            //    Enum2RadioButtonMatches.Name => names.Zip(enums).ToDictionary(x => x.First, y => y.Second),
+            //    Enum2RadioButtonMatches.Value => enums.Zip(enums).ToDictionary(x => x.First.ToString(), y => y.Second),
+            //    _ => []
+            //};
+
 
         }
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
