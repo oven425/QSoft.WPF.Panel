@@ -6,45 +6,56 @@
         xmlns:local="clr-namespace:WpfApp_MVVM"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <TabControl>
-        <TabItem Header="V1">
-            <local:Validate1/>
-        </TabItem>
-        <TabItem Header="V2">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <StackPanel Orientation="Horizontal">
-                    <RadioButton x:Name="radiobutton_1" Click="radiobutton_1_Click">One</RadioButton>
-                    <RadioButton>Two</RadioButton>
-                </StackPanel>
-                <StackPanel Grid.Row="1">
-                    <TextBlock Text="Name"/>
-                    <TextBox Text="{Binding Data.Name}"/>
-                    <TextBlock Text="Age"/>
-                    <TextBox Text="{Binding Data.Age}"/>
-                    <StackPanel.Style>
-                        <Style TargetType="StackPanel">
-                            <Setter Property="Visibility" Value="Collapsed"/>
-                            <Style.Triggers>
+    <Window.Resources>
+        
+        <DataTemplate x:Key="show">
+            <StackPanel IsEnabled="False">
+                <TextBlock Text="Name"/>
+                <TextBox Text="{Binding Name}"/>
+                <TextBlock Text="Age"/>
+                <TextBox Text="{Binding Age}"/>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="modify">
+            <StackPanel>
+                <TextBlock Text="Name"/>
+                <TextBox Text="{Binding Name}"/>
+                <TextBlock Text="Age"/>
+                <TextBox Text="{Binding Age}"/>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="create">
+            <StackPanel>
+                <TextBlock Text="Item Name"/>
+                <TextBox Text="{Binding ItemName}"/>
+                <TextBlock Text="Name"/>
+                <TextBox Text="{Binding Name}"/>
+                <TextBlock Text="Age"/>
+                <TextBox Text="{Binding Age}"/>
+            </StackPanel>
+        </DataTemplate>
+        <local:vvvs x:Key="vvvs" Show="{StaticResource show}" Create="{StaticResource create}" Modify="{StaticResource modify}"/>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Button Command="{Binding NewCommand}">New</Button>
+                <Button Command="{Binding ModifyCommand}">Modify</Button>
+                <Button>Delete</Button>
+            </StackPanel>
+            <ComboBox ItemsSource="{Binding ParametersNames}" SelectedItem="{Binding ParametersName}"/>
+        </StackPanel>
+        <ContentControl ContentTemplateSelector="{StaticResource vvvs}" Content="{Binding VM}" Grid.Row="1">
 
-                            </Style.Triggers>
-                        </Style>
-                    </StackPanel.Style>
-                </StackPanel>
-                <StackPanel Grid.Row="1">
-                    <TextBlock Text="Name"/>
-                    <TextBox Text="{Binding Name}"/>
-                    <TextBlock Text="Age"/>
-                    <TextBox Text="{Binding Age}"/>
-                    <Button Command="{Binding SaveCommand}">Save</Button>
-                    <Button Command="{Binding CancelCommand}">Cancel</Button>
-                </StackPanel>
-
-            </Grid>
-
-        </TabItem>
-    </TabControl>
+        </ContentControl>
+        <WrapPanel Grid.Row="2">
+            <Button Command="{Binding CancelCommand}">Cancel</Button>
+            <Button Command="{Binding SaveCommand}">Save</Button>
+        </WrapPanel>
+    </Grid>
 </Window>

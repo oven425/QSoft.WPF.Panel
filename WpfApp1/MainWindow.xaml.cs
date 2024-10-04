@@ -52,6 +52,7 @@ namespace WpfApp1
             });
 
             this.DataContext = new MainUI();
+            QSoft.WPF.MVVM.Region.ContentControlRegion.Get("aaa");
         }
     }
 

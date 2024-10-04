@@ -1,8 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using CommunityToolkit.Mvvm.Input;
 using System.Collections;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.Metrics;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -24,83 +28,145 @@ namespace WpfApp_MVVM
         public MainWindow()
         {
             InitializeComponent();
-            //this.DataContext = new VN1<Test>();
-            //this.DataContext = new VN2();
-            this.DataContext = new VN_VM();
+            var dic = new Dictionary<string, People>();
+            dic["1"] = new People("1", 11);
+            dic["2"] = new People("2", 22);
+            dic["3"] = new People("3", 33);
+            dic["4"] = new People("4", 44);
+            this.DataContext = m_MainUI = new MainUI<People>(dic);
         }
+        MainUI<People> m_MainUI;
 
-        private void radiobutton_1_Click(object sender, RoutedEventArgs e)
+    }
+
+    public class vvvs:DataTemplateSelector
+    {
+        public DataTemplate Show { set; get; }
+        public DataTemplate Modify { set; get; }
+        public DataTemplate Create { set; get; }
+        public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
-            if(this.DataContext is VN1<Test> vn1)
+            if(item is null) return base.SelectTemplate(item, container);
+            //var tt = item.GetType().BaseType;
+            //if (tt.IsGenericType)
+            //{
+            //    var bbb = tt.GetGenericTypeDefinition() == typeof(ParameterVM_New<>);
+            //    if(bbb)
+            //    {
+            //        return this.Create;
+            //    }
+            //}
+
+            var int11 = item switch
             {
-                vn1.Data = new Test() { Age = DateTime.Now.Second, Name = DateTime.Now.Second.ToString() };
-            }
-            else if(this.DataContext is VN_VM vn_vm)
-            {
-                vn_vm.VN1 = new VN1<Test>()
-                {
-                    Data = new Test() { Age = DateTime.Now.Second, Name = DateTime.Now.Second.ToString() }
-                };
-            }
+                
+                object=>10,
+                _=>-1
+            };
+            return this.Show;
+            return base.SelectTemplate(item, container);
         }
     }
 
-
-    public enum VNStates
+    public partial class MainUI<TParameter>(Dictionary<string, TParameter> parameters) : ObservableObject
     {
-        one, two, three
-    }
-    public partial class VN_VM:ObservableObject
-    {
+        public ObservableCollection<string> ParametersNames { set; get; }= new ObservableCollection<string>(parameters.Keys);
         [ObservableProperty]
-        VN1<Test> vN1;
-
+        string? parametersName= parameters.Keys.FirstOrDefault();
         [ObservableProperty]
-        VN2 vN2;
-    }
-
-    public partial class VN1<T> : ObservableObject
-    {
-        [ObservableProperty]
-        T? data;
-    }
-
-    public partial class VN2: ObservableValidator
-    {
-        [Required]
-        public string? Name { set; get; }
-
-        [Required]
-        public int Age { set; get; }
+        object? vM = parameters.Values.FirstOrDefault();
 
         [RelayCommand]
         void Save()
         {
-            this.ValidateAllProperties();
+
         }
         [RelayCommand]
         void Cancel()
         {
+            this.VM = null;
+        }
+        [RelayCommand]
+        void New()
+        {
+            var item = Ioc.Default.GetService<ParameterVM_New<TParameter>>();
+            var tt = item.GetType().BaseType;
+            if(tt.IsGenericType)
+            {
+                var bbb = tt.GetGenericTypeDefinition() == typeof(ParameterVM_New<>);
+                bbb = false;
+            }
+            this.VM = Ioc.Default.GetService<ParameterVM_New<TParameter>>();
+        }
 
+        [RelayCommand]
+        void Modify()
+        {
+            if (this.ParametersName is null) return;
+            if (parameters.TryGetValue(this.ParametersName, out var ddd))
+            {
+                var aa = Ioc.Default.GetService<ParameterVM_Modify<TParameter>>();
+                aa.FromParameter(ddd);
+                this.VM = aa;
+
+            }
+            
+        }
+
+    }
+
+
+    public class ObservableValidatorEx: ObservableValidator
+    {
+        public void ValidateAll()
+        {
+            this.ValidateAllProperties();
         }
     }
 
-
-    public class Test
+    public abstract class ParameterVM_New<T> : ObservableValidatorEx
     {
-        public string? Name { set; get; }
-
-        public int Age { set; get; }
+        public abstract T? ToParameter();
+    }
+    public abstract class ParameterVM_Modify<T> : ObservableValidatorEx
+    {
+        public abstract void FromParameter(T parameter);
+        public abstract T? ToParameter();
     }
 
-    public class TestEdit(Test? data): ObservableValidator
+    public partial class ParameterVM_Modify_People : ParameterVM_Modify<People>
     {
         [Required]
-        public string? Name { set; get; } = data?.Name ?? "";
-
+        [ObservableProperty]
+        string? name;
         [Required]
-        public int Age { set; get; }= data?.Age ?? 0;
+        [ObservableProperty]
+        int age;
+
+        public override void FromParameter(People parameter)
+        {
+            this.Name = parameter.Name;
+            this.Age = parameter.Age;
+        }
+
+        public override People? ToParameter() => new(this.Name ?? "", this.Age);
     }
 
-    
+
+    public partial class ParameterVM_New_People : ParameterVM_New<People>
+    {
+        [Required]
+        [ObservableProperty]
+        string? itemName;
+        [Required]
+        [ObservableProperty]
+        string? name;
+        [Required]
+        [ObservableProperty]
+        int age;
+
+        public override People? ToParameter()=> new(this.Name??"", this.Age);
+    }
+
+    public record People(string Name, int Age);
 }
