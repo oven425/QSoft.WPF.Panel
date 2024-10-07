@@ -13,7 +13,7 @@ namespace QSoft.WPF.ValueConvert
     public class Enum2RadioButton<TEnum> : IValueConverter where TEnum : struct, Enum
     {
         public TEnum Default { set; get; }
-        public Enum2RadioButtonMatches Match { set; get; } = Enum2RadioButtonMatches.Index;
+        public Enum2RadioButtonMatches Match { set; get; } = Enum2RadioButtonMatches.Name;
         Dictionary<string, TEnum>? m_String2Enum;
         public Enum2RadioButton()
         {
@@ -21,7 +21,8 @@ namespace QSoft.WPF.ValueConvert
             var enums = Enum.GetValues(typeof(TEnum)).OfType<TEnum>();
             this.Default = enums.First();
             var tt = Enum.GetUnderlyingType(typeof(TEnum));
-            //var ints = enums.Select(x=> (int)x);
+
+
             //var ints = Enum.GetValuesAsUnderlyingType<TEnum>().OfType<int>().Select(x => x.ToString());
             //m_String2Enum = Match switch
             //{
@@ -37,16 +38,24 @@ namespace QSoft.WPF.ValueConvert
         {
 
             var enumValue = (TEnum)value;
-            var str = parameter as string;
-            if (str is null)
+            TEnum c = (TEnum)Enum.Parse(typeof(TEnum), parameter as string??"");
+            if(Enum.TryParse<TEnum>(parameter as string ?? "", out var vv))
             {
-                return false;
+
             }
-            if (m_String2Enum.TryGetValue(str, out var result))
-            {
-                var bb = Enum.Equals(enumValue, result);
-                return bb;
-            }
+
+            //var str = parameter as string;
+            //if (str is null)
+            //{
+            //    return false;
+            //}
+            //if (m_String2Enum.TryGetValue(str, out var result))
+            //{
+            //    var bb = Enum.Equals(enumValue, result);
+            //    return bb;
+            //}
+
+            //Enum.IsDefined(typeof(Color), "Green")
             return false;
         }
 

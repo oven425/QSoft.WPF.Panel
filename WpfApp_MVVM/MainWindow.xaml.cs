@@ -57,6 +57,8 @@ namespace WpfApp_MVVM
             //    }
             //}
 
+
+
             var int11 = item switch
             {
                 
@@ -72,14 +74,21 @@ namespace WpfApp_MVVM
     {
         public ObservableCollection<string> ParametersNames { set; get; }= new ObservableCollection<string>(parameters.Keys);
         [ObservableProperty]
-        string? parametersName= parameters.Keys.FirstOrDefault();
+        [NotifyCanExecuteChangedFor(nameof(NewCommand))]
+        string? parametersName;
+
+        partial void OnParametersNameChanged(string? value)
+        {
+            
+        }
+
         [ObservableProperty]
         object? vM = parameters.Values.FirstOrDefault();
+        
 
         [RelayCommand]
         void Save()
         {
-
         }
         [RelayCommand]
         void Cancel()

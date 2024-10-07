@@ -155,7 +155,6 @@
                             <GridViewRowPresenter x:Name="PART_Header" 
                                         Content="{TemplateBinding Header}"/>
                         </Border>
-
                         <ItemsPresenter x:Name="ItemsHost"/>
                     </StackPanel>
                     <ControlTemplate.Triggers>
