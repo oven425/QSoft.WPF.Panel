@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\QSoft.WPF.Behaviors\QSoft.WPF.Behaviors.csproj" />
     <ProjectReference Include="..\QSoft.WPF.TreeListView\QSoft.WPF.TreeListView.csproj" />
   </ItemGroup>
 

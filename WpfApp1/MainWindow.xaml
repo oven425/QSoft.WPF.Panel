@@ -215,28 +215,30 @@
         </Style>
 
     </Window.Resources>
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
-        <StackPanel>
-            <RadioButton IsChecked="{Binding AAs, Converter={StaticResource aas}, ConverterParameter=100}">One</RadioButton>
-            <RadioButton IsChecked="{Binding AAs, Converter={StaticResource aas}, ConverterParameter=101}">Two</RadioButton>
-            <RadioButton IsChecked="{Binding AAs, Converter={StaticResource aas}, ConverterParameter=102}">Three</RadioButton>
-            <ContentControl Background="Red" Height="100" region:ContentControlRegion.Name="aaa"/>
-        </StackPanel>
-        <local:TreeListView Visibility="Collapsed" x:Name="_list" ItemsSource="{Binding Children}"  BorderThickness="2">
-            <local:TreeListView.ItemTemplate >
-                <HierarchicalDataTemplate ItemsSource="{Binding Children}" >
-                    <TextBlock Text="{Binding}" Margin="2 0"/>
-                </HierarchicalDataTemplate>
+    <TabControl>
+        <TabItem Header="TreeList">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <StackPanel>
+                    <RadioButton IsChecked="{Binding AAs, Converter={StaticResource aas}, ConverterParameter=100}">One</RadioButton>
+                    <RadioButton IsChecked="{Binding AAs, Converter={StaticResource aas}, ConverterParameter=101}">Two</RadioButton>
+                    <RadioButton IsChecked="{Binding AAs, Converter={StaticResource aas}, ConverterParameter=102}">Three</RadioButton>
+                    <ContentControl Background="Red" Height="100" region:ContentControlRegion.Name="aaa"/>
+                </StackPanel>
+                <local:TreeListView Visibility="Collapsed" x:Name="_list" ItemsSource="{Binding Children}"  BorderThickness="2">
+                    <local:TreeListView.ItemTemplate >
+                        <HierarchicalDataTemplate ItemsSource="{Binding Children}" >
+                            <TextBlock Text="{Binding}" Margin="2 0"/>
+                        </HierarchicalDataTemplate>
 
-            </local:TreeListView.ItemTemplate>
+                    </local:TreeListView.ItemTemplate>
 
-        </local:TreeListView>
-        <!--<StackPanel Grid.Column="1" Orientation="Horizontal">
+                </local:TreeListView>
+                <!--<StackPanel Grid.Column="1" Orientation="Horizontal">
             <ToggleButton Style="{DynamicResource ExpandCollapseToggleStyleaa}"/>
             <CheckBox>
                
@@ -244,8 +246,8 @@
             <TextBlock Text="123"/>
         </StackPanel>-->
 
-        <DockPanel Grid.Column="1">
-            <!--<Border  Background="Transparent" Height="20" Width="20" >
+                <DockPanel Grid.Column="1">
+                    <!--<Border  Background="Transparent" Height="20" Width="20" >
                 <Path  Stretch="Fill" x:Name="ExpandPath"  Fill="#FFFFFFFF" Stroke="#FF818181">
                     <Path.Data>
                         <PathGeometry Figures="M0,0 L6,3 L0,6 z"/>
@@ -261,9 +263,9 @@
                 </Path>
             </Border>-->
 
-        </DockPanel>
-        
-        <!--<qtreelist:TreeListView x:Name="qtreelistview" Grid.Column="1" ExpenderStyle="{DynamicResource ExpandCollapseToggleStyle}">
+                </DockPanel>
+
+                <!--<qtreelist:TreeListView x:Name="qtreelistview" Grid.Column="1" ExpenderStyle="{DynamicResource ExpandCollapseToggleStyle}">
             <qtreelist:TreeListView.ItemTemplate >
                 <HierarchicalDataTemplate  ItemsSource="{Binding Children}" >
                 </HierarchicalDataTemplate>
@@ -272,7 +274,9 @@
             <qtreelist:TreeListView.View>
                 <GridView>
                     <GridView.Columns>
-                        --><!--<GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" />--><!--
+                        -->
+                <!--<GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" />-->
+                <!--
                         <GridViewColumn Header="Name">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
@@ -297,27 +301,27 @@
                 </GridView>
             </qtreelist:TreeListView.View>
         </qtreelist:TreeListView>-->
-        <qtreelist:TreeListView x:Name="qtreelistview1" Grid.Column="2">
-            <qtreelist:TreeListView.ItemTemplate >
-                <HierarchicalDataTemplate 
+                <qtreelist:TreeListView x:Name="qtreelistview1" Grid.Column="2">
+                    <qtreelist:TreeListView.ItemTemplate >
+                        <HierarchicalDataTemplate 
                     ItemTemplateSelector="{StaticResource ss}" 
                             ItemsSource="{Binding Items}">
-                </HierarchicalDataTemplate>
+                        </HierarchicalDataTemplate>
 
-            </qtreelist:TreeListView.ItemTemplate>
-            <qtreelist:TreeListView.View>
-                <GridView>
-                    <GridView.Columns>
-                        <!--<GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" />-->
-                        <GridViewColumn Header="Name">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Name}"/>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn CellTemplateSelector="{StaticResource ss1}"/>
-                        <!--<GridViewColumn>
+                    </qtreelist:TreeListView.ItemTemplate>
+                    <qtreelist:TreeListView.View>
+                        <GridView>
+                            <GridView.Columns>
+                                <!--<GridViewColumn Header="Name" DisplayMemberBinding="{Binding Name}" />-->
+                                <GridViewColumn Header="Name">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Name}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn CellTemplateSelector="{StaticResource ss1}"/>
+                                <!--<GridViewColumn>
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
@@ -327,9 +331,15 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>-->
-                    </GridView.Columns>
-                </GridView>
-            </qtreelist:TreeListView.View>
-        </qtreelist:TreeListView>
-    </Grid>
+                            </GridView.Columns>
+                        </GridView>
+                    </qtreelist:TreeListView.View>
+                </qtreelist:TreeListView>
+            </Grid>
+
+        </TabItem>
+        <TabItem Header="bb">
+            <local:RoutedEventIsHandledBehavior/>
+        </TabItem>
+    </TabControl>
 </Window>
