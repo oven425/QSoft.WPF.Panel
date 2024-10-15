@@ -12,8 +12,13 @@
         <CheckBox x:Name="checkbox">tt</CheckBox>
         <TextBox>
             <i:Interaction.Behaviors>
-                <qbehavior:RoutedEventIsHandledBehavior IsHandled="{Binding IsChecked, ElementName=checkbox}"/>
+                <qbehavior:RoutedEventIsHandledBehavior EventName="PreviewKeyDown" IsHandled="{Binding IsChecked, ElementName=checkbox}"/>
             </i:Interaction.Behaviors>
         </TextBox>
+        <!--<Button>
+            <i:Interaction.Behaviors>
+                <qbehavior:RoutedEventIsHandledBehavior IsHandled="{Binding IsChecked, ElementName=checkbox}"/>
+            </i:Interaction.Behaviors>
+        </Button>-->
     </StackPanel>
 </UserControl>

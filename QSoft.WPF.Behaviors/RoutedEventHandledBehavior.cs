@@ -10,44 +10,36 @@ using System.Windows.Controls;
 
 namespace QSoft.WPF.Behaviors
 {
-    public class RoutedEventIsHandledBehavior: Behavior<TextBox>
+    public class RoutedEventIsHandledBehavior: Behavior<UIElement>
     {
         readonly public static DependencyProperty IsHandledProperty = DependencyProperty.Register("IsHandled", typeof(bool), typeof(RoutedEventIsHandledBehavior));
+        readonly public static DependencyProperty EventNameProperty = DependencyProperty.Register("EventName", typeof(string), typeof(RoutedEventIsHandledBehavior));
         public bool IsHandled { set => SetValue(IsHandledProperty, value); get => (bool)GetValue(IsHandledProperty); }
-        private MethodInfo? eventHandlerMethodInfo;
+        public string EventName { set => SetValue(EventNameProperty, value); get => (string)GetValue(EventNameProperty); }
+        EventInfo? m_EventInfo;
+        Delegate ? m_Delegate;
         protected override void OnAttached()
         {
             Type targetType = this.AssociatedObject.GetType();
-            var eventInfo = targetType.GetEvent("PreviewKeyDown");
-            this.eventHandlerMethodInfo = typeof(RoutedEventIsHandledBehavior).GetMethod("OnEventImpl", BindingFlags.NonPublic | BindingFlags.Instance);
-            eventInfo?.AddEventHandler(this.AssociatedObject, Delegate.CreateDelegate(eventInfo.EventHandlerType, this, this.eventHandlerMethodInfo));
+            m_EventInfo = targetType.GetEvent(EventName);
+            if (m_EventInfo is null) return;
+            if (m_EventInfo.EventHandlerType is null) return;
+            var eventHandlerMethodInfo = typeof(RoutedEventIsHandledBehavior).GetMethod("OnEventImpl", BindingFlags.NonPublic | BindingFlags.Instance);
+            if (eventHandlerMethodInfo is null) return;
+            m_Delegate = Delegate.CreateDelegate(m_EventInfo.EventHandlerType, this, eventHandlerMethodInfo);
+            m_EventInfo.AddEventHandler(this.AssociatedObject, m_Delegate);
             
-
-            //this.AssociatedObject.PreviewKeyDown += AssociatedObject_PreviewKeyDown;
-            //this.AssociatedObject.AddHandler
             base.OnAttached();
         }
 
         private void OnEventImpl(object sender, RoutedEventArgs eventArgs)
         {
             eventArgs.Handled = IsHandled;
-            //var rr = eventArgs as RoutedEventArgs;
-            //if(rr is not null)
-            //{
-            //    rr.Handled = IsHandled;
-            //}
-        }
-
-        private void AssociatedObject_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            e.Handled = IsHandled;
-            //throw new NotImplementedException();
         }
 
         protected override void OnDetaching()
         {
-            this.AssociatedObject.PreviewKeyDown -= AssociatedObject_PreviewKeyDown;
-
+            m_EventInfo?.RemoveEventHandler(this.AssociatedObject, m_Delegate);
             base.OnDetaching();
         }
     }
