@@ -53,6 +53,8 @@ namespace QSoft.WPF.TreeListView
             DefaultStyleKeyProperty.OverrideMetadata(typeof(TreeListViewItem), new FrameworkPropertyMetadata(typeof(TreeListViewItem)));
         }
 
+        
+
         public int Level
         {
             get

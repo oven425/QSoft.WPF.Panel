@@ -20,6 +20,8 @@ namespace QSoft.WPF.Behaviors
         Delegate ? m_Delegate;
         protected override void OnAttached()
         {
+            if (string.IsNullOrWhiteSpace(EventName)) return;
+            if (string.IsNullOrEmpty(EventName)) return;
             Type targetType = this.AssociatedObject.GetType();
             m_EventInfo = targetType.GetEvent(EventName);
             if (m_EventInfo is null) return;

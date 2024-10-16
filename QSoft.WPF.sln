@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QSoft.WPF.ValueConvert", "Q
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfAppNET472", "WpfAppNET472\WpfAppNET472.csproj", "{94DF9C99-217C-42E0-AEAE-C31D2D79BE7F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QSoft.WPF.Behaviors", "QSoft.WPF.Behaviors\QSoft.WPF.Behaviors.csproj", "{1692E8CF-4D3C-44EB-96B4-5EF2AD3E4EF6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QSoft.WPF.Behaviors", "QSoft.WPF.Behaviors\QSoft.WPF.Behaviors.csproj", "{1692E8CF-4D3C-44EB-96B4-5EF2AD3E4EF6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPF_TouchKeyboardNotifier", "WPF_TouchKeyboardNotifier\WPF_TouchKeyboardNotifier.csproj", "{907FE7D0-7172-48CD-AD63-4FEED361C9E4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{1692E8CF-4D3C-44EB-96B4-5EF2AD3E4EF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1692E8CF-4D3C-44EB-96B4-5EF2AD3E4EF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1692E8CF-4D3C-44EB-96B4-5EF2AD3E4EF6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{907FE7D0-7172-48CD-AD63-4FEED361C9E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{907FE7D0-7172-48CD-AD63-4FEED361C9E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{907FE7D0-7172-48CD-AD63-4FEED361C9E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{907FE7D0-7172-48CD-AD63-4FEED361C9E4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
