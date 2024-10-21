@@ -6,56 +6,12 @@
         xmlns:local="clr-namespace:WpfApp_MVVM"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Window.Resources>
-        
-        <DataTemplate x:Key="show">
-            <StackPanel IsEnabled="False">
-                <TextBlock Text="Name"/>
-                <TextBox Text="{Binding Name}"/>
-                <TextBlock Text="Age"/>
-                <TextBox Text="{Binding Age}"/>
-            </StackPanel>
-        </DataTemplate>
-        <DataTemplate x:Key="modify">
-            <StackPanel>
-                <TextBlock Text="Name"/>
-                <TextBox Text="{Binding Name}"/>
-                <TextBlock Text="Age"/>
-                <TextBox Text="{Binding Age}"/>
-            </StackPanel>
-        </DataTemplate>
-        <DataTemplate x:Key="create">
-            <StackPanel>
-                <TextBlock Text="Item Name"/>
-                <TextBox Text="{Binding ItemName}"/>
-                <TextBlock Text="Name"/>
-                <TextBox Text="{Binding Name}"/>
-                <TextBlock Text="Age"/>
-                <TextBox Text="{Binding Age}"/>
-            </StackPanel>
-        </DataTemplate>
-        <local:vvvs x:Key="vvvs" Show="{StaticResource show}" Create="{StaticResource create}" Modify="{StaticResource modify}"/>
-    </Window.Resources>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Button Command="{Binding NewCommand}">New</Button>
-                <Button Command="{Binding ModifyCommand}">Modify</Button>
-                <Button>Delete</Button>
-            </StackPanel>
-            <ComboBox ItemsSource="{Binding ParametersNames}" SelectedItem="{Binding ParametersName}"/>
-        </StackPanel>
-        <ContentControl ContentTemplateSelector="{StaticResource vvvs}" Content="{Binding VM}" Grid.Row="1">
+    <StackPanel>
+        <TextBox Text="{Binding FirstName,UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBox Text="{Binding LastName, UpdateSourceTrigger=PropertyChanged}"/>
+        <TextBlock Text="{Binding FullName}"/>
+        <CheckBox IsChecked="{Binding IsEnableButton}"/>
+        <Button Command="{Binding SaveCommand}">addd</Button>
 
-        </ContentControl>
-        <WrapPanel Grid.Row="2">
-            <Button Command="{Binding CancelCommand}">Cancel</Button>
-            <Button Command="{Binding SaveCommand}">Save</Button>
-        </WrapPanel>
-    </Grid>
+    </StackPanel>
 </Window>

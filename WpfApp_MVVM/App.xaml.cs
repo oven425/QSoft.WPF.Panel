@@ -25,8 +25,6 @@ namespace WpfApp_MVVM
             var builder = Host.CreateApplicationBuilder(args);
             var bb = builder.Configuration["aa"];
             //builder.Configuration.AddCommandLine(args);
-            builder.Services.AddTransient<ParameterVM_New<People>, ParameterVM_New_People>();
-            builder.Services.AddTransient<ParameterVM_Modify<People>, ParameterVM_Modify_People>();
             builder.Services.Configure<AppArgs>(config => new AppArgs()
             {
                 aa = builder.Configuration["aa"] ?? ""
