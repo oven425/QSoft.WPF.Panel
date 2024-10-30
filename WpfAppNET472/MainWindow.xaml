@@ -11,8 +11,8 @@
         <local:TTT2 x:Key="tt2"/>
     </Window.Resources>
     <StackPanel>
-        <RadioButton IsChecked="{Binding TTT, Converter={StaticResource tt2}, ConverterParameter=0}">AAA</RadioButton>
-        <RadioButton IsChecked="{Binding TTT, Converter={StaticResource tt2}, ConverterParameter=1}">BBB</RadioButton>
-        <RadioButton IsChecked="{Binding TTT, Converter={StaticResource tt2}, ConverterParameter=2}">CCC</RadioButton>
+        <RadioButton IsChecked="{Binding TTT, Converter={StaticResource tt2}, ConverterParameter=One}">AAA</RadioButton>
+        <RadioButton IsChecked="{Binding TTT, Converter={StaticResource tt2}, ConverterParameter=Two}">BBB</RadioButton>
+        <RadioButton IsChecked="{Binding TTT, Converter={StaticResource tt2}, ConverterParameter=Three}">CCC</RadioButton>
     </StackPanel>
 </Window>

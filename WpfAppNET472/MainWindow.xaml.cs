@@ -31,7 +31,7 @@ namespace WpfAppNET472
 
     public class MainUI : INotifyPropertyChanged
     {
-        TTT m_TTT;
+        TTT m_TTT = TTT.Three;
         public TTT TTT
         {
             set { m_TTT = value; Update("TTT"); }
@@ -46,8 +46,8 @@ namespace WpfAppNET472
 
     public enum TTT
     {
-        One = 100,
-        Two = 101, 
+        One,
+        Two, 
         Three,
         Four,
         Five

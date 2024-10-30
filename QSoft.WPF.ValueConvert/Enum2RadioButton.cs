@@ -7,8 +7,8 @@ namespace QSoft.WPF.ValueConvert
     public enum Enum2RadioButtonMatches
     {
         Name,
-        Value,
-        Index
+        //Value,
+        //Index
     }
     public class Enum2RadioButton<TEnum> : IValueConverter where TEnum : struct, Enum
     {
@@ -36,37 +36,37 @@ namespace QSoft.WPF.ValueConvert
         }
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-
-            var enumValue = (TEnum)value;
-            TEnum c = (TEnum)Enum.Parse(typeof(TEnum), parameter as string??"");
-            if(Enum.TryParse<TEnum>(parameter as string ?? "", out var vv))
+            if(this.Match == Enum2RadioButtonMatches.Name)
             {
-
+                var src = value.ToString();
+                if (parameter is string str)
+                {
+                    return src == str;
+                }
+                
             }
 
-            //var str = parameter as string;
-            //if (str is null)
-            //{
-            //    return false;
-            //}
-            //if (m_String2Enum.TryGetValue(str, out var result))
-            //{
-            //    var bb = Enum.Equals(enumValue, result);
-            //    return bb;
-            //}
-
-            //Enum.IsDefined(typeof(Color), "Green")
             return false;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var vv = this.Default;
-            if (parameter is string str)
+            if(Match == Enum2RadioButtonMatches.Name)
             {
-                vv = this.m_String2Enum[str];
+                var names = Enum.GetNames(typeof(TEnum));
+                var enums = Enum.GetValues(typeof(TEnum));
+                if (names is not null && enums is not null)
+                {
+                    bool bb = (bool)value;
+                    var inff = Array.IndexOf(names, parameter.ToString());
+                    if(inff != -1)
+                    {
+                        return enums.GetValue(inff);
+                    }
+                    
+                }
             }
-            return vv;
+            return null;
         }
     }
 
