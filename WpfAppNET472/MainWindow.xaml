@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfAppNET472"
         mc:Ignorable="d"
+        xmlns:qcontrol="clr-namespace:QSoft.WPF.Controls.ComboButton;assembly=QSoft.WPF.Controls.ComboButton"
         xmlns:convert="clr-namespace:QSoft.WPF.ValueConvert;assembly=QSoft.WPF.ValueConvert"
         Title="MainWindow" Height="450" Width="800">
     <Window.Resources>
@@ -14,5 +15,16 @@
         <RadioButton IsChecked="{Binding TTT, Converter={StaticResource tt2}, ConverterParameter=One}">AAA</RadioButton>
         <RadioButton IsChecked="{Binding TTT, Converter={StaticResource tt2}, ConverterParameter=Two}">BBB</RadioButton>
         <RadioButton IsChecked="{Binding TTT, Converter={StaticResource tt2}, ConverterParameter=Three}">CCC</RadioButton>
+        <qcontrol:ComboButton SelectedIndex="0">
+            <ComboBoxItem>
+                <Image Source="/1.jpg"/>
+            </ComboBoxItem>
+            <ComboBoxItem>
+                <Image Source="/2.jpg"/>
+            </ComboBoxItem>
+            <ComboBoxItem>
+                <Image Source="/3.jpg"/>
+            </ComboBoxItem>
+        </qcontrol:ComboButton>
     </StackPanel>
 </Window>
