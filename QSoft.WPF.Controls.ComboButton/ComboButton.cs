@@ -44,18 +44,22 @@ namespace QSoft.WPF.Controls.ComboButton
     ///     <MyNamespace:ComboButton/>
     ///
     /// </summary>
-    public class ComboButton : ComboBox
+    public class ComboButton : System.Windows.Controls.Primitives.Selector
     {
         static ComboButton()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ComboButton), new FrameworkPropertyMetadata(typeof(ComboButton)));
         }
 
-        Button button;
+        
+
         public override void OnApplyTemplate()
         {
-            button = this.GetTemplateChild("button") as Button;
-            button.Click += Button_Click;
+            if(this.GetTemplateChild("button") is Button button)
+            {
+                button.Click += Button_Click;
+            }
+            
             base.OnApplyTemplate();
         }
 
@@ -75,7 +79,6 @@ namespace QSoft.WPF.Controls.ComboButton
                     this.SelectedIndex = 0;
                 }
             }
-            //throw new NotImplementedException();
         }
     }
 }

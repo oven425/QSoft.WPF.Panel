@@ -27,6 +27,17 @@ namespace WpfAppNET472
             InitializeComponent();
             this.DataContext = new MainUI();
         }
+
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+    }
+
+    public class Buttond
+    {
+        public ImageSource Image { get; set; }
+        public string Text { set; get; }
     }
 
     public class MainUI : INotifyPropertyChanged
