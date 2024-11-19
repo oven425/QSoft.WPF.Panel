@@ -33,38 +33,12 @@ namespace WpfApp_MVVM
 
     }
 
+    public class TestDD
+    {
+        public string? Name { get; set; }
+    }
+
     public partial class MainUI:ObservableObject
     {
-
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(FullName))]
-        //[NotifyCanExecuteChangedFor(nameof(SaveCommand))]
-        private string firstName = string.Empty;
-
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(FullName))]
-        //[NotifyCanExecuteChangedFor(nameof(SaveCommand))]
-        private string lastName = string.Empty;
-
-        public string FullName => $"{FirstName} {LastName}";
-
-        [ObservableProperty]
-        [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
-        bool isEnableButton;
-
-        [RelayCommand(CanExecute = nameof(CanSaveExecute), IncludeCancelCommand = true)]
-        private Task SaveAsync(CancellationToken cancelToken)
-        {
-            // Code to save the user details
-            return Task.CompletedTask;
-        }
-
-
-        private bool CanSaveExecute()
-            => this.IsEnableButton;
-
-
-        //private bool CanSaveExecute()
-        //    => !string.IsNullOrWhiteSpace(FirstName) && !string.IsNullOrWhiteSpace(LastName);
     }
 }

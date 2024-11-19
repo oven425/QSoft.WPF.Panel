@@ -29,11 +29,14 @@ namespace WpfApp_MVVM
             {
                 aa = builder.Configuration["aa"] ?? ""
             });
-
+            builder.Services.AddTransient<TestDD>();
             m_Host = builder.Build();
             Ioc.Default.ConfigureServices(m_Host.Services);
+            var dd = m_Host.Services.GetService<TestDD>();
+            dd = new TestDD() { Name = "123" };
+            dd = m_Host.Services.GetService<TestDD>();
 
-            var appargs = m_Host.Services.GetService<IOptions<AppArgs>>();
+            //var appargs = m_Host.Services.GetService<IOptions<AppArgs>>();
         }
     }
 

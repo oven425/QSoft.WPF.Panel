@@ -60,5 +60,9 @@
             </qcontrol:ComboButton.ItemTemplate>
 
         </qcontrol:ComboButton>
+        <TextBlock FontSize="30">
+            <Run>123</Run>
+            <Run>456</Run>
+        </TextBlock>
     </StackPanel>
 </Window>
