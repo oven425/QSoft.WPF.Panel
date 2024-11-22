@@ -22,37 +22,37 @@ namespace WpfApp1
         {
             InitializeComponent();
 
-            ObjForTest root = new ObjForTest();
-            ObjForTest depart = new ObjForTest("Department", null, "");
-            ObjForTest c1 = new ObjForTest("li", 45, "M");
-            ObjForTest c2 = new ObjForTest("xu", 30, "W");
-            ObjForTest c3 = new ObjForTest("zhang", 22, "M");
-            ObjForTest cc1 = new ObjForTest("shen", 30, "M");
-            ObjForTest cc2 = new ObjForTest("zhao", 18, "W");
-            ObjForTest cc3 = new ObjForTest("wang", 32, "M");
-            ObjForTest ccc1 = new ObjForTest("qian", 20, "W");
-            root.Children.Add(depart);
-            depart.Children.Add(c1);
-            depart.Children.Add(c2);
-            depart.Children.Add(c3);
-            c1.Children.Add(cc1);
-            c2.Children.Add(cc2);
-            c3.Children.Add(cc3);
-            cc1.Children.Add(ccc1);
-            this._list.ItemsSource = root.Children;
-            //this.qtreelistview.ItemsSource = root.Children;
-            //ListView list = new ListView();
-            //list.View
+            //ObjForTest root = new ObjForTest();
+            //ObjForTest depart = new ObjForTest("Department", null, "");
+            //ObjForTest c1 = new ObjForTest("li", 45, "M");
+            //ObjForTest c2 = new ObjForTest("xu", 30, "W");
+            //ObjForTest c3 = new ObjForTest("zhang", 22, "M");
+            //ObjForTest cc1 = new ObjForTest("shen", 30, "M");
+            //ObjForTest cc2 = new ObjForTest("zhao", 18, "W");
+            //ObjForTest cc3 = new ObjForTest("wang", 32, "M");
+            //ObjForTest ccc1 = new ObjForTest("qian", 20, "W");
+            //root.Children.Add(depart);
+            //depart.Children.Add(c1);
+            //depart.Children.Add(c2);
+            //depart.Children.Add(c3);
+            //c1.Children.Add(cc1);
+            //c2.Children.Add(cc2);
+            //c3.Children.Add(cc3);
+            //cc1.Children.Add(ccc1);
+            //this._list.ItemsSource = root.Children;
+            ////this.qtreelistview.ItemsSource = root.Children;
+            ////ListView list = new ListView();
+            ////list.View
 
-            this.qtreelistview1.ItemsSource = Enumerable.Range(1, 10).Select(x => new Group()
-            {
-                Name = $"Group{x}",
-                IsGroup = true,
-                Items = new ObservableCollection<Item>(Enumerable.Range(x, x + 10).Select(x => new Item() { Name = $"Item{x}" }))
-            });
+            //this.qtreelistview1.ItemsSource = Enumerable.Range(1, 10).Select(x => new Group()
+            //{
+            //    Name = $"Group{x}",
+            //    IsGroup = true,
+            //    Items = new ObservableCollection<Item>(Enumerable.Range(x, x + 10).Select(x => new Item() { Name = $"Item{x}" }))
+            //});
 
-            this.DataContext = new MainUI();
-            QSoft.WPF.MVVM.Region.ContentControlRegion.Get("aaa");
+            //this.DataContext = new MainUI();
+            //QSoft.WPF.MVVM.Region.ContentControlRegion.Get("aaa");
         }
     }
 
