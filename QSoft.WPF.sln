@@ -23,6 +23,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QSoft.WPF.Controls.ComboBut
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp_TreeView", "WpfApp_TreeView\WpfApp_TreeView.csproj", "{D1EECBB3-784A-426D-A1F3-215AF8D0B54C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp_ContentControl", "WpfApp_ContentControl\WpfApp_ContentControl.csproj", "{942B3178-198C-40BE-8B81-0727068DA5B9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QSoft.WPF.ContentControlView", "QSoft.WPF.ContentControlView\QSoft.WPF.ContentControlView.csproj", "{C8AF9929-6841-4F72-9EFB-05F7486DCD7C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +73,14 @@ Global
 		{D1EECBB3-784A-426D-A1F3-215AF8D0B54C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D1EECBB3-784A-426D-A1F3-215AF8D0B54C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D1EECBB3-784A-426D-A1F3-215AF8D0B54C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{942B3178-198C-40BE-8B81-0727068DA5B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{942B3178-198C-40BE-8B81-0727068DA5B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{942B3178-198C-40BE-8B81-0727068DA5B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{942B3178-198C-40BE-8B81-0727068DA5B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8AF9929-6841-4F72-9EFB-05F7486DCD7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8AF9929-6841-4F72-9EFB-05F7486DCD7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8AF9929-6841-4F72-9EFB-05F7486DCD7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8AF9929-6841-4F72-9EFB-05F7486DCD7C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
