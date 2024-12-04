@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
@@ -18,43 +19,15 @@ namespace WpfApp_ContentControl
     /// </summary>
     public partial class MainWindow : Window
     {
-        MainUI m_MainUI;
         public MainWindow()
         {
             InitializeComponent();
-            this.DataContext = m_MainUI = new MainUI()
-            {
-                VM = new TextVM()
-            };
+
         }
 
-        private void button_text_Click(object sender, RoutedEventArgs e)
-        {
-            this.m_MainUI.VM = new TextVM();
-        }
-
-        private void button_int_Click(object sender, RoutedEventArgs e)
-        {
-            this.m_MainUI.VM =new IntVM();
-        }
-
-        private void button_null_Click(object sender, RoutedEventArgs e)
-        {
-            this.m_MainUI.VM = null;
-        }
+        
     }
 
-    public class MainUI : INotifyPropertyChanged
-    {
-        object m_VM;
-        public object VM
-        { set { m_VM = value; Update("VM"); } get { return m_VM; } }
-        public event PropertyChangedEventHandler? PropertyChanged;
-        void Update(string name)
-        {
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name)); 
-        }
-    }
 
     public class TextVM
     {
@@ -65,4 +38,6 @@ namespace WpfApp_ContentControl
     {
         public int Value { set; get; } = DateTime.Now.Minute;
     }
+
+
 }

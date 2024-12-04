@@ -5,39 +5,18 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp_ContentControl"
         mc:Ignorable="d"
-        xmlns:contentview="clr-namespace:QSoft.WPF.ContentControlView;assembly=QSoft.WPF.ContentControlView"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
         <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
-            <WrapPanel ItemWidth="100">
-                <Button x:Name="button_text" Click="button_text_Click">Text</Button>
-                <Button x:Name="button_int" Click="button_int_Click">Int</Button>
-                <Button x:Name="button_null" Click="button_null_Click"></Button>
-            </WrapPanel>
-            <!--<local:ContentControlView Grid.Row="1" Content="{Binding VM}" Background="Red">
-                <local:ContentControlView.Resources>
-                    <DataTemplate DataType="{x:Type local:TextVM}">
-                        <TextBlock Text="{Binding Text}"/>
-                    </DataTemplate>
-                    <DataTemplate DataType="{x:Type local:IntVM}">
-                        <TextBox VerticalAlignment="Top" Text="{Binding Value}"></TextBox>
-                    </DataTemplate>
-                </local:ContentControlView.Resources>
-            </local:ContentControlView>-->
-            <contentview:ContentControlView Grid.Row="1" Content="{Binding VM}" Background="Red">
-                <contentview:ContentControlView.Resources>
-                    <DataTemplate DataType="{x:Type local:TextVM}">
-                        <TextBlock Text="{Binding Text}"/>
-                    </DataTemplate>
-                    <DataTemplate DataType="{x:Type local:IntVM}">
-                        <TextBox VerticalAlignment="Top" Text="{Binding Value}"></TextBox>
-                    </DataTemplate>
-                </contentview:ContentControlView.Resources>
-            </contentview:ContentControlView>
+            
+            <TabControl>
+                <TabItem Header="ContentView">
+                    <local:ContentView/>
+                </TabItem>
+                <TabItem Header="Items">
+                    <local:ItemsConControlT/>
+                </TabItem>
+            </TabControl>
 
         </Grid>
     </Grid>
