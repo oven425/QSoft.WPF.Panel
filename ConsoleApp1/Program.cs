@@ -15,7 +15,11 @@ char Choice(params char[] datas)
         }
         else
         {
+#if NET6_0_OR_GREATER
             var pos = Console.GetCursorPosition();
+#else
+            var pos = (Console.CursorLeft, Console.CursorTop);
+#endif
             Console.SetCursorPosition(pos.Left - 1, pos.Top);
             Console.Beep();
         }

@@ -13,11 +13,12 @@
         <TabItem Header="TreeList">
 
         </TabItem>
-        <TabItem Header="bb">
-            <local:RoutedEventIsHandledBehavior/>
-        </TabItem>
+        
         <TabItem Header="TreeView2">
             <local:TreeListView2/>
+        </TabItem>
+        <TabItem Header="bb">
+            <local:RoutedEventIsHandledBehavior/>
         </TabItem>
     </TabControl>
 </Window>
