@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp_ContentControl", "Wp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QSoft.WPF.ContentControlView", "QSoft.WPF.ContentControlView\QSoft.WPF.ContentControlView.csproj", "{C8AF9929-6841-4F72-9EFB-05F7486DCD7C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wpf_WebView2", "Wpf_WebView2\Wpf_WebView2.csproj", "{17787AA6-A1FB-468A-966F-0A9D386CB99B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +83,10 @@ Global
 		{C8AF9929-6841-4F72-9EFB-05F7486DCD7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C8AF9929-6841-4F72-9EFB-05F7486DCD7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C8AF9929-6841-4F72-9EFB-05F7486DCD7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17787AA6-A1FB-468A-966F-0A9D386CB99B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17787AA6-A1FB-468A-966F-0A9D386CB99B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17787AA6-A1FB-468A-966F-0A9D386CB99B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17787AA6-A1FB-468A-966F-0A9D386CB99B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
