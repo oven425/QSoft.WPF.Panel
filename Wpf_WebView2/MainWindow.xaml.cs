@@ -39,20 +39,28 @@ namespace Wpf_WebView2
         {
             webview2.CoreWebView2.Navigate("https://www.google.com/maps");
         }
+        //https://www.cnblogs.com/xslx/p/17244811.html
         //https://www.cnblogs.com/zhaotianff/p/18256433
         async private void button_reactjs_Click(object sender, RoutedEventArgs e)
         {
-            var options = new CoreWebView2EnvironmentOptions("--allow-file-access-from-files");
-            var environment = await CoreWebView2Environment.CreateAsync(options: options);
-            await webview2.EnsureCoreWebView2Async(environment);
             var GetDirectory = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
             var root = System.IO.Path.GetDirectoryName(GetDirectory);
             root = System.IO.Path.GetDirectoryName(root);
             root = System.IO.Path.GetDirectoryName(root);
             root = @$"{root}\reactjst\dist";
+
+            var options = new CoreWebView2EnvironmentOptions("--allow-file-access-from-files");
+            var environment = await CoreWebView2Environment.CreateAsync(null, null, options);
+            await webview2.EnsureCoreWebView2Async(environment);
             var reactjs = @$"{root}\index.html";
 
+
             webview2.CoreWebView2.Navigate(reactjs);
+        }
+
+        private void webview2_WebMessageReceived(object sender, CoreWebView2WebMessageReceivedEventArgs e)
+        {
+
         }
     }
 }

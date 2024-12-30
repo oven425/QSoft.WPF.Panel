@@ -18,6 +18,6 @@
             <Button x:Name="button_googlemap" Click="button_googlemap_Click">google map</Button>
             <Button x:Name="button_reactjs" Click="button_reactjs_Click">ReactJs</Button>
         </StackPanel>
-        <webview2:WebView2 x:Name="webview2" Grid.Row="1" Source="https://myfreetime.cn"></webview2:WebView2>
+        <webview2:WebView2 WebMessageReceived="webview2_WebMessageReceived" x:Name="webview2" Grid.Row="1"></webview2:WebView2>
     </Grid>
 </Window>
