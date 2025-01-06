@@ -17,6 +17,7 @@
             <Button x:Name="button_pdf" Click="button_pdf_Click">pdf</Button>
             <Button x:Name="button_googlemap" Click="button_googlemap_Click">google map</Button>
             <Button x:Name="button_reactjs" Click="button_reactjs_Click">ReactJs</Button>
+            <Button x:Name="button_html" Click="button_html_Click">html</Button>
         </StackPanel>
         <webview2:WebView2 WebMessageReceived="webview2_WebMessageReceived" x:Name="webview2" Grid.Row="1"></webview2:WebView2>
     </Grid>

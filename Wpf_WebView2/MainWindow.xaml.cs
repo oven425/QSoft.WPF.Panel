@@ -62,5 +62,23 @@ namespace Wpf_WebView2
         {
 
         }
+
+        private async void button_html_Click(object sender, RoutedEventArgs e)
+        {
+            var GetDirectory = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            var root = System.IO.Path.GetDirectoryName(GetDirectory);
+            root = System.IO.Path.GetDirectoryName(root);
+            root = System.IO.Path.GetDirectoryName(root);
+            root = @$"{root}\html";
+
+            var options = new CoreWebView2EnvironmentOptions("--allow-file-access-from-files");
+            var environment = await CoreWebView2Environment.CreateAsync(null, null, options);
+            await webview2.EnsureCoreWebView2Async(environment);
+            var reactjs = @$"{root}\index.html";
+            //C:\Users\oven4\source\repos\QSoft.WPF\Wpf_WebView2\reactjst\dist
+            //C:\Users\oven4\\source\repos\QSoft.WPF\Wpf_WebView2\reactjst\dist
+            webview2.CoreWebView2.Navigate(reactjs);
+
+        }
     }
 }
