@@ -7,18 +7,27 @@
         mc:Ignorable="d"
         xmlns:webview2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition/>
-        </Grid.RowDefinitions>
-        <StackPanel Orientation="Horizontal">
-            <Button x:Name="button_url" Click="button_url_Click">Yahoo</Button>
-            <Button x:Name="button_pdf" Click="button_pdf_Click">pdf</Button>
-            <Button x:Name="button_googlemap" Click="button_googlemap_Click">google map</Button>
-            <Button x:Name="button_reactjs" Click="button_reactjs_Click">ReactJs</Button>
-            <Button x:Name="button_html" Click="button_html_Click">html</Button>
-        </StackPanel>
-        <webview2:WebView2 WebMessageReceived="webview2_WebMessageReceived" x:Name="webview2" Grid.Row="1"></webview2:WebView2>
-    </Grid>
+    <TabControl>
+        <TabItem Header="tt">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <StackPanel Orientation="Horizontal">
+                    <Button x:Name="button_url" Click="button_url_Click">Yahoo</Button>
+                    <Button x:Name="button_pdf" Click="button_pdf_Click">pdf</Button>
+                    <Button x:Name="button_googlemap" Click="button_googlemap_Click">google map</Button>
+                    <Button x:Name="button_reactjs" Click="button_reactjs_Click">ReactJs</Button>
+                    <Button x:Name="button_html" Click="button_html_Click">html</Button>
+                </StackPanel>
+                <webview2:WebView2 WebMessageReceived="webview2_WebMessageReceived" x:Name="webview2" Grid.Row="1"></webview2:WebView2>
+
+            </Grid>
+        </TabItem>
+        <TabItem Header="Reactjs">
+            <local:WebViewReactjs/>
+        </TabItem>
+    </TabControl>
+
 </Window>

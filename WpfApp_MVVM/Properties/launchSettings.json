@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "WpfApp_MVVM": {
-      "commandName": "Project",
-      "commandLineArgs": "aa=aa;bb=bb"
-    }
-  }
-}

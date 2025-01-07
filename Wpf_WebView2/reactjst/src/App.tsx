@@ -6,7 +6,7 @@ import './App.css'
 function App() {
   const [count, setCount] = useState(0)
   const button1=()=>{
-    window.ReactNativeWebView.postMessage(data);
+    window.chrome.webview?.postMessage("aaa");
     setCount((count) => count + 1)
   }
   return (
