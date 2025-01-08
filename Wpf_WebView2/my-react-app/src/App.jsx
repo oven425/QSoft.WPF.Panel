@@ -5,15 +5,7 @@ import './App.css'
 
 function App() {
   const [count, setCount] = useState(0)
-  const button1=()=>{
-    //window.chrome.webv.postMessage(`GetCookies ${input.value}`);
-    
-    //window.chrome.webview?.postMessage("aaa");
-    //window.chrome.webview?.addEventListener('message', args=>{
-
-    //});
-    setCount((count) => count + 1)
-  }
+  
   return (
     <>
       <div>
@@ -26,11 +18,11 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
-        <button onClick={() => button1()}>
+        <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
         </button>
         <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
+          Edit <code>src/App.jsx</code> and save to test HMR
         </p>
       </div>
       <p className="read-the-docs">

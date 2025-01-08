@@ -53,8 +53,6 @@ namespace Wpf_WebView2
             var environment = await CoreWebView2Environment.CreateAsync(null, null, options);
             await webview2.EnsureCoreWebView2Async(environment);
             var reactjs = @$"{root}\index.html";
-            //C:\Users\oven4\source\repos\QSoft.WPF\Wpf_WebView2\reactjst\dist
-            //C:\Users\oven4\\source\repos\QSoft.WPF\Wpf_WebView2\reactjst\dist
             webview2.CoreWebView2.Navigate(reactjs);
         }
 

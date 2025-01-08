@@ -6,12 +6,16 @@
              xmlns:local="clr-namespace:Wpf_WebView2"
              mc:Ignorable="d" 
              xmlns:webview2="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+             Loaded="UserControl_Loaded"
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <webview2:WebView2 Grid.Row="1"/>
+        <StackPanel Orientation="Horizontal">
+            <Button x:Name="button_alert" Click="button_alert_Click">alert</Button>
+        </StackPanel>
+        <webview2:WebView2 WebMessageReceived="webview2_WebMessageReceived" x:Name="webview2" Grid.Row="1"/>
     </Grid>
 </UserControl>
