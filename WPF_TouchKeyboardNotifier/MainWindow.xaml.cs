@@ -48,7 +48,7 @@ namespace WPF_TouchKeyboardNotifier
         private void CheckBox_Click(object sender, RoutedEventArgs e)
         {
             var cc = sender as CheckBox;
-            
+            m_InputPane?.TryShow();
             //if(cc.IsChecked == true)
             //{
             //    var bb = m_InputPane?.TryShow();

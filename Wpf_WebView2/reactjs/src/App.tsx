@@ -4,8 +4,23 @@ import viteLogo from '/vite.svg'
 import './App.css'
 
 function App() {
+  const [text, setText] = useState('text');
   const [count, setCount] = useState(0)
-  
+  const ttt = ()=>
+  {
+    setCount((count) => count + 1)
+    window.chrome.webview.postMessage('aaa');
+    // window.chrome.webview.addEventListener('aa', ()=>
+    //   {
+    //     console.log('123')
+    //   }, false);
+
+      window.chrome.webview.addEventListener('message', arg => {
+        setText(arg.data);         
+        document.body.style.background = 'red';    
+        //alert(arg.data);
+                 });
+  }
   return (
     <>
       <div>
@@ -18,11 +33,12 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
+        <p>{text}</p>
+        <button onClick={ttt}>
           count is {count}
         </button>
         <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
+          Edit <code>src/App.tsx</code> and save to test HMR
         </p>
       </div>
       <p className="read-the-docs">

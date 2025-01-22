@@ -11,6 +11,10 @@
         window.onload = function () {
             //alert("onload-success");
         }
+		window.chrome.webview.addEventListener('message', arg => {
+              alert('webview messgae')
+			  alert(arg.data)
+         });
         function postMsg() {
             var args = "msg ，from webView2";
             window.chrome.webview.postMessage(args);
