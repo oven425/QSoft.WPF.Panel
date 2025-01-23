@@ -4,22 +4,24 @@ import viteLogo from '/vite.svg'
 import './App.css'
 
 function App() {
-  const [text, setText] = useState('text');
+  //const [text, setText] = useState('text');
   const [count, setCount] = useState(0)
+  
   const ttt = ()=>
   {
     setCount((count) => count + 1)
+    alert('button click')
     window.chrome.webview.postMessage('aaa');
     // window.chrome.webview.addEventListener('aa', ()=>
     //   {
     //     console.log('123')
     //   }, false);
 
-      window.chrome.webview.addEventListener('message', arg => {
-        setText(arg.data);         
-        document.body.style.background = 'red';    
-        //alert(arg.data);
-                 });
+      // window.chrome.webview.addEventListener('message', arg => {
+      //   setText(arg.data);         
+      //   document.body.style.background = 'red';    
+      //   //alert(arg.data);
+      //            });
   }
   return (
     <>
@@ -33,7 +35,7 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
-        <p>{text}</p>
+        {/* <p>{text}</p> */}
         <button onClick={ttt}>
           count is {count}
         </button>

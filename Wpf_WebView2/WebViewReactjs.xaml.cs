@@ -48,19 +48,29 @@ namespace Wpf_WebView2
 
         private void webview2_WebMessageReceived(object sender, CoreWebView2WebMessageReceivedEventArgs e)
         {
-            System.Diagnostics.Trace.WriteLine(e.WebMessageAsJson);
+            this.m_MainUI.ReceiveString = e.WebMessageAsJson;
         }
 
         private async void button_alert_Click(object sender, RoutedEventArgs e)
         {
+            var json = "{\"background\":\"https://myfreetime.cn/usr/uploads/2024/4/%E6%B8%85%E5%B9%B3%E8%B0%83%C2%B7%E5%90%8D%E8%8A%B1%E5%80%BE%E5%9B%BD%E4%B8%A4%E7%9B%B8%E6%AC%A2/jk3.jpg\"}";
 
-            this.webview2.CoreWebView2.PostWebMessageAsJson("{}");
-            //await webview2.CoreWebView2.ExecuteScriptAsync($"alert({DateTime.Now:T})");
+            this.webview2.CoreWebView2.PostWebMessageAsJson(json);
         }
     }
 
     public class WebViewReactjsVM : INotifyPropertyChanged
     {
+        string m_ReceiveString;
+        public string ReceiveString
+        {
+            set
+            {
+                this.m_ReceiveString = value;
+                this.Update("ReceiveString");
+            }
+            get => m_ReceiveString;
+        }
         public string ExcutSnn { set; get; }
         public event PropertyChangedEventHandler? PropertyChanged;
         void Update(string name)=>this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
