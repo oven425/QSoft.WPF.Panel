@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "WinUI3_NET9_NAOT (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "WinUI3_NET9_NAOT (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

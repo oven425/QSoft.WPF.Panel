@@ -2,7 +2,7 @@
 using System.Data;
 using System.Windows;
 
-namespace WpfApp_TreeView
+namespace QSoft.WPF.TreeListViewT
 {
     /// <summary>
     /// Interaction logic for App.xaml

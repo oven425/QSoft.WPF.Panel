@@ -1,0 +1,24 @@
+﻿<Window x:Class="QSoft.WPF.TreeListViewT.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:QSoft.WPF.TreeListViewT"
+        mc:Ignorable="d"
+        xmlns:qtreelistview="clr-namespace:QSoft.WPF.TreeListView;assembly=QSoft.WPF.TreeListView"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <qtreelistview:TreeListView>
+            <qtreelistview:TreeListView.View>
+                <GridView>
+                    <GridViewColumn Header="Name"/>
+                    
+                </GridView>
+            </qtreelistview:TreeListView.View>
+        </qtreelistview:TreeListView>
+    </Grid>
+</Window>
