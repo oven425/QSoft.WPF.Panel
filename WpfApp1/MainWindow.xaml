@@ -10,13 +10,6 @@
         xmlns:qtreelist ="clr-namespace:QSoft.WPF.TreeListView;assembly=QSoft.WPF.TreeListView"
         Title="MainWindow" Height="450" Width="800">
     <TabControl>
-        <TabItem Header="TreeList">
-
-        </TabItem>
-        
-        <TabItem Header="TreeView2">
-            <local:TreeListView2/>
-        </TabItem>
         <TabItem Header="bb">
             <local:RoutedEventIsHandledBehavior/>
         </TabItem>

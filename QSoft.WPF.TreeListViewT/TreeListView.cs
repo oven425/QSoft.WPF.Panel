@@ -8,7 +8,7 @@ using System.Windows;
 using System.Globalization;
 using System.Windows.Data;
 
-namespace WpfApp1
+namespace QSoft.WPF.TreeListViewT
 {
     public class TreeListView : TreeView
     {

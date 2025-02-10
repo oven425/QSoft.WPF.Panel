@@ -8,17 +8,14 @@
         xmlns:qtreelistview="clr-namespace:QSoft.WPF.TreeListView;assembly=QSoft.WPF.TreeListView"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
-        <qtreelistview:TreeListView>
-            <qtreelistview:TreeListView.View>
-                <GridView>
-                    <GridViewColumn Header="Name"/>
-                    
-                </GridView>
-            </qtreelistview:TreeListView.View>
-        </qtreelistview:TreeListView>
+        <TabControl>
+            <TabItem Header="TreeList">
+
+            </TabItem>
+
+            <TabItem Header="TreeView2">
+                <local:TreeListView2/>
+            </TabItem>
+        </TabControl>
     </Grid>
 </Window>

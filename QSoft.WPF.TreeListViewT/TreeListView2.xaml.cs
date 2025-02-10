@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace WpfApp1
+namespace QSoft.WPF.TreeListViewT
 {
     /// <summary>
     /// TreeListView2.xaml 的互動邏輯
