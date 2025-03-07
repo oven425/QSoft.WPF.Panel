@@ -9,26 +9,48 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <HierarchicalDataTemplate DataType="{x:Type local:Group2}" ItemsSource="{Binding Items}">
-            <TextBlock Text="{Binding GroupName}"/>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding GroupName}"/>
+                <TextBlock Text="{Binding GroupName}"/>
+            </StackPanel>
+        </HierarchicalDataTemplate>
+        <HierarchicalDataTemplate DataType="{x:Type local:Item2}">
+            <TextBlock Text="{Binding ItemName}"/>
         </HierarchicalDataTemplate>
     </UserControl.Resources>
     <Grid>
-        <qtreelist:TreeListView ItemsSource="{Binding TreeDs}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <qtreelist:TreeListView
+            ItemsSource="{Binding TreeDs}">
             <qtreelist:TreeListView.View>
                 <GridView>
                     <GridView.Columns>
                         <GridViewColumn Header="Name">
-                            <GridViewColumn.CellTemplate>
+                            <!--<GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Name}"/>
+                                    <TextBlock Text="{Binding GroupName}"/>
                                 </DataTemplate>
-                            </GridViewColumn.CellTemplate>
+                            </GridViewColumn.CellTemplate>-->
                         </GridViewColumn>
                         <!--<GridViewColumn CellTemplateSelector="{StaticResource ss1}"/>-->
                     </GridView.Columns>
                 </GridView>
             </qtreelist:TreeListView.View>
         </qtreelist:TreeListView>
+        <ListView x:Name="listview" Grid.Column="1" ItemsSource="{Binding TreeDs}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Name"/>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <TreeView ItemsSource="{Binding TreeDs}" Grid.Column="2">
             
+        </TreeView>
+        <Button Grid.Column="2" Click="Button_Click">aa</Button>
     </Grid>
 </UserControl>

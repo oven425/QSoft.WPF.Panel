@@ -76,6 +76,7 @@ namespace QSoft.WPF.TreeListView
             if(this.View is GridView gridview && 
                 this.GetTemplateChild("header") is GridViewHeaderRowPresenter hp)
             {
+                
                 DataTemplate template = new DataTemplate();
                 FrameworkElementFactory panel = new FrameworkElementFactory(typeof(DockPanel));
                 template.VisualTree = panel;
@@ -151,15 +152,20 @@ namespace QSoft.WPF.TreeListView
                 template.Triggers.Add(datatrigger);
                 hp.Columns = gridview.Columns;
                 hp.Columns[0].DisplayMemberBinding = null;
-                //hp.Columns[0].CellTemplate = FindResource("CellTemplate_Name11") as DataTemplate;
                 hp.Columns[0].CellTemplate = template;
             }
             base.OnApplyTemplate();
         }
 
+        protected override void OnItemTemplateChanged(DataTemplate oldItemTemplate, DataTemplate newItemTemplate)
+        {
+            base.OnItemTemplateChanged(oldItemTemplate, newItemTemplate);
+        }
+
         protected override DependencyObject GetContainerForItemOverride()
         {
             var item = new TreeListViewItem();
+            
             if (this.View is GridView gridview)
             {
                 item.ColumnCollection = gridview.Columns;

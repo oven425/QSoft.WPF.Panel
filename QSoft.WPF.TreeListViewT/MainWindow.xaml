@@ -9,9 +9,9 @@
         Title="MainWindow" Height="450" Width="800">
     <Grid>
         <TabControl>
-            <TabItem Header="TreeList">
+            <!--<TabItem Header="TreeList">
 
-            </TabItem>
+            </TabItem>-->
 
             <TabItem Header="TreeView2">
                 <local:TreeListView2/>

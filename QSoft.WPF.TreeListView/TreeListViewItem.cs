@@ -73,6 +73,8 @@ namespace QSoft.WPF.TreeListView
             var hp = this.GetTemplateChild("PART_Header") as GridViewRowPresenter;
             //PART_Header
             hp.Columns = this.ColumnCollection;
+            var t1 = this.TemplatedParent;
+            var t2 = this.Template;
             base.OnApplyTemplate();
         }
 

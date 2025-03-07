@@ -26,6 +26,14 @@ namespace QSoft.WPF.TreeListViewT
             InitializeComponent();
             this.DataContext = new TreeListView2VM();
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            if(this.listview.View is GridView gridview)
+            {
+                var t1 = gridview.Columns[0] as GridViewColumn;
+            }
+        }
     }
 
     public class TreeListView2VM
