@@ -1,0 +1,8 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:System="clr-namespace:System;assembly=mscorlib"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <System:String x:Key="WelcomeText">歡迎！</System:String>
+    <System:String x:Key="NameLabel">姓名：</System:String>
+    <System:String x:Key="SubmitButton">提交</System:String>
+    <System:String x:Key="CurrentLanguage">目前語言：繁體中文</System:String>
+</ResourceDictionary>

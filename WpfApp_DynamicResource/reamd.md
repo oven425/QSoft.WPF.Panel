@@ -1,0 +1,1 @@
+# Study Dynamic Resource
