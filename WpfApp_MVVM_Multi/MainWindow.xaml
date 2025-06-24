@@ -10,5 +10,7 @@
     <StackPanel>
         <CheckBox IsChecked="{Binding IsSet}" Command="{Binding SetCommand}" CommandParameter="{Binding IsSet}"/>
         <Button x:Name="button" Click="button_Click">aa</Button>
+        <TextBlock Text="{Binding SetText}"/>
+        <CheckBox IsChecked="{Binding IsSet2}"/>
     </StackPanel>
 </Window>

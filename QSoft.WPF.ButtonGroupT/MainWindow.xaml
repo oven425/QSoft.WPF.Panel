@@ -1,0 +1,35 @@
+﻿<Window x:Class="QSoft.WPF.ButtonGroupT.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:QSoft.WPF.ButtonGroupT"
+        mc:Ignorable="d"
+        xmlns:bg="clr-namespace:QSoft.WPF.ButtonGroup;assembly=QSoft.WPF.ButtonGroup"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <bg:ButtonGroup Orientation="Horizontal">
+            <bg:ButtonGroup.FirstButtonBaseStyle>
+                <Style TargetType="Button">
+                    <Setter Property="Background" Value="LightBlue"/>
+                    <Setter Property="Foreground" Value="Black"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                </Style>
+            </bg:ButtonGroup.FirstButtonBaseStyle>
+            <Button Content="Button 1"/>
+            <Button Content="Button 2"/>
+            <Button Content="Button 3"/>
+        </bg:ButtonGroup>
+        <bg:ButtonGroup ItemsSource="{Binding Items}" Grid.Row="1">
+            <bg:ButtonGroup.ItemTemplate>
+                <DataTemplate>
+                    <Button Content="{Binding Name}"></Button>
+                </DataTemplate>
+            </bg:ButtonGroup.ItemTemplate>
+        </bg:ButtonGroup>
+    </Grid>
+</Window>

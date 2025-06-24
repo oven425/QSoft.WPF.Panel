@@ -1,5 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -29,19 +31,60 @@ namespace WpfApp_MVVM_Multi
             if (DataContext is MainWindowVM vm)
             {
                 vm.IsSet = !vm.IsSet;
+                vm.IsSet2 = !vm.IsSet2;
             }
         }
     }
 
-    public partial class MainWindowVM:ObservableObject
+    public partial class MainWindowVM : BaseVM, INotifyPropertyChanged
     {
         [ObservableProperty]
+        [NotifyPropertyChangedFor("SetText")]
         bool isSet = false;
 
         [RelayCommand]
         void Set(bool ss)
         {
+            //base.OnPropertyChanged(nameof(SetText));
+        }
 
+        public string SetText
+        {
+            get => IsSet ? "Set" : "Unset";
+        }
+
+        bool m_IsSet2 = false;
+        public bool IsSet2
+        {
+            set
+                            {
+                if (m_IsSet2 != value)
+                {
+                    m_IsSet2 = value;
+                    OnPropertyChanged();
+                }
+            }
+            get => m_IsSet2;
+        }
+
+        //public event PropertyChangedEventHandler PropertyChanged;
+        public override void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            string str = propertyName;
+            //base.SetProperty(ref str, true);
+
+            //base.OnPropertyChanged(propertyName);
+            //PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+    }
+
+    public class BaseVM:ObservableObject
+    {
+
+
+        public virtual new void OnPropertyChanged([CallerMemberName] string propertyName = "")
+        {
         }
     }
 }
