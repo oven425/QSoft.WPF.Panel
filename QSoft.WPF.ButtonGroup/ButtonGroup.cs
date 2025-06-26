@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -108,7 +109,36 @@ namespace QSoft.WPF.ButtonGroup
             //    }
                 
             //}
+
+            foreach(var oo in this.Items)
+            {
+                if(oo is FrameworkElement cc)
+                {
+                    cc.Style = this.FirstButtonBaseStyle;
+                }
+            }
             base.OnApplyTemplate();
+        }
+
+        protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e)
+        {
+            foreach (var oo in this.Items)
+            {
+                if (oo is FrameworkElement cc)
+                {
+                    cc.Style = this.FirstButtonBaseStyle;
+                }
+            }
+            base.OnItemsChanged(e);
+        }
+
+        protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
+        {
+            base.PrepareContainerForItemOverride(element, item);
+            if (element is FrameworkElement cc)
+            {
+                cc.Style = this.FirstButtonBaseStyle;
+            }
         }
 
         private void Items_CurrentChanged(object? sender, EventArgs e)

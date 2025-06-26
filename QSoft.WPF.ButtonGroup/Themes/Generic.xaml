@@ -8,10 +8,24 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:ButtonGroup}">
+                    <Border ClipToBounds="True" CornerRadius="10" Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                        
+                        <StackPanel IsItemsHost="True" HorizontalAlignment="Stretch" Orientation="{TemplateBinding Orientation}"></StackPanel>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type local:ToggleButtonGroup}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:ToggleButtonGroup}">
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}">
-                        <StackPanel IsItemsHost="True" HorizontalAlignment="Stretch" Orientation="{TemplateBinding Orientation}"></StackPanel>
                     </Border>
                 </ControlTemplate>
             </Setter.Value>

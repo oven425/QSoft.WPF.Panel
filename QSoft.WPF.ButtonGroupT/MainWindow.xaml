@@ -7,12 +7,89 @@
         mc:Ignorable="d"
         xmlns:bg="clr-namespace:QSoft.WPF.ButtonGroup;assembly=QSoft.WPF.ButtonGroup"
         Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <ResourceDictionary>
+            
+        <Style x:Key="ButtonLikeRadioButton" TargetType="{x:Type RadioButton}">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#4299E1"/>
+            <!-- 預設藍色背景 -->
+            <Setter Property="BorderBrush" Value="#2B6CB0"/>
+            <!-- 預設深藍色邊框 -->
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RadioButton}">
+                        <Border x:Name="templateRoot"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="5">
+                            <!-- 圓角 -->
+                            <ContentPresenter x:Name="contentPresenter"
+                                          Content="{TemplateBinding Content}"
+                                          ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <!-- 當滑鼠懸停時的視覺狀態 -->
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="templateRoot" Property="Background" Value="#63B3ED"/>
+                                <!-- 淺一點的藍色 -->
+                            </Trigger>
+                            <!-- 當按鈕被按下時的視覺狀態 -->
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="templateRoot" Property="Background" Value="#2C5282"/>
+                                <!-- 更深的藍色 -->
+                                <Setter TargetName="templateRoot" Property="BorderBrush" Value="#1A365D"/>
+                            </Trigger>
+                            <!-- 當 RadioButton 被選中時的視覺狀態 -->
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="templateRoot" Property="Background" Value="#3182CE"/>
+                                <!-- 選中時的藍色 -->
+                                <Setter TargetName="templateRoot" Property="BorderBrush" Value="#2C5282"/>
+                                <Setter Property="Foreground" Value="White"/>
+                                <!-- 選中時文字顏色 -->
+                            </Trigger>
+                            <!-- 當 RadioButton 被選中且滑鼠懸停時的視覺狀態 -->
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsChecked" Value="True"/>
+                                    <Condition Property="IsMouseOver" Value="True"/>
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="templateRoot" Property="Background" Value="#4C8AD6"/>
+                                <!-- 選中且懸停時的藍色 -->
+                            </MultiTrigger>
+                            <!-- 當 RadioButton 被禁用時的視覺狀態 -->
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#A0AEC0"/>
+                                <!-- 灰色背景 -->
+                                <Setter Property="BorderBrush" Value="#718096"/>
+                                <Setter Property="Foreground" Value="#EDF2F7"/>
+                                <!-- 淺灰色文字 -->
+                                <Setter TargetName="templateRoot" Property="Opacity" Value="0.6"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        </ResourceDictionary>
+
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <bg:ButtonGroup Orientation="Horizontal">
+        <!--<bg:ButtonGroup Orientation="Horizontal">
             <bg:ButtonGroup.FirstButtonBaseStyle>
                 <Style TargetType="Button">
                     <Setter Property="Background" Value="LightBlue"/>
@@ -22,14 +99,17 @@
             </bg:ButtonGroup.FirstButtonBaseStyle>
             <Button Content="Button 1"/>
             <Button Content="Button 2"/>
-            <Button Content="Button 3"/>
-        </bg:ButtonGroup>
-        <bg:ButtonGroup ItemsSource="{Binding Items}" Grid.Row="1">
-            <bg:ButtonGroup.ItemTemplate>
-                <DataTemplate>
-                    <Button Content="{Binding Name}"></Button>
-                </DataTemplate>
-            </bg:ButtonGroup.ItemTemplate>
-        </bg:ButtonGroup>
+            <Button Content="Button 3" Cursor="Hand"/>
+        </bg:ButtonGroup>-->
+        <Grid Grid.Row="1" VerticalAlignment="Top">
+            <bg:ButtonGroup ItemsSource="{Binding Items}" Grid.Row="1" FirstButtonBaseStyle="{StaticResource ButtonLikeRadioButton}">
+                <bg:ButtonGroup.ItemTemplate>
+                    <DataTemplate>
+                        <RadioButton Content="{Binding Name}" GroupName="aa"/>
+                    </DataTemplate>
+                </bg:ButtonGroup.ItemTemplate>
+            </bg:ButtonGroup>
+
+        </Grid>
     </Grid>
 </Window>
