@@ -2,7 +2,7 @@
 using System.Data;
 using System.Windows;
 
-namespace WpfApp_MVVM_Multi
+namespace WpfApp_TestObejctBinding
 {
     /// <summary>
     /// Interaction logic for App.xaml
