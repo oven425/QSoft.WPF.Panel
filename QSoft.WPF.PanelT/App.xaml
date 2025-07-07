@@ -1,7 +1,7 @@
-﻿<Application x:Class="WpfApp_TestObejctBinding.App"
+﻿<Application x:Class="QSoft.WPF.PanelT.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:WpfApp_TestObejctBinding"
+             xmlns:local="clr-namespace:QSoft.WPF.PanelT"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
          

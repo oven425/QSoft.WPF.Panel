@@ -2,7 +2,7 @@
 using System.Data;
 using System.Windows;
 
-namespace WpfApp_TestObejctBinding
+namespace QSoft.WPF.PanelT
 {
     /// <summary>
     /// Interaction logic for App.xaml

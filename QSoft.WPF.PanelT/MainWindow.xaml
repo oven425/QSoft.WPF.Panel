@@ -1,0 +1,26 @@
+﻿<Window x:Class="QSoft.WPF.PanelT.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:QSoft.WPF.PanelT"
+        mc:Ignorable="d"
+        xmlns:panel="clr-namespace:QSoft.WPF.Panel;assembly=QSoft.WPF.Panel"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <panel:FlexPanel JustifyContent="{Binding SelectedItem, ElementName=combobox_justifycontent}">
+            <Button>A</Button>
+            <Button Width="100">B</Button>
+            <Button Width="100">C</Button>
+        </panel:FlexPanel>
+        <StackPanel Orientation="Horizontal" Grid.Row="1">
+            <ComboBox ItemsSource="{Binding JustifyContents}" x:Name="combobox_justifycontent">
+                
+            </ComboBox>
+        </StackPanel>
+    </Grid>
+</Window>
