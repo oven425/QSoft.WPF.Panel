@@ -12,10 +12,10 @@
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <panel:FlexPanel JustifyContent="{Binding SelectedItem, ElementName=combobox_justifycontent}">
-            <Button>A</Button>
-            <Button Width="100">B</Button>
-            <Button Width="100">C</Button>
+        <panel:FlexPanel Background="Pink" JustifyContent="{Binding SelectedItem, ElementName=combobox_justifycontent}">
+            <Rectangle Width="50" Fill="Red"/>
+            <Rectangle Width="100" Fill="Green"/>
+            <Rectangle Width="200" Fill="Blue"/>
         </panel:FlexPanel>
         <StackPanel Orientation="Horizontal" Grid.Row="1">
             <ComboBox ItemsSource="{Binding JustifyContents}" x:Name="combobox_justifycontent">

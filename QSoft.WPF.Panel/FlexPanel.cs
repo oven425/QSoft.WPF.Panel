@@ -51,25 +51,96 @@ namespace QSoft.WPF.Panel
         {
             var item_w = finalSize.Width / InternalChildren.Count;
             double x = 0;
-            foreach (UIElement child in InternalChildren)
+            switch(this.JustifyContent)
             {
-                switch(this.JustifyContent)
-                {
-                    case JustifyContent.Left:
+                case JustifyContent.Left:
+                    {
+                        foreach (UIElement child in InternalChildren)
                         {
                             item_w = child.DesiredSize.Width;
+                            child.Arrange(new Rect()
+                            {
+                                X = x,
+                                Y = 0,
+                                Height = finalSize.Height,
+                                Width = item_w,
+                            });
+                            x = x + item_w;
                         }
-                        break;
-                }
-                child.Arrange(new Rect()
-                {
-                    X = x,
-                    Y = 0,
-                    Height = finalSize.Height,
-                    Width = item_w,
-                });
-                x=x+ item_w;
+                    }
+                    break;
+                case JustifyContent.Right:
+                    {
+                        x = finalSize.Width;
+                        for (int i = InternalChildren.Count - 1; i >= 0; i--)
+                        {
+                            UIElement child = InternalChildren[i];
+                            item_w = child.DesiredSize.Width;
+                            x = x - item_w;
+                            child.Arrange(new Rect()
+                            {
+                                X = x,
+                                Y = 0,
+                                Height = finalSize.Height,
+                                Width = item_w,
+                            });
+                            
+                        }
+                    }
+                    break;
+                case JustifyContent.SpaceBetween:
+                    {
+                        for (int i= 0; i < InternalChildren.Count; i++)
+                        {
+                            var child = InternalChildren[i];
+                            var iw = finalSize.Width / InternalChildren.Count;
+                            
+                            item_w = child.DesiredSize.Width;
+
+                            if(item_w > iw)
+                            {
+                                item_w = iw;
+                            }
+                            Rect rc;
+                            if(i==0)
+                            {
+                                rc = new Rect()
+                                {
+                                    X = 0,
+                                    Y = 0,
+                                    Height = finalSize.Height,
+                                    Width = item_w,
+                                };
+                            }
+                            else if(i == InternalChildren.Count - 1)
+                            {
+                                rc = new Rect()
+                                {
+                                    X = finalSize.Width - item_w,
+                                    Y = 0,
+                                    Height = finalSize.Height,
+                                    Width = item_w,
+                                };
+                            }
+                            else
+                            {
+                                rc= new Rect()
+                                {
+                                    X = x,
+                                    Y = 0,
+                                    Height = finalSize.Height,
+                                    Width = item_w,
+                                };
+                            }
+                            child.Arrange(rc);
+                            System.Diagnostics.Debug.WriteLine($"[{i}] {rc}");
+                            x += iw;
+                        }
+                    }
+                    break;
+                    
             }
+            
             return finalSize;
         }
     }
