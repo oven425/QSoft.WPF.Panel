@@ -6,21 +6,20 @@
         xmlns:local="clr-namespace:QSoft.WPF.PanelT"
         mc:Ignorable="d"
         xmlns:panel="clr-namespace:QSoft.WPF.Panel;assembly=QSoft.WPF.Panel"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="900">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <panel:FlexPanel Background="Pink" JustifyContent="{Binding SelectedItem, ElementName=combobox_justifycontent}">
-            <Rectangle Width="50" Fill="Red"/>
-            <Rectangle Width="100" Fill="Green"/>
-            <Rectangle Width="200" Fill="Blue"/>
+            <Rectangle Width="50" Fill="Red" Stroke="Black" StrokeThickness="1"/>
+            <Rectangle Width="100" Fill="Green" Stroke="Black" StrokeThickness="1"/>
+            <Rectangle Width="200" Fill="Blue" Stroke="Black" StrokeThickness="1"/>
         </panel:FlexPanel>
         <StackPanel Orientation="Horizontal" Grid.Row="1">
-            <ComboBox ItemsSource="{Binding JustifyContents}" x:Name="combobox_justifycontent">
-                
-            </ComboBox>
+            <ComboBox ItemsSource="{Binding JustifyContents}" x:Name="combobox_justifycontent"/>
+            <ComboBox ItemsSource="{Binding AlignItems}"/>
         </StackPanel>
     </Grid>
 </Window>

@@ -34,5 +34,14 @@ namespace QSoft.WPF.PanelT
             QSoft.WPF.Panel.JustifyContent.SpaceAround,
             QSoft.WPF.Panel.JustifyContent.SpaceBetween
         ];
+
+        public ObservableCollection<QSoft.WPF.Panel.AlignItems> AlignItems { get; set; } =
+        [
+            QSoft.WPF.Panel.AlignItems.Top,
+            QSoft.WPF.Panel.AlignItems.Bottom,
+            QSoft.WPF.Panel.AlignItems.Center,
+            QSoft.WPF.Panel.AlignItems.Stretch,
+            QSoft.WPF.Panel.AlignItems.BaeseLine
+        ];
     }
 }

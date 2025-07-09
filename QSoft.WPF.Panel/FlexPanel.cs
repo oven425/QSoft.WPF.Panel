@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 //https://w3c.hexschool.com/flexbox/4a029043
 namespace QSoft.WPF.Panel
@@ -47,6 +48,37 @@ namespace QSoft.WPF.Panel
             return availableSize;
         }
 
+        protected override void OnRender(DrawingContext dc)
+        {
+            base.OnRender(dc);
+            switch(this.JustifyContent)
+            {
+                case JustifyContent.SpaceAround:
+                case JustifyContent.SpaceBetween:
+                    {
+                        var item_w = ActualWidth / InternalChildren.Count;
+                        double x = 0;
+                        foreach (UIElement child in InternalChildren)
+                        {
+                            item_w = child.DesiredSize.Width;
+                            if (item_w > ActualWidth)
+                            {
+                                item_w = ActualWidth;
+                            }
+                            dc.DrawRectangle(Brushes.LightGray, null, new Rect()
+                            {
+                                X = x,
+                                Y = 0,
+                                Height = ActualHeight,
+                                Width = item_w,
+                            });
+                            x += item_w;
+                        }
+                    }
+                    break;
+            }
+        }
+
         protected override Size ArrangeOverride(Size finalSize)
         {
             var item_w = finalSize.Width / InternalChildren.Count;
@@ -84,16 +116,58 @@ namespace QSoft.WPF.Panel
                                 Height = finalSize.Height,
                                 Width = item_w,
                             });
-                            
+                        }
+                    }
+                    break;
+                case JustifyContent.Center:
+                    {
+                        var totalw = 0.0;
+                        foreach(UIElement oo in this.InternalChildren)
+                        {
+                            totalw += oo.DesiredSize.Width;
+                        }
+                        x = (finalSize.Width - totalw) / 2;
+                        foreach (UIElement child in InternalChildren)
+                        {
+                            item_w = child.DesiredSize.Width;
+                            child.Arrange(new Rect()
+                            {
+                                X = x,
+                                Y = 0,
+                                Height = finalSize.Height,
+                                Width = item_w,
+                            });
+                            x += item_w;
+                        }
+                    }
+                    break;
+                case JustifyContent.SpaceAround:
+                    {
+                        var iw = finalSize.Width / InternalChildren.Count;
+                        foreach (UIElement child in InternalChildren)
+                        {
+                            item_w = child.DesiredSize.Width;
+                            if (iw < child.DesiredSize.Width)
+                            {
+                                iw = child.DesiredSize.Width;
+                            }
+                            child.Arrange(new Rect()
+                            {
+                                X = x+(iw- child.DesiredSize.Width)/2,
+                                Y = 0,
+                                Height = finalSize.Height,
+                                Width = item_w,
+                            });
+                            x += iw;
                         }
                     }
                     break;
                 case JustifyContent.SpaceBetween:
                     {
+                        var iw = finalSize.Width / InternalChildren.Count;
                         for (int i= 0; i < InternalChildren.Count; i++)
                         {
                             var child = InternalChildren[i];
-                            var iw = finalSize.Width / InternalChildren.Count;
                             
                             item_w = child.DesiredSize.Width;
 
@@ -126,7 +200,7 @@ namespace QSoft.WPF.Panel
                             {
                                 rc= new Rect()
                                 {
-                                    X = x,
+                                    X = x+(iw-item_w)/2,
                                     Y = 0,
                                     Height = finalSize.Height,
                                     Width = item_w,
