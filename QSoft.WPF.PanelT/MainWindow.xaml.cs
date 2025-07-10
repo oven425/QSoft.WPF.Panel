@@ -43,5 +43,7 @@ namespace QSoft.WPF.PanelT
             QSoft.WPF.Panel.AlignItems.Stretch,
             QSoft.WPF.Panel.AlignItems.BaeseLine
         ];
+        public QSoft.WPF.Panel.JustifyContent JustifyContent { set; get; } = QSoft.WPF.Panel.JustifyContent.Left;
+        public QSoft.WPF.Panel.AlignItems AlignItem { set; get; } = QSoft.WPF.Panel.AlignItems.Top;
     }
 }

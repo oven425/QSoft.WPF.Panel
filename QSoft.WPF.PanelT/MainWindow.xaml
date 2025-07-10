@@ -12,14 +12,14 @@
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <panel:FlexPanel Background="Pink" JustifyContent="{Binding SelectedItem, ElementName=combobox_justifycontent}">
-            <Rectangle Width="50" Fill="Red" Stroke="Black" StrokeThickness="1"/>
-            <Rectangle Width="100" Fill="Green" Stroke="Black" StrokeThickness="1"/>
-            <Rectangle Width="200" Fill="Blue" Stroke="Black" StrokeThickness="1"/>
+        <panel:FlexPanel Background="Pink" JustifyContent="{Binding JustifyContent}" AlignItems="{Binding AlignItem}">
+            <Rectangle Width="50" Height="50" Fill="Red" Stroke="Black" StrokeThickness="1"/>
+            <Rectangle Width="100" Height="100" Fill="Green" Stroke="Black" StrokeThickness="1"/>
+            <Rectangle Width="200" Height="200" Fill="Blue" Stroke="Black" StrokeThickness="1"/>
         </panel:FlexPanel>
         <StackPanel Orientation="Horizontal" Grid.Row="1">
-            <ComboBox ItemsSource="{Binding JustifyContents}" x:Name="combobox_justifycontent"/>
-            <ComboBox ItemsSource="{Binding AlignItems}"/>
+            <ComboBox ItemsSource="{Binding JustifyContents}" SelectedItem="{Binding JustifyContent}" x:Name="combobox_justifycontent"/>
+            <ComboBox ItemsSource="{Binding AlignItems}" SelectedItem="{Binding AlignItem}" x:Name="combobox_alignitems"/>
         </StackPanel>
     </Grid>
 </Window>
