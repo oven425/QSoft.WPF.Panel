@@ -47,19 +47,26 @@ namespace QSoft.WPF.Panel
             get => (AlignItems)GetValue(AlignItemsProperty);
         }
 
+        public readonly static DependencyProperty PaddingProperty = DependencyProperty.Register("Padding", typeof(Thickness), typeof(FlexPanel), new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure));
+        [Category("FlexPanel")]
+        public Thickness Padding
+        {
+            set => this.SetValue(PaddingProperty, value);
+            get => (Thickness)GetValue(PaddingProperty);
+        }
+
+        public readonly static DependencyProperty GapProperty = DependencyProperty.Register("Gap", typeof(double), typeof(FlexPanel), new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsMeasure));
+        [Category("FlexPanel")]
+        public double Gap
+        {
+            set => this.SetValue(GapProperty, value);
+            get => (double)GetValue(GapProperty);
+        }
+
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            var height = this.AlignItems switch
-            {
-                AlignItems.Top => 0,
-                AlignItems.Bottom => availableSize.Height,
-                AlignItems.Center => availableSize.Height / 2,
-                AlignItems.Stretch => availableSize.Height,
-                AlignItems.BaeseLine => 0, // TODO: implement
-                _ => availableSize.Height,
-            };
-
+            availableSize = new Size(availableSize.Width - this.Padding.Left - this.Padding.Right, availableSize.Height - this.Padding.Top - this.Padding.Bottom);
             foreach (UIElement child in InternalChildren)
             {
                 child?.Measure(availableSize);
@@ -70,27 +77,27 @@ namespace QSoft.WPF.Panel
         protected override void OnRender(DrawingContext dc)
         {
             base.OnRender(dc);
-            //switch (this.JustifyContent)
-            //{
-            //    case JustifyContent.SpaceAround:
-            //    case JustifyContent.SpaceBetween:
-            //        {
-            //            var item_w = ActualWidth / InternalChildren.Count;
-            //            double x = 0;
-            //            foreach (UIElement child in InternalChildren)
-            //            {
-            //                dc.DrawLine(new Pen(Brushes.Red, 1), new Point(x, 0), new Point(x, ActualHeight));
-            //                x += item_w;
-            //            }
+            switch (this.JustifyContent)
+            {
+                case JustifyContent.SpaceAround:
+                case JustifyContent.SpaceBetween:
+                    {
+                        var item_w = ActualWidth / InternalChildren.Count;
+                        double x = 0;
+                        foreach (UIElement child in InternalChildren)
+                        {
+                            dc.DrawLine(new Pen(Brushes.Red, 1), new Point(x, 0), new Point(x, ActualHeight));
+                            x += item_w;
+                        }
 
-            //        }
-            //        break;
-            //}
+                    }
+                    break;
+            }
         }
 
         protected override Size ArrangeOverride(Size finalSize)
         {
-
+            Rect rcc = new(this.Padding.Left, this.Padding.Top, finalSize.Width - this.Padding.Left - this.Padding.Right, finalSize.Height - this.Padding.Top - this.Padding.Bottom);
             Dictionary<UIElement, Rect> rc = [];
             foreach (UIElement child in InternalChildren)
             {
@@ -171,26 +178,15 @@ namespace QSoft.WPF.Panel
         void CalacJustifyContent(Dictionary<UIElement, Rect> els, Size finalSize)
         {
             var item_w = finalSize.Width / InternalChildren.Count;
-            double x = 0;
+            double x = this.Padding.Left;
             switch (this.JustifyContent)
             {
                 case JustifyContent.Left:
                     {
-                        //foreach (UIElement child in InternalChildren)
-                        //{
-                        //    item_w = child.DesiredSize.Width;
-                          //    {
-                        //        X = x,
-                        //        Y = 0,
-                        //        Height = finalSize.Height,
-                        //        Width = item_w,
-                        //    });
-                        //    x = x + item_w;
-                        //}
-                        foreach (var oo in els)
+                        foreach (var oo in els.Select(x=>x.Key))
                         {
-                            item_w = oo.Key.DesiredSize.Width;
-                            els[oo.Key] = new Rect()
+                            item_w = oo.DesiredSize.Width;
+                            els[oo] = new Rect()
                             {
                                 X = x,
                                 Y = 0,
@@ -204,22 +200,7 @@ namespace QSoft.WPF.Panel
                     break;
                 case JustifyContent.Right:
                     {
-                        //x = finalSize.Width;
-                        //for (int i = InternalChildren.Count - 1; i >= 0; i--)
-                        //{
-                        //    UIElement child = InternalChildren[i];
-                        //    item_w = child.DesiredSize.Width;
-                        //    x = x - item_w;
-                        //    child.Arrange(new Rect()
-                        //    {
-                        //        X = x,
-                        //        Y = 0,
-                        //        Height = finalSize.Height,
-                        //        Width = item_w,
-                        //    });
-                        //}
-
-                        x = finalSize.Width;
+                        x = finalSize.Width - this.Padding.Right;
                         for (int i = els.Count - 1; i >= 0; i--)
                         {
                             UIElement child = els.ElementAt(i).Key;
@@ -238,53 +219,137 @@ namespace QSoft.WPF.Panel
                     break;
                 case JustifyContent.Center:
                     {
-                        var totalw = 0.0;
-                        foreach (UIElement oo in this.InternalChildren)
-                        {
-                            totalw += oo.DesiredSize.Width;
-                        }
+                        //var totalw = 0.0;
+                        //foreach (UIElement oo in this.InternalChildren)
+                        //{
+                        //    totalw += oo.DesiredSize.Width;
+                        //}
+                        //x = (finalSize.Width - totalw) / 2;
+                        //foreach (UIElement child in InternalChildren)
+                        //{
+                        //    item_w = child.DesiredSize.Width;
+                        //    child.Arrange(new Rect()
+                        //    {
+                        //        X = x,
+                        //        Y = 0,
+                        //        Height = finalSize.Height,
+                        //        Width = item_w,
+                        //    });
+                        //    x += item_w;
+                        //}
+
+                        var totalw = els.Keys.Sum(x => x.DesiredSize.Width);
+
                         x = (finalSize.Width - totalw) / 2;
-                        foreach (UIElement child in InternalChildren)
+                        foreach(var oo in els.Select(x=>x.Key))
                         {
-                            item_w = child.DesiredSize.Width;
-                            child.Arrange(new Rect()
+                            item_w = oo.DesiredSize.Width;
+                            els[oo] = new Rect()
                             {
                                 X = x,
                                 Y = 0,
                                 Height = finalSize.Height,
                                 Width = item_w,
-                            });
+                            };
                             x += item_w;
                         }
+
                     }
                     break;
                 case JustifyContent.SpaceAround:
                     {
-                        var iw = finalSize.Width / InternalChildren.Count;
-                        foreach (UIElement child in InternalChildren)
+                        //var iw = finalSize.Width / InternalChildren.Count;
+                        //foreach (UIElement child in InternalChildren)
+                        //{
+                        //    item_w = child.DesiredSize.Width;
+                        //    if (iw < child.DesiredSize.Width)
+                        //    {
+                        //        iw = child.DesiredSize.Width;
+                        //    }
+                        //    child.Arrange(new Rect()
+                        //    {
+                        //        X = x + (iw - child.DesiredSize.Width) / 2,
+                        //        Y = 0,
+                        //        Height = finalSize.Height,
+                        //        Width = item_w,
+                        //    });
+                        //    x += iw;
+                        //}
+
+                        var iw = (finalSize.Width - this.Padding.Left - this.Padding.Right) / InternalChildren.Count;
+                        foreach(var oo in els.Select(x=>x.Key))
                         {
-                            item_w = child.DesiredSize.Width;
-                            if (iw < child.DesiredSize.Width)
+                            item_w = oo.DesiredSize.Width;
+                            if (iw < oo.DesiredSize.Width)
                             {
-                                iw = child.DesiredSize.Width;
+                                iw = oo.DesiredSize.Width;
                             }
-                            child.Arrange(new Rect()
+                            els[oo] = new Rect()
                             {
-                                X = x + (iw - child.DesiredSize.Width) / 2,
+                                X = x + (iw - oo.DesiredSize.Width) / 2,
                                 Y = 0,
                                 Height = finalSize.Height,
                                 Width = item_w,
-                            });
+                            };
                             x += iw;
                         }
                     }
                     break;
                 case JustifyContent.SpaceBetween:
                     {
+                        //var iw = finalSize.Width / InternalChildren.Count;
+                        //for (int i = 0; i < InternalChildren.Count; i++)
+                        //{
+                        //    var child = InternalChildren[i];
+
+                        //    item_w = child.DesiredSize.Width;
+
+                        //    if (item_w > iw)
+                        //    {
+                        //        item_w = iw;
+                        //    }
+                        //    Rect rc;
+                        //    if (i == 0)
+                        //    {
+                        //        rc = new Rect()
+                        //        {
+                        //            X = 0,
+                        //            Y = 0,
+                        //            Height = finalSize.Height,
+                        //            Width = item_w,
+                        //        };
+                        //    }
+                        //    else if (i == InternalChildren.Count - 1)
+                        //    {
+                        //        rc = new Rect()
+                        //        {
+                        //            X = finalSize.Width - item_w,
+                        //            Y = 0,
+                        //            Height = finalSize.Height,
+                        //            Width = item_w,
+                        //        };
+                        //    }
+                        //    else
+                        //    {
+                        //        rc = new Rect()
+                        //        {
+                        //            X = x + (iw - item_w) / 2,
+                        //            Y = 0,
+                        //            Height = finalSize.Height,
+                        //            Width = item_w,
+                        //        };
+                        //    }
+                        //    child.Arrange(rc);
+                        //    System.Diagnostics.Debug.WriteLine($"[{i}] {rc}");
+                        //    x += iw;
+                        //}
+
+
+
                         var iw = finalSize.Width / InternalChildren.Count;
-                        for (int i = 0; i < InternalChildren.Count; i++)
+                        for(int i=0; i<els.Count; i++)
                         {
-                            var child = InternalChildren[i];
+                            var child = els.ElementAt(i).Key;
 
                             item_w = child.DesiredSize.Width;
 
@@ -323,8 +388,7 @@ namespace QSoft.WPF.Panel
                                     Width = item_w,
                                 };
                             }
-                            child.Arrange(rc);
-                            System.Diagnostics.Debug.WriteLine($"[{i}] {rc}");
+                            els[child] = rc;
                             x += iw;
                         }
                     }

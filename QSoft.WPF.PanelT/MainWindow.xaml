@@ -12,7 +12,7 @@
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <panel:FlexPanel Background="Pink" JustifyContent="{Binding JustifyContent}" AlignItems="{Binding AlignItem}">
+        <panel:FlexPanel Background="Pink" Padding="10,0,50,0" JustifyContent="{Binding JustifyContent}" AlignItems="{Binding AlignItem}">
             <Rectangle Width="50" Height="50" Fill="Red" Stroke="Black" StrokeThickness="1"/>
             <Rectangle Width="100" Height="100" Fill="Green" Stroke="Black" StrokeThickness="1"/>
             <Rectangle Width="200" Height="200" Fill="Blue" Stroke="Black" StrokeThickness="1"/>
