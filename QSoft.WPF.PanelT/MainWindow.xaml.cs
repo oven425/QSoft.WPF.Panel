@@ -41,9 +41,24 @@ namespace QSoft.WPF.PanelT
             QSoft.WPF.Panel.AlignItems.Bottom,
             QSoft.WPF.Panel.AlignItems.Center,
             QSoft.WPF.Panel.AlignItems.Stretch,
-            QSoft.WPF.Panel.AlignItems.BaeseLine
+            //QSoft.WPF.Panel.AlignItems.BaeseLine
         ];
         public QSoft.WPF.Panel.JustifyContent JustifyContent { set; get; } = QSoft.WPF.Panel.JustifyContent.Left;
         public QSoft.WPF.Panel.AlignItems AlignItem { set; get; } = QSoft.WPF.Panel.AlignItems.Top;
+    }
+
+    public class DpiDecorator : Decorator
+    {
+        public DpiDecorator()
+        {
+            this.Loaded += (s, e) =>
+            {
+                Matrix m = PresentationSource.FromVisual(this).CompositionTarget.TransformToDevice;
+                ScaleTransform dpiTransform = new ScaleTransform(1 / m.M11, 1 / m.M22);
+                if (dpiTransform.CanFreeze)
+                    dpiTransform.Freeze();
+                this.LayoutTransform = dpiTransform;
+            };
+        }
     }
 }

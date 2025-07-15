@@ -1,10 +1,17 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFrameworks>net472;net6.0-windows;net8.0-windows</TargetFrameworks>
+    <LangVersion>12.0</LangVersion>
+    <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
-    <ImplicitUsings>enable</ImplicitUsings>
+    <Title>Panel.NET</Title>
+    <Copyright>Copyright © Ben Hsu 2025</Copyright>
+    <PackageProjectUrl>https://github.com/oven425/QSoft.WPF/tree/master/QSoft.WPF.Panel</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/oven425/QSoft.WPF.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>Flex</PackageTags>
   </PropertyGroup>
 
 </Project>

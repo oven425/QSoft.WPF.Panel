@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:QSoft.WPF.PanelT"
         mc:Ignorable="d"
+        SnapsToDevicePixels="True"
         xmlns:panel="clr-namespace:QSoft.WPF.Panel;assembly=QSoft.WPF.Panel"
         Title="MainWindow" Height="450" Width="900">
     <Grid>
@@ -12,14 +13,22 @@
             <RowDefinition/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <panel:FlexPanel Background="Pink" Padding="10,0,50,0" JustifyContent="{Binding JustifyContent}" AlignItems="{Binding AlignItem}">
-            <Rectangle Width="50" Height="50" Fill="Red" Stroke="Black" StrokeThickness="1"/>
-            <Rectangle Width="100" Height="100" Fill="Green" Stroke="Black" StrokeThickness="1"/>
-            <Rectangle Width="200" Height="200" Fill="Blue" Stroke="Black" StrokeThickness="1"/>
-        </panel:FlexPanel>
+        <local:DpiDecorator>
+            <panel:FlexPanel x:Name="flexpanel" Background="Pink" Padding="0,0,0,0" JustifyContent="{Binding JustifyContent}" AlignItems="{Binding AlignItem}">
+                <Rectangle Width="50" Height="50" Fill="Red" Stroke="Black" StrokeThickness="1"/>
+                <Rectangle Width="100" Height="100" Fill="Green" Stroke="Black" StrokeThickness="1"/>
+                <Rectangle Width="200" Height="200" Fill="Blue" Stroke="Black" StrokeThickness="1"/>
+                <Button>A</Button>
+                <Button>B</Button>
+                <Button>C</Button>
+            </panel:FlexPanel>
+        </local:DpiDecorator>
         <StackPanel Orientation="Horizontal" Grid.Row="1">
             <ComboBox ItemsSource="{Binding JustifyContents}" SelectedItem="{Binding JustifyContent}" x:Name="combobox_justifycontent"/>
             <ComboBox ItemsSource="{Binding AlignItems}" SelectedItem="{Binding AlignItem}" x:Name="combobox_alignitems"/>
+            <TextBox Text="{Binding Padding, ElementName=flexpanel}"/>
+            <TextBox Text="{Binding Gap, ElementName=flexpanel}"/>
         </StackPanel>
     </Grid>
+
 </Window>
