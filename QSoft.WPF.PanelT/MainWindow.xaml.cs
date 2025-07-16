@@ -22,6 +22,13 @@ namespace QSoft.WPF.PanelT
             InitializeComponent();
             this.DataContext = new MainUI();
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+            Point relativePoint = button.TranslatePoint(new Point(0, 0), flexpanel);
+            System.Diagnostics.Trace.WriteLine($"{relativePoint} {button.ActualWidth} {button.ActualHeight}");
+        }
     }
 
     public class MainUI
@@ -43,8 +50,8 @@ namespace QSoft.WPF.PanelT
             QSoft.WPF.Panel.AlignItems.Stretch,
             //QSoft.WPF.Panel.AlignItems.BaeseLine
         ];
-        public QSoft.WPF.Panel.JustifyContent JustifyContent { set; get; } = QSoft.WPF.Panel.JustifyContent.Left;
-        public QSoft.WPF.Panel.AlignItems AlignItem { set; get; } = QSoft.WPF.Panel.AlignItems.Top;
+        public QSoft.WPF.Panel.JustifyContent JustifyContent { set; get; } = QSoft.WPF.Panel.JustifyContent.SpaceAround;
+        public QSoft.WPF.Panel.AlignItems AlignItem { set; get; } = QSoft.WPF.Panel.AlignItems.Stretch;
     }
 
     public class DpiDecorator : Decorator

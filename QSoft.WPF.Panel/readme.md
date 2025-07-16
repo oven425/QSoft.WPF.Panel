@@ -1,0 +1,3 @@
+# QSoft.WPF.Panel 
+## FlexPanel
+

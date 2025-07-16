@@ -32,7 +32,7 @@ namespace QSoft.WPF.Panel
     }
     public class FlexPanel: System.Windows.Controls.Panel
     {
-        public readonly static DependencyProperty JustifyContentProperty = DependencyProperty.Register("JustifyContent", typeof(JustifyContent), typeof(FlexPanel), new FrameworkPropertyMetadata(JustifyContent.Left, FrameworkPropertyMetadataOptions.AffectsMeasure));
+        public readonly static DependencyProperty JustifyContentProperty = DependencyProperty.Register("JustifyContent", typeof(JustifyContent), typeof(FlexPanel), new FrameworkPropertyMetadata(JustifyContent.SpaceAround, FrameworkPropertyMetadataOptions.AffectsMeasure));
         [Category("FlexPanel")]
         public JustifyContent JustifyContent
         {
@@ -77,28 +77,6 @@ namespace QSoft.WPF.Panel
                 child?.Measure(availableSize);
             }
             return availableSize;
-        }
-
-        protected override void OnRender(DrawingContext dc)
-        {
-            base.OnRender(dc);
-#if DEBUG
-            switch (this.JustifyContent)
-            {
-                case JustifyContent.SpaceAround:
-                case JustifyContent.SpaceBetween:
-                    {
-                        var item_w = (ActualWidth-this.Padding.Left - this.Padding.Right) / InternalChildren.Count;
-                        double x = this.Padding.Left;
-                        foreach (UIElement child in InternalChildren)
-                        {
-                            dc.DrawLine(new Pen(Brushes.Red, 1), new Point(x, 0), new Point(x, ActualHeight));
-                            x += item_w;
-                        }
-                    }
-                    break;
-            }
-#endif
         }
 
         protected override Size ArrangeOverride(Size finalSize)
@@ -204,7 +182,7 @@ namespace QSoft.WPF.Panel
                         {
                             var child = els.ElementAt(i).Key;
                             item_w = child.DesiredSize.Width;
-                            x = x - item_w-this.Gap;
+                            x = x - item_w;
 
                             els[child] = new Rect()
                             {
@@ -213,14 +191,19 @@ namespace QSoft.WPF.Panel
                                 Height = finalSize.Height,
                                 Width = item_w,
                             };
+                            x-= this.Gap;
                         }
                     }
                     break;
                 case JustifyContent.Center:
                     {
                         var totalw = els.Keys.Sum(x => x.DesiredSize.Width);
-
-                        x = (finalSize.Width - totalw) / 2;
+                        var totalgap = this.Gap * (els.Count - 1);
+                        if (totalgap <= 0)
+                        {
+                            totalgap = 0;
+                        }
+                        x = (finalSize.Width - totalw - totalgap) / 2;
                         foreach(var oo in els.Select(x=>x.Key))
                         {
                             item_w = oo.DesiredSize.Width;
@@ -243,10 +226,10 @@ namespace QSoft.WPF.Panel
                             totalgap = 0;
                         }
                         var iw = (finalSize.Width - this.Padding.Left - this.Padding.Right - totalgap) / InternalChildren.Count;
-                        foreach(var oo in els.Select(x=>x.Key))
+                        foreach (var oo in els.Select(x => x.Key))
                         {
                             item_w = oo.DesiredSize.Width;
-                            
+
                             if (iw > item_w)
                             {
                                 item_w = iw;
@@ -258,7 +241,7 @@ namespace QSoft.WPF.Panel
                                 Height = finalSize.Height,
                                 Width = item_w,
                             };
-                            x += iw+this.Gap;
+                            x += iw + this.Gap;
                         }
                     }
                     break;
