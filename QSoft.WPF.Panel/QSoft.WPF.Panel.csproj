@@ -14,6 +14,37 @@
     <PackageTags>Flex</PackageTags>
     <Description>custom panel of WPF
 FlexPanel like css flex</Description>
+    <PackageIcon>40429294503_2b2a198be1_o.jpg</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReleaseNotes>FlexPanel
+only support bleow property
+1. row axis
+2. justify content
+3. align items, but no baseline
+4. padding and gap, only x axis</PackageReleaseNotes>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\40429294503_2b2a198be1_o.jpg">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\LICENSE.txt">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="40429294503_2b2a198be1_o.jpg">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>
