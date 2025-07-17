@@ -13,6 +13,13 @@ using System.Windows.Media.Media3D;
 //https://w3c.hexschool.com/flexbox/4a029043
 namespace QSoft.WPF.Panel
 {
+    public enum FlexDirection
+    {
+        Row,
+        //RowReverse,
+        Column,
+        //ColumnReverse
+    }
     public enum JustifyContent
     {
         Left,
@@ -64,6 +71,13 @@ namespace QSoft.WPF.Panel
             get => (double)GetValue(GapProperty);
         }
 
+        public readonly static DependencyProperty FlexDirectionProperty = DependencyProperty.Register("FlexDirection", typeof(FlexDirection), typeof(FlexPanel), new FrameworkPropertyMetadata(FlexDirection.Row, FrameworkPropertyMetadataOptions.AffectsMeasure));
+        [Category("FlexPanel")]
+        public FlexDirection FlexDirection
+        {
+            set => this.SetValue(FlexDirectionProperty, value);
+            get => (FlexDirection)GetValue(FlexDirectionProperty);
+        }
 
         protected override Size MeasureOverride(Size availableSize)
         {
@@ -152,9 +166,11 @@ namespace QSoft.WPF.Panel
             }
         }
 
+        
+
         void CalacJustifyContent(Dictionary<FrameworkElement, Rect> els, Size finalSize)
         {
-            var item_w = finalSize.Width / InternalChildren.Count;
+            var item_w = 0.0;
             double x = this.Padding.Left;
             switch (this.JustifyContent)
             {

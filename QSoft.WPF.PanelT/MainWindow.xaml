@@ -26,6 +26,7 @@
         <StackPanel Orientation="Horizontal" Grid.Row="1">
             <ComboBox ItemsSource="{Binding JustifyContents}" SelectedItem="{Binding JustifyContent}" x:Name="combobox_justifycontent"/>
             <ComboBox ItemsSource="{Binding AlignItems}" SelectedItem="{Binding AlignItem}" x:Name="combobox_alignitems"/>
+            <ComboBox ItemsSource="{Binding FlexDirections}" SelectedItem="{Binding FlexDirection, ElementName=flexpanel}"/>
             <TextBox Text="{Binding Padding, ElementName=flexpanel}"/>
             <TextBox Text="{Binding Gap, ElementName=flexpanel}"/>
         </StackPanel>

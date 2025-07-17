@@ -50,6 +50,11 @@ namespace QSoft.WPF.PanelT
             QSoft.WPF.Panel.AlignItems.Stretch,
             //QSoft.WPF.Panel.AlignItems.BaeseLine
         ];
+        public ObservableCollection<QSoft.WPF.Panel.FlexDirection> FlexDirections { get; set; } =
+        [
+            QSoft.WPF.Panel.FlexDirection.Row,
+            QSoft.WPF.Panel.FlexDirection.Column,
+        ];
         public QSoft.WPF.Panel.JustifyContent JustifyContent { set; get; } = QSoft.WPF.Panel.JustifyContent.SpaceAround;
         public QSoft.WPF.Panel.AlignItems AlignItem { set; get; } = QSoft.WPF.Panel.AlignItems.Stretch;
     }
