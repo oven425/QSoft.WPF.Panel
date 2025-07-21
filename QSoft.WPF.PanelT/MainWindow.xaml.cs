@@ -25,9 +25,9 @@ namespace QSoft.WPF.PanelT
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            var button = sender as Button;
-            Point relativePoint = button.TranslatePoint(new Point(0, 0), flexpanel);
-            System.Diagnostics.Trace.WriteLine($"{relativePoint} {button.ActualWidth} {button.ActualHeight}");
+            //var button = sender as Button;
+            //Point relativePoint = button.TranslatePoint(new Point(0, 0), flexpanel);
+            //System.Diagnostics.Trace.WriteLine($"{relativePoint} {button.ActualWidth} {button.ActualHeight}");
         }
     }
 
@@ -35,8 +35,8 @@ namespace QSoft.WPF.PanelT
     {
         public ObservableCollection<QSoft.WPF.Panel.JustifyContent> JustifyContents { get; set; } =
         [
-            QSoft.WPF.Panel.JustifyContent.Left,
-            QSoft.WPF.Panel.JustifyContent.Right,
+            QSoft.WPF.Panel.JustifyContent.Start,
+            QSoft.WPF.Panel.JustifyContent.End,
             QSoft.WPF.Panel.JustifyContent.Center,
             QSoft.WPF.Panel.JustifyContent.SpaceAround,
             QSoft.WPF.Panel.JustifyContent.SpaceBetween
@@ -44,8 +44,8 @@ namespace QSoft.WPF.PanelT
 
         public ObservableCollection<QSoft.WPF.Panel.AlignItems> AlignItems { get; set; } =
         [
-            QSoft.WPF.Panel.AlignItems.Top,
-            QSoft.WPF.Panel.AlignItems.Bottom,
+            QSoft.WPF.Panel.AlignItems.Start,
+            QSoft.WPF.Panel.AlignItems.End,
             QSoft.WPF.Panel.AlignItems.Center,
             QSoft.WPF.Panel.AlignItems.Stretch,
             //QSoft.WPF.Panel.AlignItems.BaeseLine
@@ -55,8 +55,6 @@ namespace QSoft.WPF.PanelT
             QSoft.WPF.Panel.FlexDirection.Row,
             QSoft.WPF.Panel.FlexDirection.Column,
         ];
-        public QSoft.WPF.Panel.JustifyContent JustifyContent { set; get; } = QSoft.WPF.Panel.JustifyContent.SpaceAround;
-        public QSoft.WPF.Panel.AlignItems AlignItem { set; get; } = QSoft.WPF.Panel.AlignItems.Stretch;
     }
 
     public class DpiDecorator : Decorator

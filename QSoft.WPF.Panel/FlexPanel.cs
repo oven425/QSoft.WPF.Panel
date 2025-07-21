@@ -22,8 +22,8 @@ namespace QSoft.WPF.Panel
     }
     public enum JustifyContent
     {
-        Left,
-        Right,
+        Start,
+        End,
         Center,
         SpaceAround,
         SpaceBetween
@@ -31,15 +31,15 @@ namespace QSoft.WPF.Panel
 
     public enum AlignItems
     {
-        Top,
-        Bottom,
+        Start,
+        End,
         Center,
         Stretch,
         //BaeseLine
     }
     public class FlexPanel: System.Windows.Controls.Panel
     {
-        public readonly static DependencyProperty JustifyContentProperty = DependencyProperty.Register("JustifyContent", typeof(JustifyContent), typeof(FlexPanel), new FrameworkPropertyMetadata(JustifyContent.SpaceAround, FrameworkPropertyMetadataOptions.AffectsMeasure));
+        public readonly static DependencyProperty JustifyContentProperty = DependencyProperty.Register("JustifyContent", typeof(JustifyContent), typeof(FlexPanel), new FrameworkPropertyMetadata(JustifyContent.SpaceBetween, FrameworkPropertyMetadataOptions.AffectsMeasure));
         [Category("FlexPanel")]
         public JustifyContent JustifyContent
         {
@@ -81,16 +81,37 @@ namespace QSoft.WPF.Panel
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            availableSize = new Size(availableSize.Width - this.Padding.Left - this.Padding.Right, availableSize.Height - this.Padding.Top - this.Padding.Bottom);
-            if(this.InternalChildren.Count >1)
-            {
-                availableSize = new Size(availableSize.Width-this.Gap*(this.InternalChildren.Count-1), availableSize.Height);
-            }
+
             foreach (UIElement child in InternalChildren)
             {
                 child?.Measure(availableSize);
             }
             return availableSize;
+            var ll = InternalChildren.OfType<FrameworkElement>().ToList();
+            var totalgap = TotalGap();
+            var sz = new Size(0, 0);
+            switch (this.FlexDirection)
+            {
+                case FlexDirection.Row:
+                    sz.Width = ll.Sum(x => x.DesiredSize.Width) + totalgap;
+                    sz.Height = ll.Max(x => x.DesiredSize.Height);
+                    break;
+                case FlexDirection.Column:
+                    sz.Width = ll.Max(x => x.DesiredSize.Width);
+                    sz.Height = ll.Sum(x => x.DesiredSize.Height) + totalgap;
+                    break;
+            }
+            sz.Width = sz.Width + this.Padding.Left + this.Padding.Right;
+            sz.Height = sz.Height + this.Padding.Top + this.Padding.Bottom;
+            if(sz.Width >availableSize.Width)
+            {
+                sz.Width = availableSize.Width;
+            }
+            if(sz.Height > availableSize.Height)
+            {
+                sz.Height = availableSize.Height;
+            }
+            return sz;
         }
 
         protected override Size ArrangeOverride(Size finalSize)
@@ -98,7 +119,7 @@ namespace QSoft.WPF.Panel
             Dictionary<FrameworkElement, Rect> rc = [];
             foreach (FrameworkElement child in InternalChildren)
             {
-                rc.Add(child, new());
+                rc.Add(child, new(0,0,child.DesiredSize.Width,child.DesiredSize.Height));
             }
             CalacJustifyContent(rc, finalSize);
             CalacAlignItems(rc, finalSize);
@@ -111,208 +132,392 @@ namespace QSoft.WPF.Panel
         }
 
         void CalacAlignItems(Dictionary<FrameworkElement, Rect> els, Size finalSize)
-        {
-            double y = 0;
-            
-            switch (this.AlignItems)
-            {
-                case AlignItems.Top:
-                    y = 0;
-                    break;
-                case AlignItems.Bottom:
-                    y = finalSize.Height;
-                    break;
-                case AlignItems.Center:
-                    y = finalSize.Height / 2;
-                    break;
-                case AlignItems.Stretch:
-                    y = 0; // stretch is handled in ArrangeOverride
-                    break;
-            }
-            
+        {            
             foreach (var oo in els)
             {
                 var rc = oo.Value;
-                rc.Y = y;
                 switch (this.AlignItems)
                 {
-                    case AlignItems.Top:
+                    case AlignItems.Start:
                         {
-                            rc.Y = 0;
-                            rc.Height = oo.Key.DesiredSize.Height;
+                            switch(this.FlexDirection)
+                            {
+                                case FlexDirection.Row:
+                                    rc.Y = this.Padding.Top;
+                                    rc.Height = oo.Key.DesiredSize.Height;
+                                    break;
+                                case FlexDirection.Column:
+                                    rc.X = this.Padding.Left;
+                                    rc.Width = oo.Key.DesiredSize.Width;
+                                    break;
+                            }
                         }
                         break;
-                    case AlignItems.Bottom:
+                    case AlignItems.End:
                         {
-                            rc.Y = finalSize.Height - oo.Key.DesiredSize.Height;
-                            rc.Height = oo.Key.DesiredSize.Height;
+                            switch(this.FlexDirection)
+                            {
+                                case FlexDirection.Row:
+                                    rc.Y = finalSize.Height - oo.Key.DesiredSize.Height;
+                                    rc.Height = oo.Key.DesiredSize.Height;
+                                    break;
+                                case FlexDirection.Column:
+                                    rc.X = finalSize.Width - oo.Key.DesiredSize.Width - this.Padding.Right;
+                                    rc.Width = oo.Key.DesiredSize.Width;
+                                    break;
+                            }
                         }
                         break;
                     case AlignItems.Center:
                         {
-                            rc.Y = (finalSize.Height - oo.Key.DesiredSize.Height) / 2;
-                            rc.Height = oo.Key.DesiredSize.Height;
+                            switch(this.FlexDirection)
+                            {
+                                case FlexDirection.Row:
+                                    rc.Y = (finalSize.Height - oo.Key.DesiredSize.Height) / 2;
+                                    rc.Height = oo.Key.DesiredSize.Height;
+                                    break;
+                                case FlexDirection.Column:
+                                    rc.X = (finalSize.Width - oo.Key.DesiredSize.Width) / 2;
+                                    rc.Width = oo.Key.DesiredSize.Width;
+                                    break;
+                            }
                         }
                         break;
                     case AlignItems.Stretch:
                         {
-                            rc.Y = 0;
-                            rc.Height = finalSize.Height;
+                            switch(this.FlexDirection)
+                            {
+                                case FlexDirection.Row:
+                                    rc.Y = this.Padding.Top;
+                                    rc.Height = finalSize.Height - this.Padding.Top-this.Padding.Bottom;
+                                    break;
+                                case FlexDirection.Column:
+                                    rc.X = this.Padding.Left;
+                                    rc.Width = finalSize.Width - this.Padding.Left - this.Padding.Right;
+                                    break;
+                            }
+                            
                         }
                         break;
                 }
-                
                 els[oo.Key] = rc;
             }
         }
 
-        
+        double TotalGap()
+        {
+            var totalgap = this.Gap * (InternalChildren.Count - 1);
+            if (totalgap <= 0)
+            {
+                totalgap = 0;
+            }
+            return totalgap;
+        }
 
         void CalacJustifyContent(Dictionary<FrameworkElement, Rect> els, Size finalSize)
         {
             var item_w = 0.0;
+            var item_h = 0.0;
             double x = this.Padding.Left;
+            double y = this.Padding.Top;
+            
             switch (this.JustifyContent)
             {
-                case JustifyContent.Left:
+                case JustifyContent.Start:
+                    switch (this.FlexDirection)
                     {
-                        foreach (var oo in els.Select(x=>x.Key))
-                        {
-                            item_w = oo.DesiredSize.Width;
-                            els[oo] = new Rect()
+                        case FlexDirection.Row:
+                            foreach (var oo in els.Select(x => x.Key))
                             {
-                                X = x,
-                                Y = 0,
-                                Height = finalSize.Height,
-                                Width = item_w,
-                            };
-                            x = x + item_w+this.Gap;
-                        }
-
-                    }
-                    break;
-                case JustifyContent.Right:
-                    {
-                        x = finalSize.Width - this.Padding.Right;
-                        for (int i = els.Count - 1; i >= 0; i--)
-                        {
-                            var child = els.ElementAt(i).Key;
-                            item_w = child.DesiredSize.Width;
-                            x = x - item_w;
-
-                            els[child] = new Rect()
-                            {
-                                X = x,
-                                Y = 0,
-                                Height = finalSize.Height,
-                                Width = item_w,
-                            };
-                            x-= this.Gap;
-                        }
-                    }
-                    break;
-                case JustifyContent.Center:
-                    {
-                        var totalw = els.Keys.Sum(x => x.DesiredSize.Width);
-                        var totalgap = this.Gap * (els.Count - 1);
-                        if (totalgap <= 0)
-                        {
-                            totalgap = 0;
-                        }
-                        x = (finalSize.Width - totalw - totalgap) / 2;
-                        foreach(var oo in els.Select(x=>x.Key))
-                        {
-                            item_w = oo.DesiredSize.Width;
-                            els[oo] = new Rect()
-                            {
-                                X = x,
-                                Y = 0,
-                                Height = finalSize.Height,
-                                Width = item_w,
-                            };
-                            x += item_w + this.Gap;
-                        }
-                    }
-                    break;
-                case JustifyContent.SpaceAround:
-                    {
-                        var totalgap = this.Gap * (els.Count - 1);
-                        if(totalgap<=0)
-                        {
-                            totalgap = 0;
-                        }
-                        var iw = (finalSize.Width - this.Padding.Left - this.Padding.Right - totalgap) / InternalChildren.Count;
-                        foreach (var oo in els.Select(x => x.Key))
-                        {
-                            item_w = oo.DesiredSize.Width;
-
-                            if (iw > item_w)
-                            {
-                                item_w = iw;
+                                item_w = oo.DesiredSize.Width;
+                                els[oo] = new Rect()
+                                {
+                                    X = x,
+                                    Y = y,
+                                    Height = finalSize.Height,
+                                    Width = item_w,
+                                };
+                                x = x + item_w + this.Gap;
                             }
-                            els[oo] = new Rect()
+                            break;
+                        case FlexDirection.Column:
+                            foreach (var oo in els.Select(x => x.Key))
                             {
-                                X = x + (iw - item_w) / 2,
-                                Y = 0,
-                                Height = finalSize.Height,
-                                Width = item_w,
-                            };
-                            x += iw + this.Gap;
-                        }
+                                item_h = oo.DesiredSize.Height;
+                                els[oo] = new Rect()
+                                {
+                                    X = x,
+                                    Y = y,
+                                    Height = item_h,
+                                    Width = finalSize.Width,
+                                };
+                                y = y + item_h + this.Gap;
+                            }
+                            break;
                     }
                     break;
-                case JustifyContent.SpaceBetween:
+                case JustifyContent.End:
+                    switch (this.FlexDirection)
                     {
-                        var iw = (finalSize.Width - this.Padding.Left - this.Padding.Right) / InternalChildren.Count;
-                        for(int i=0; i<els.Count; i++)
-                        {
-                            var child = els.ElementAt(i).Key;
+                        case FlexDirection.Row:
+                            x = finalSize.Width - this.Padding.Right;
+                            for (int i = els.Count - 1; i >= 0; i--)
+                            {
+                                var child = els.ElementAt(i).Key;
+                                item_w = child.DesiredSize.Width;
+                                x = x - item_w;
 
-                            item_w = child.DesiredSize.Width;
-                            if(double.IsNaN(child.Width))
-                            {
-                                item_w = iw;
-                            }
-                            else if (item_w > iw)
-                            {
-                                item_w = iw;
-                            }
-                            Rect rc;
-                            if (i == 0)
-                            {
-                                rc = new Rect()
+                                els[child] = new Rect()
                                 {
                                     X = x,
                                     Y = 0,
                                     Height = finalSize.Height,
                                     Width = item_w,
                                 };
+                                x -= this.Gap;
                             }
-                            else if (i == InternalChildren.Count - 1)
+                            break;
+                        case FlexDirection.Column:
+                            y = finalSize.Height - this.Padding.Bottom;
+                            for (int i = els.Count - 1; i >= 0; i--)
                             {
-                                rc = new Rect()
+                                var child = els.ElementAt(i).Key;
+                                item_h = child.DesiredSize.Height;
+                                y = y - item_h;
+
+                                els[child] = new Rect()
                                 {
-                                    X = x+ (iw - item_w),
+                                    X = 0,
+                                    Y = y,
+                                    Height = item_h,
+                                    Width = child.DesiredSize.Width,
+                                };
+                                y -= this.Gap;
+                            }
+                            break;
+                    }
+
+                    break;
+                case JustifyContent.Center:
+                    switch (this.FlexDirection)
+                    {
+                        case FlexDirection.Row:
+                            var totalw = els.Keys.Sum(x => x.DesiredSize.Width);
+                            var totalgap = this.Gap * (els.Count - 1);
+                            if (totalgap <= 0)
+                            {
+                                totalgap = 0;
+                            }
+                            x = (finalSize.Width - totalw - totalgap) / 2;
+                            foreach (var oo in els.Select(x => x.Key))
+                            {
+                                item_w = oo.DesiredSize.Width;
+                                els[oo] = new Rect()
+                                {
+                                    X = x,
                                     Y = 0,
                                     Height = finalSize.Height,
                                     Width = item_w,
                                 };
+                                x += item_w + this.Gap;
                             }
-                            else
+                            break;
+                        case FlexDirection.Column:
+                            var totalh = els.Keys.Sum(x => x.DesiredSize.Height);
+                            var totalgap_h = this.Gap * (els.Count - 1);
+                            if (totalgap_h <= 0)
                             {
-                                rc = new Rect()
+                                totalgap_h = 0;
+                            }
+                            y = (finalSize.Height - totalh - totalgap_h) / 2;
+                            foreach (var oo in els.Select(x => x.Key))
+                            {
+                                item_h = oo.DesiredSize.Height;
+                                els[oo] = new Rect()
+                                {
+                                    X = 0,
+                                    Y = y,
+                                    Height = item_h,
+                                    Width = finalSize.Width,
+                                };
+                                y += item_h + this.Gap;
+                            }
+                            break;
+                    }
+
+                    break;
+                case JustifyContent.SpaceAround:
+                    switch (this.FlexDirection)
+                    {
+                        case FlexDirection.Row:
+                            var totalgapw = this.Gap * (els.Count - 1);
+                            if (totalgapw <= 0)
+                            {
+                                totalgapw = 0;
+                            }
+                            var iw = (finalSize.Width - this.Padding.Left - this.Padding.Right - totalgapw) / InternalChildren.Count;
+                            foreach (var oo in els.Select(x => x.Key))
+                            {
+                                item_w = oo.DesiredSize.Width;
+
+                                if (iw > item_w)
+                                {
+                                    item_w = iw;
+                                }
+                                els[oo] = new Rect()
                                 {
                                     X = x + (iw - item_w) / 2,
                                     Y = 0,
                                     Height = finalSize.Height,
                                     Width = item_w,
                                 };
+                                x += iw + this.Gap;
                             }
-                            els[child] = rc;
-                            
-                            x += iw;
-                        }
+                            break;
+                        case FlexDirection.Column:
+                            var totalgaph = this.Gap * (els.Count - 1);
+                            if (totalgaph <= 0)
+                            {
+                                totalgaph = 0;
+                            }
+                            var ih = (finalSize.Height - this.Padding.Top - this.Padding.Bottom - totalgaph) / InternalChildren.Count;
+                            foreach (var oo in els.Select(x => x.Key))
+                            {
+                                item_h = oo.DesiredSize.Height;
+
+                                if (ih > item_h)
+                                {
+                                    item_h = ih;
+                                }
+                                els[oo] = new Rect()
+                                {
+                                    X = 0,
+                                    Y = y + (ih - item_h) / 2,
+                                    Height = item_h,
+                                    Width = finalSize.Width,
+                                };
+                                y += ih + this.Gap;
+                            }
+                            break;
                     }
+
+                    break;
+                case JustifyContent.SpaceBetween:
+                    switch (this.FlexDirection)
+                    {
+                        case FlexDirection.Row:
+                            var totalgapw = this.Gap * (els.Count - 1);
+                            if (totalgapw <= 0)
+                            {
+                                totalgapw = 0;
+                            }
+                            var iw = (finalSize.Width - this.Padding.Left - this.Padding.Right - totalgapw) / InternalChildren.Count;
+                            for (int i = 0; i < els.Count; i++)
+                            {
+                                var child = els.ElementAt(i).Key;
+
+                                item_w = child.DesiredSize.Width;
+                                if (double.IsNaN(child.Width))
+                                {
+                                    item_w = iw;
+                                }
+                                else if (item_w > iw)
+                                {
+                                    item_w = iw;
+                                }
+                                Rect rc;
+                                if (i == 0)
+                                {
+                                    rc = new Rect()
+                                    {
+                                        X = x,
+                                        Y = y,
+                                        Height = finalSize.Height,
+                                        Width = item_w,
+                                    };
+                                }
+                                else if (i == InternalChildren.Count - 1)
+                                {
+                                    rc = new Rect()
+                                    {
+                                        X = x + (iw - item_w),
+                                        Y = y,
+                                        Height = finalSize.Height,
+                                        Width = item_w,
+                                    };
+                                }
+                                else
+                                {
+                                    rc = new Rect()
+                                    {
+                                        X = x + (iw - item_w) / 2,
+                                        Y = y,
+                                        Height = finalSize.Height,
+                                        Width = item_w,
+                                    };
+                                }
+                                els[child] = rc;
+                                x += iw+this.Gap;
+                            }
+                            break;
+                        case FlexDirection.Column:
+                            var totalgaph = this.Gap * (els.Count - 1);
+                            if (totalgaph <= 0)
+                            {
+                                totalgaph = 0;
+                            }
+                            var ih = (finalSize.Height - this.Padding.Top - this.Padding.Bottom - totalgaph) / InternalChildren.Count;
+                            for (int i = 0; i < els.Count; i++)
+                            {
+                                var child = els.ElementAt(i).Key;
+
+                                item_h = child.DesiredSize.Height;
+                                if (double.IsNaN(child.Width))
+                                {
+                                    item_h = ih;
+                                }
+                                else if (item_w > ih)
+                                {
+                                    item_h = ih;
+                                }
+                                Rect rc;
+                                if (i == 0)
+                                {
+                                    rc = new Rect()
+                                    {
+                                        X = x,
+                                        Y = y,
+                                        Height = item_h,
+                                        Width = finalSize.Width,
+                                    };
+                                }
+                                else if (i == InternalChildren.Count - 1)
+                                {
+                                    rc = new Rect()
+                                    {
+                                        X = x,
+                                        Y = y + (ih - item_h),
+                                        Height = item_h,
+                                        Width = finalSize.Width,
+                                    };
+                                }
+                                else
+                                {
+                                    rc = new Rect()
+                                    {
+                                        X = x,
+                                        Y = y + (ih - item_h) / 2,
+                                        Height = item_h,
+                                        Width = finalSize.Width,
+                                    };
+                                }
+                                els[child] = rc;
+                                y += ih+this.Gap;
+                            }
+                            break;
+
+                    }
+
                     break;
 
             }
