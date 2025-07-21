@@ -86,7 +86,7 @@ namespace QSoft.WPF.Panel
             {
                 child?.Measure(availableSize);
             }
-            return availableSize;
+            //return availableSize;
             var ll = InternalChildren.OfType<FrameworkElement>().ToList();
             var totalgap = TotalGap();
             var sz = new Size(0, 0);
@@ -111,15 +111,19 @@ namespace QSoft.WPF.Panel
             {
                 sz.Height = availableSize.Height;
             }
+            System.Diagnostics.Debug.WriteLine($"{this.Name} MeasureOverride: {sz}");
             return sz;
         }
 
+
         protected override Size ArrangeOverride(Size finalSize)
         {
+            System.Diagnostics.Debug.WriteLine($"{this.Name} ArrangeOverride: {finalSize}");
+
             Dictionary<FrameworkElement, Rect> rc = [];
             foreach (FrameworkElement child in InternalChildren)
             {
-                rc.Add(child, new(0,0,child.DesiredSize.Width,child.DesiredSize.Height));
+                rc.Add(child, new(0, 0, child.DesiredSize.Width, child.DesiredSize.Height));
             }
             CalacJustifyContent(rc, finalSize);
             CalacAlignItems(rc, finalSize);
@@ -419,7 +423,7 @@ namespace QSoft.WPF.Panel
                                 item_w = child.DesiredSize.Width;
                                 if (double.IsNaN(child.Width))
                                 {
-                                    item_w = iw;
+                                    //item_w = iw;
                                 }
                                 else if (item_w > iw)
                                 {
@@ -472,9 +476,9 @@ namespace QSoft.WPF.Panel
                                 var child = els.ElementAt(i).Key;
 
                                 item_h = child.DesiredSize.Height;
-                                if (double.IsNaN(child.Width))
+                                if (double.IsNaN(child.Height))
                                 {
-                                    item_h = ih;
+                                    //item_h = ih;
                                 }
                                 else if (item_w > ih)
                                 {
