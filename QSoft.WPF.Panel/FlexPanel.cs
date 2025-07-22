@@ -37,14 +37,25 @@ namespace QSoft.WPF.Panel
         Stretch,
         //BaeseLine
     }
-    public class FlexPanel: System.Windows.Controls.Panel
+
+    public enum AlignSelf
+    {
+        Auto,
+        Start,
+        End,
+        Center,
+        Stretch,
+        //BaeseLine
+    }
+
+    public class FlexPanel : System.Windows.Controls.Panel
     {
         public readonly static DependencyProperty JustifyContentProperty = DependencyProperty.Register("JustifyContent", typeof(JustifyContent), typeof(FlexPanel), new FrameworkPropertyMetadata(JustifyContent.SpaceBetween, FrameworkPropertyMetadataOptions.AffectsMeasure));
         [Category("FlexPanel")]
         public JustifyContent JustifyContent
         {
-            set=>this.SetValue(JustifyContentProperty, value);
-            get=>(JustifyContent)GetValue(JustifyContentProperty);
+            set => this.SetValue(JustifyContentProperty, value);
+            get => (JustifyContent)GetValue(JustifyContentProperty);
         }
 
         public readonly static DependencyProperty AlignItemsProperty = DependencyProperty.Register("AlignItems", typeof(AlignItems), typeof(FlexPanel), new FrameworkPropertyMetadata(AlignItems.Stretch, FrameworkPropertyMetadataOptions.AffectsMeasure));
@@ -79,9 +90,16 @@ namespace QSoft.WPF.Panel
             get => (FlexDirection)GetValue(FlexDirectionProperty);
         }
 
+        public static readonly DependencyProperty AlignSelfProperty = DependencyProperty.RegisterAttached("AlignSelf", typeof(AlignSelf), typeof(FlexPanel), new FrameworkPropertyMetadata(AlignSelf.Auto, FrameworkPropertyMetadataOptions.AffectsParentArrange |
+            FrameworkPropertyMetadataOptions.AffectsMeasure |
+            FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+        public static AlignSelf GetAlignSelf(DependencyObject obj) => (AlignSelf)obj.GetValue(AlignSelfProperty);
+        public static void SetAlignSelf(DependencyObject obj, AlignSelf value) => obj.SetValue(AlignSelfProperty, value);
+
         protected override Size MeasureOverride(Size availableSize)
         {
-
+            if (InternalChildren.Count == 0)
+                return base.MeasureOverride(availableSize);
             foreach (UIElement child in InternalChildren)
             {
                 child?.Measure(availableSize);
@@ -103,11 +121,11 @@ namespace QSoft.WPF.Panel
             }
             sz.Width = sz.Width + this.Padding.Left + this.Padding.Right;
             sz.Height = sz.Height + this.Padding.Top + this.Padding.Bottom;
-            if(sz.Width >availableSize.Width)
+            if (sz.Width > availableSize.Width)
             {
                 sz.Width = availableSize.Width;
             }
-            if(sz.Height > availableSize.Height)
+            if (sz.Height > availableSize.Height)
             {
                 sz.Height = availableSize.Height;
             }
@@ -118,6 +136,9 @@ namespace QSoft.WPF.Panel
 
         protected override Size ArrangeOverride(Size finalSize)
         {
+            if (InternalChildren.Count == 0)
+                return base.ArrangeOverride(finalSize);
+
             System.Diagnostics.Debug.WriteLine($"{this.Name} ArrangeOverride: {finalSize}");
 
             Dictionary<FrameworkElement, Rect> rc = [];
@@ -136,15 +157,23 @@ namespace QSoft.WPF.Panel
         }
 
         void CalacAlignItems(Dictionary<FrameworkElement, Rect> els, Size finalSize)
-        {            
+        {
             foreach (var oo in els)
             {
+                var alignitem = GetAlignSelf(oo.Key) switch
+                {
+                    AlignSelf.Stretch => AlignItems.Stretch,
+                    AlignSelf.Center => AlignItems.Center,
+                    AlignSelf.Start => AlignItems.Start,
+                    AlignSelf.End => AlignItems.End,
+                    _ => this.AlignItems
+                };
                 var rc = oo.Value;
-                switch (this.AlignItems)
+                switch (alignitem)
                 {
                     case AlignItems.Start:
                         {
-                            switch(this.FlexDirection)
+                            switch (this.FlexDirection)
                             {
                                 case FlexDirection.Row:
                                     rc.Y = this.Padding.Top;
@@ -159,10 +188,10 @@ namespace QSoft.WPF.Panel
                         break;
                     case AlignItems.End:
                         {
-                            switch(this.FlexDirection)
+                            switch (this.FlexDirection)
                             {
                                 case FlexDirection.Row:
-                                    rc.Y = finalSize.Height - oo.Key.DesiredSize.Height;
+                                    rc.Y = finalSize.Height - oo.Key.DesiredSize.Height - this.Padding.Bottom;
                                     rc.Height = oo.Key.DesiredSize.Height;
                                     break;
                                 case FlexDirection.Column:
@@ -174,7 +203,7 @@ namespace QSoft.WPF.Panel
                         break;
                     case AlignItems.Center:
                         {
-                            switch(this.FlexDirection)
+                            switch (this.FlexDirection)
                             {
                                 case FlexDirection.Row:
                                     rc.Y = (finalSize.Height - oo.Key.DesiredSize.Height) / 2;
@@ -189,18 +218,18 @@ namespace QSoft.WPF.Panel
                         break;
                     case AlignItems.Stretch:
                         {
-                            switch(this.FlexDirection)
+                            switch (this.FlexDirection)
                             {
                                 case FlexDirection.Row:
                                     rc.Y = this.Padding.Top;
-                                    rc.Height = finalSize.Height - this.Padding.Top-this.Padding.Bottom;
+                                    rc.Height = finalSize.Height - this.Padding.Top - this.Padding.Bottom;
                                     break;
                                 case FlexDirection.Column:
                                     rc.X = this.Padding.Left;
                                     rc.Width = finalSize.Width - this.Padding.Left - this.Padding.Right;
                                     break;
                             }
-                            
+
                         }
                         break;
                 }
@@ -224,7 +253,7 @@ namespace QSoft.WPF.Panel
             var item_h = 0.0;
             double x = this.Padding.Left;
             double y = this.Padding.Top;
-            
+
             switch (this.JustifyContent)
             {
                 case JustifyContent.Start:
@@ -371,7 +400,7 @@ namespace QSoft.WPF.Panel
                                 els[oo] = new Rect()
                                 {
                                     X = x + (iw - item_w) / 2,
-                                    Y = 0,
+                                    Y = y,
                                     Height = finalSize.Height,
                                     Width = item_w,
                                 };
@@ -461,7 +490,7 @@ namespace QSoft.WPF.Panel
                                     };
                                 }
                                 els[child] = rc;
-                                x += iw+this.Gap;
+                                x += iw + this.Gap;
                             }
                             break;
                         case FlexDirection.Column:
@@ -516,7 +545,7 @@ namespace QSoft.WPF.Panel
                                     };
                                 }
                                 els[child] = rc;
-                                y += ih+this.Gap;
+                                y += ih + this.Gap;
                             }
                             break;
 

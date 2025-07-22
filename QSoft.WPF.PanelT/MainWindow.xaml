@@ -8,7 +8,7 @@
         SnapsToDevicePixels="True"
         xmlns:panel="clr-namespace:QSoft.WPF.Panel;assembly=QSoft.WPF.Panel"
         Title="MainWindow" Height="480" Width="640">
-    <TabControl>
+    <TabControl SelectedIndex="1">
         <TabItem Header="Basic1">
             <Grid>
                 <Grid.RowDefinitions>
@@ -16,24 +16,27 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <local:DpiDecorator>
-                    <panel:FlexPanel x:Name="flexpanel" Background="Pink" Padding="0,0,0,0" Visibility="Visible">
-                        <!--<Rectangle Width="50" Height="50" Fill="Red" Stroke="Black" StrokeThickness="1"/>
+                    <panel:FlexPanel JustifyContent="SpaceAround"  x:Name="flexpanel" Background="Pink" Padding="0,0,0,0" Visibility="Visible">
+                        <Rectangle Width="50" Height="50" Fill="Red" Stroke="Black" StrokeThickness="1"/>
                         <Rectangle Width="100" Height="100" Fill="Green" Stroke="Black" StrokeThickness="1"/>
                         <Rectangle Width="200" Height="200" Fill="Blue" Stroke="Black" StrokeThickness="1"/>
-                        <Button Click="Button_Click">A</Button>
-                        <Button Click="Button_Click">B</Button>
-                        <Button Click="Button_Click">C</Button>-->
-                        <TextBlock Text="Title"/>
+                        <Button panel:FlexPanel.AlignSelf="Start" Click="Button_Click">A</Button>
+                        <Button panel:FlexPanel.AlignSelf="Center" Click="Button_Click">B</Button>
+                        <Button panel:FlexPanel.AlignSelf="End" Click="Button_Click">C</Button>
+                        <!--<TextBlock Text="Title"/>
                         <CheckBox>AA</CheckBox>
-                        <Button>Button</Button>
-
+                        <Button panel:FlexPanel.AlignSelf="Start">Button</Button>
+                        <ComboBox x:Name="combobox_alignself" SelectionChanged="combobox_alignself_SelectionChanged" ItemsSource="{Binding AlignSelf}">
+                            
+                        </ComboBox>-->
+                        
                     </panel:FlexPanel>
                 </local:DpiDecorator>
                 
                 <StackPanel Orientation="Horizontal" Grid.Row="1">
-                    <ComboBox ItemsSource="{Binding JustifyContents}" SelectedItem="{Binding JustifyContent, ElementName=flexpanel}" x:Name="combobox_justifycontent"/>
-                    <ComboBox ItemsSource="{Binding AlignItems}" SelectedItem="{Binding AlignItems, ElementName=flexpanel}"/>
-                    <ComboBox ItemsSource="{Binding FlexDirections}" SelectedItem="{Binding FlexDirection, ElementName=flexpanel}"/>
+                    <ComboBox ItemsSource="{Binding JustifyContents}" SelectedItem="{Binding JustifyContent, ElementName=flexpanel}" Width="110"/>
+                    <ComboBox ItemsSource="{Binding AlignItems}" SelectedItem="{Binding AlignItems, ElementName=flexpanel}" Width="70"/>
+                    <ComboBox ItemsSource="{Binding FlexDirections}" SelectedItem="{Binding FlexDirection, ElementName=flexpanel}" Width="80"/>
                     <TextBox Text="{Binding Padding, ElementName=flexpanel}"/>
                     <TextBox Text="{Binding Gap, ElementName=flexpanel}">
 
@@ -44,16 +47,60 @@
         </TabItem>
         <TabItem Header="com">
             <local:DpiDecorator>
-                <panel:FlexPanel x:Name="flexpanle_title" VerticalAlignment="Top" FlexDirection="Column" Gap="8">
-                    <panel:FlexPanel JustifyContent="SpaceBetween">
-                        <TextBlock Text="Title"/>
-                        <CheckBox>AA</CheckBox>
+                <panel:FlexPanel Background="Gray" Padding="16" Gap="8" FlexDirection="Column" AlignItems="Center">
+                    <panel:FlexPanel Padding="16" AlignItems="Start" FlexDirection="Column" Gap="8" panel:FlexPanel.AlignSelf="Stretch">
+                        <panel:FlexPanel FlexDirection="Column" AlignItems="Center"  Gap="8">
+                            <panel:FlexPanel JustifyContent="SpaceBetween" AlignItems="Center" Height="40">
+                                <panel:FlexPanel Gap="8" AlignItems="Center">
+                                    <TextBlock Text="Title"/>
+                                    <TextBlock Text="png"/>
+                                </panel:FlexPanel>
+                                <panel:FlexPanel Gap="9" JustifyContent="End">
+                                    <TextBlock>Test</TextBlock>
+                                    <CheckBox/>
+                                </panel:FlexPanel>
+                            </panel:FlexPanel>
+
+                            <panel:FlexPanel FlexDirection="Column" JustifyContent="Center" AlignItems="Start" Padding="16,0,0,0" Gap="8">
+                                <panel:FlexPanel JustifyContent="SpaceBetween" AlignItems="Center" Height="40">
+                                    <panel:FlexPanel Gap="8" AlignItems="Center">
+                                        <TextBlock Text="Sub title 1"/>
+                                        <TextBlock Text="png"/>
+                                    </panel:FlexPanel>
+                                    <panel:FlexPanel Gap="9" JustifyContent="End">
+                                        <TextBlock>Test</TextBlock>
+                                        <CheckBox/>
+                                    </panel:FlexPanel>
+                                </panel:FlexPanel>
+                                <panel:FlexPanel JustifyContent="SpaceBetween">
+                                    <panel:FlexPanel Gap="8" AlignItems="Center">
+                                        <TextBlock Text="Sub title 2"/>
+                                        <TextBlock Text="png"/>
+                                    </panel:FlexPanel>
+                                </panel:FlexPanel>
+                                <panel:FlexPanel Padding="16,0,0,0" Gap="8" JustifyContent="SpaceAround">
+                                    <Button>Fun1</Button>
+                                    <Button>Fun2</Button>
+                                </panel:FlexPanel>
+                                <panel:FlexPanel JustifyContent="SpaceBetween">
+                                    <panel:FlexPanel Gap="8" AlignItems="Center">
+                                        <TextBlock Text="Sub title 3"/>
+                                        <TextBlock Text="png"/>
+                                    </panel:FlexPanel>
+                                </panel:FlexPanel>
+                                <panel:FlexPanel Padding="16,0,0,0" Gap="8" JustifyContent="SpaceAround">
+                                    <Button>Fun1</Button>
+                                    <Button>Fun2</Button>
+                                </panel:FlexPanel>
+                            </panel:FlexPanel>
+                        </panel:FlexPanel>
+
+
+
                     </panel:FlexPanel>
-                    <panel:FlexPanel x:Name="flexpanel_bb" JustifyContent="SpaceAround" Gap="8" Padding="0,0,0,0" >
-                        <Button Height="100">Fun1</Button>
-                        <Button Height="100">Fun2</Button>
-                    </panel:FlexPanel>
+
                 </panel:FlexPanel>
+
             </local:DpiDecorator>
         </TabItem>
     </TabControl>

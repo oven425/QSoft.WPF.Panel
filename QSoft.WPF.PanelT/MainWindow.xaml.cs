@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using QSoft.WPF.Panel;
+using System.Collections.ObjectModel;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -29,6 +30,12 @@ namespace QSoft.WPF.PanelT
             //Point relativePoint = button.TranslatePoint(new Point(0, 0), flexpanel);
             //System.Diagnostics.Trace.WriteLine($"{relativePoint} {button.ActualWidth} {button.ActualHeight}");
         }
+
+        private void combobox_alignself_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var Combobox = sender as ComboBox;
+            Panel.FlexPanel.SetAlignSelf(Combobox, (AlignSelf)Combobox.SelectedItem);
+        }
     }
 
     public class MainUI
@@ -54,6 +61,15 @@ namespace QSoft.WPF.PanelT
         [
             QSoft.WPF.Panel.FlexDirection.Row,
             QSoft.WPF.Panel.FlexDirection.Column,
+        ];
+
+        public ObservableCollection<QSoft.WPF.Panel.AlignSelf> AlignSelf { get; set; } =
+        [
+            QSoft.WPF.Panel.AlignSelf.Auto,
+            QSoft.WPF.Panel.AlignSelf.Start,
+            QSoft.WPF.Panel.AlignSelf.End,
+            QSoft.WPF.Panel.AlignSelf.Center,
+            QSoft.WPF.Panel.AlignSelf.Stretch,
         ];
     }
 
