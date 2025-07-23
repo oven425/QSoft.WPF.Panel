@@ -1,2 +1,0 @@
-# QSoft.WPF.TouchKeyboardNotifier
-
