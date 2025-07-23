@@ -1,8 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <VersionPrefix>1.0.0.1</VersionPrefix>
     <TargetFrameworks>net472;net6.0-windows;net8.0-windows</TargetFrameworks>
-    <LangVersion>12.0</LangVersion>
+    <LangVersion>13.0</LangVersion>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
@@ -18,10 +19,11 @@ FlexPanel like css flex</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageReleaseNotes>FlexPanel
 only support bleow property
-1. row axis
+1. flex direction
 2. justify content
 3. align items, but no baseline
-4. padding and gap, only x axis</PackageReleaseNotes>
+4. align self, but no baseline
+5. padding and gap</PackageReleaseNotes>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
 

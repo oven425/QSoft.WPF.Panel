@@ -1,9 +1,10 @@
 # QSoft.WPF.Panel 
 ## FlexPanel
 only support bleow property
-* row axis
+* flex direction
 * justify content
 * align items, but no baseline
+* align self, but no baseline
 * padding and gap, only x axis
 
 
