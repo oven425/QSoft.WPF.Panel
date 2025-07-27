@@ -5,6 +5,7 @@ only support bleow property
 * justify content
 * align items, but no baseline
 * align self, but no baseline
-* padding and gap, only x axis
+* padding and gap
+* border properties
 
 

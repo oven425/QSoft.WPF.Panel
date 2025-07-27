@@ -8,6 +8,13 @@
         SnapsToDevicePixels="True"
         xmlns:panel="clr-namespace:QSoft.WPF.Panel;assembly=QSoft.WPF.Panel"
         Title="MainWindow" Height="400" Width="300">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="RadioRoundButton.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
     <TabControl SelectedIndex="0">
         <TabItem Header="Basic1">
             <Grid>
@@ -16,13 +23,13 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <local:DpiDecorator>
-                    <panel:FlexPanel BorderBrush="Goldenrod" BorderThickness="10,20,30,40" CornerRadius="10,20,30,40" JustifyContent="SpaceAround"  x:Name="flexpanel" Background="Pink" Padding="0,0,0,0" Visibility="Visible">
-                        <Rectangle Width="50" Height="50" Fill="Red" Stroke="Black" StrokeThickness="1"/>
+                    <panel:FlexPanel BorderBrush="Red" BorderThickness="5" CornerRadius="0" JustifyContent="SpaceAround"  x:Name="flexpanel" Background="Pink" Padding="0,0,0,0" Visibility="Visible">
+                        <!--<Rectangle Width="50" Height="50" Fill="Red" Stroke="Black" StrokeThickness="1"/>
                         <Rectangle Width="100" Height="100" Fill="Green" Stroke="Black" StrokeThickness="1"/>
-                        <Rectangle Width="200" Height="200" Fill="Blue" Stroke="Black" StrokeThickness="1"/>
-                        <!--<Button panel:FlexPanel.AlignSelf="Start" Click="Button_Click">A</Button>
-                        <Button panel:FlexPanel.AlignSelf="Center" Click="Button_Click">B</Button>
-                        <Button panel:FlexPanel.AlignSelf="End" Click="Button_Click">C</Button>-->
+                        <Rectangle Width="200" Height="200" Fill="Blue" Stroke="Black" StrokeThickness="1"/>-->
+                        <Button panel:FlexPanel.AlignSelf="Stretch" Click="Button_Click">A</Button>
+                        <Button panel:FlexPanel.AlignSelf="Stretch" Click="Button_Click">B</Button>
+                        <Button panel:FlexPanel.AlignSelf="Stretch" Click="Button_Click">C</Button>
                         
                     </panel:FlexPanel>
                 </local:DpiDecorator>
@@ -94,6 +101,29 @@
 
                 </panel:FlexPanel>
             </local:DpiDecorator>
+        </TabItem>
+        <TabItem Header="cc">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <ItemsControl ItemsSource="{Binding RadioButtons}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <RadioButton FontSize="20" GroupName="aa" Content="{Binding}"></RadioButton>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <panel:FlexPanel Gap="8" JustifyContent="SpaceAround"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+
+                <RadioButton Content="test" Grid.Row="1"></RadioButton>
+
+            </Grid>
         </TabItem>
     </TabControl>
 

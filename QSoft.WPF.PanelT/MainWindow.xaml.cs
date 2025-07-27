@@ -71,6 +71,14 @@ namespace QSoft.WPF.PanelT
             QSoft.WPF.Panel.AlignSelf.Center,
             QSoft.WPF.Panel.AlignSelf.Stretch,
         ];
+
+        public ObservableCollection<string> RadioButtons { get; set; } =
+        [
+            "RadioButton1",
+            "RadioButton2",
+            "RadioButton3",
+            "RadioButton4"
+        ];
     }
 
     public class DpiDecorator : Decorator

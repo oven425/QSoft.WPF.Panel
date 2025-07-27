@@ -50,7 +50,7 @@ namespace QSoft.WPF.Panel
 
     public class FlexPanel : System.Windows.Controls.Panel
     {
-        public readonly static DependencyProperty BorderThicknessProperty = DependencyProperty.Register("BorderThickness", typeof(Thickness), typeof(FlexPanel), new PropertyMetadata(new Thickness()));
+        public readonly static DependencyProperty BorderThicknessProperty = DependencyProperty.Register("BorderThickness", typeof(Thickness), typeof(FlexPanel), new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure|FrameworkPropertyMetadataOptions.AffectsRender));
         [Category("FlexPanel")]
         public Thickness BorderThickness
         {
@@ -58,7 +58,7 @@ namespace QSoft.WPF.Panel
             get => (Thickness)GetValue(BorderThicknessProperty);
         }
 
-        public readonly static DependencyProperty CornerRadiusProperty = DependencyProperty.Register("CornerRadius", typeof(CornerRadius), typeof(FlexPanel), new PropertyMetadata(new CornerRadius()));
+        public readonly static DependencyProperty CornerRadiusProperty = DependencyProperty.Register("CornerRadius", typeof(CornerRadius), typeof(FlexPanel), new FrameworkPropertyMetadata(new CornerRadius(), FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender));
         [Category("FlexPanel")]
         public CornerRadius CornerRadius
         {
@@ -66,7 +66,7 @@ namespace QSoft.WPF.Panel
             get => (CornerRadius)GetValue(CornerRadiusProperty);
         }
 
-        public readonly static DependencyProperty BorderBrushProperty = DependencyProperty.Register("BorderBrush", typeof(Brush), typeof(FlexPanel), new PropertyMetadata(null));
+        public readonly static DependencyProperty BorderBrushProperty = DependencyProperty.Register("BorderBrush", typeof(Brush), typeof(FlexPanel), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure));
         [Category("FlexPanel")]
         public Brush BorderBrush
         {
@@ -114,12 +114,9 @@ namespace QSoft.WPF.Panel
             get => (FlexDirection)GetValue(FlexDirectionProperty);
         }
 
-        public static readonly DependencyProperty AlignSelfProperty = DependencyProperty.RegisterAttached("AlignSelf", typeof(AlignSelf), typeof(FlexPanel), new FrameworkPropertyMetadata(AlignSelf.Auto, FrameworkPropertyMetadataOptions.AffectsParentArrange |
-            FrameworkPropertyMetadataOptions.AffectsMeasure |
-            FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+        public static readonly DependencyProperty AlignSelfProperty = DependencyProperty.RegisterAttached("AlignSelf", typeof(AlignSelf), typeof(FlexPanel), new FrameworkPropertyMetadata(AlignSelf.Auto, FrameworkPropertyMetadataOptions.AffectsParentArrange|FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
         public static AlignSelf GetAlignSelf(DependencyObject obj) => (AlignSelf)obj.GetValue(AlignSelfProperty);
         public static void SetAlignSelf(DependencyObject obj, AlignSelf value) => obj.SetValue(AlignSelfProperty, value);
-
 
         protected override void OnRender(DrawingContext dc)
         {
@@ -167,8 +164,8 @@ namespace QSoft.WPF.Panel
 
                 // 建立外部和內部幾何圖形
                 // RoundedRectangleGeometry 是描述圓角矩形的 Geometry
-                var outerGeometry = CreateRoundedRectangleGeometry(outerRect, cornerRadius);
-                var innerGeometry = CreateRoundedRectangleGeometry(innerRect, innerCornerRadius);
+                var outerGeometry = FlexPanel.CreateRoundedRectangleGeometry(outerRect, cornerRadius);
+                var innerGeometry = FlexPanel.CreateRoundedRectangleGeometry(innerRect, innerCornerRadius);
 
                 // 使用 CombinedGeometry 將兩個幾何圖形組合起來
                 // GeometryCombineMode.Exclude 會從第一個圖形中減去第二個圖形
@@ -186,7 +183,7 @@ namespace QSoft.WPF.Panel
             }
         }
 
-        PathGeometry CreateRoundedRectangleGeometry(Rect rect, CornerRadius cornerRadius)
+        static PathGeometry CreateRoundedRectangleGeometry(Rect rect, CornerRadius cornerRadius)
         {
             // 建立 PathGeometry 和 PathFigure
             var geometry = new PathGeometry();
@@ -280,7 +277,6 @@ namespace QSoft.WPF.Panel
             {
                 child?.Measure(availableSize);
             }
-            //return availableSize;
             var ll = InternalChildren.OfType<FrameworkElement>().ToList();
             var totalgap = TotalGap();
             var sz = new Size(0, 0);
@@ -305,7 +301,7 @@ namespace QSoft.WPF.Panel
             {
                 sz.Height = availableSize.Height;
             }
-            System.Diagnostics.Debug.WriteLine($"{this.Name} MeasureOverride: {sz}");
+            //System.Diagnostics.Debug.WriteLine($"{this.Name} MeasureOverride: {sz}");
             return sz;
         }
 
@@ -397,12 +393,12 @@ namespace QSoft.WPF.Panel
                             switch (this.FlexDirection)
                             {
                                 case FlexDirection.Row:
-                                    rc.Y = this.Padding.Top;
-                                    rc.Height = finalSize.Height - this.Padding.Top - this.Padding.Bottom;
+                                    rc.Y = this.Padding.Top+this.BorderThickness.Top;
+                                    rc.Height = finalSize.Height - this.Padding.Top - this.Padding.Bottom - this.BorderThickness.Top-this.BorderThickness.Bottom;
                                     break;
                                 case FlexDirection.Column:
-                                    rc.X = this.Padding.Left;
-                                    rc.Width = finalSize.Width - this.Padding.Left - this.Padding.Right;
+                                    rc.X = this.Padding.Left+this.BorderThickness.Left;
+                                    rc.Width = finalSize.Width - this.Padding.Left - this.Padding.Right - this.BorderThickness.Left - this.BorderThickness.Right;
                                     break;
                             }
 
@@ -564,15 +560,16 @@ namespace QSoft.WPF.Panel
                             {
                                 totalgapw = 0;
                             }
-                            var iw = (finalSize.Width - this.Padding.Left - this.Padding.Right - totalgapw) / InternalChildren.Count;
+                            var iw = (finalSize.Width - this.Padding.Left - this.Padding.Right - this.BorderThickness.Left - this.BorderThickness.Right - totalgapw) / InternalChildren.Count;
                             foreach (var oo in els.Select(x => x.Key))
                             {
                                 item_w = oo.DesiredSize.Width;
 
-                                if (iw > item_w)
-                                {
-                                    item_w = iw;
-                                }
+                                //if (iw > item_w)
+                                //{
+                                //    item_w = iw;
+                                //}
+                                item_w = iw;
                                 els[oo] = new Rect()
                                 {
                                     X = x + (iw - item_w) / 2,
@@ -589,18 +586,19 @@ namespace QSoft.WPF.Panel
                             {
                                 totalgaph = 0;
                             }
-                            var ih = (finalSize.Height - this.Padding.Top - this.Padding.Bottom - totalgaph) / InternalChildren.Count;
+                            var ih = (finalSize.Height - this.Padding.Top - this.Padding.Bottom - this.BorderThickness.Top - this.BorderThickness.Bottom - totalgaph) / InternalChildren.Count;
                             foreach (var oo in els.Select(x => x.Key))
                             {
                                 item_h = oo.DesiredSize.Height;
 
-                                if (ih > item_h)
-                                {
-                                    item_h = ih;
-                                }
+                                //if (ih > item_h)
+                                //{
+                                //    item_h = ih;
+                                //}
+                                item_h = ih;
                                 els[oo] = new Rect()
                                 {
-                                    X = 0,
+                                    X = x,
                                     Y = y + (ih - item_h) / 2,
                                     Height = item_h,
                                     Width = finalSize.Width,
