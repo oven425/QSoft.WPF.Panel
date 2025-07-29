@@ -118,6 +118,11 @@ namespace QSoft.WPF.Panel
         public static AlignSelf GetAlignSelf(DependencyObject obj) => (AlignSelf)obj.GetValue(AlignSelfProperty);
         public static void SetAlignSelf(DependencyObject obj, AlignSelf value) => obj.SetValue(AlignSelfProperty, value);
 
+        public static readonly DependencyProperty GrowProperty = DependencyProperty.RegisterAttached("Grow", typeof(double), typeof(FlexPanel), new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+        public static double GetGrow(DependencyObject obj) => (double)obj.GetValue(GrowProperty);
+        public static void SetGrow(DependencyObject obj, double value) => obj.SetValue(GrowProperty, value);
+
+
         protected override void OnRender(DrawingContext dc)
         {
             //base.OnRender(dc);
@@ -327,7 +332,16 @@ namespace QSoft.WPF.Panel
             {
                 rc.Add(child, new(0, 0, child.DesiredSize.Width, child.DesiredSize.Height));
             }
-            CalacJustifyContent(rc, finalSize);
+
+            var grows = rc.Keys.Select(x => Math.Max(GetGrow(x),0)).ToList();
+            if (grows.Any(static x => x >0))
+            {
+                this.CalacGrow(rc, finalSize, grows);
+            }
+            else
+            {
+                CalacJustifyContent(rc, finalSize);
+            }
             CalacAlignItems(rc, finalSize);
             foreach (var oo in rc)
             {
@@ -335,6 +349,14 @@ namespace QSoft.WPF.Panel
                 System.Diagnostics.Debug.WriteLine(oo.Value);
             }
             return finalSize;
+        }
+
+        void CalacGrow(Dictionary<FrameworkElement, Rect> els, Size finalSize, List<double> grows)
+        {
+            switch(this.FlexDirection)
+            {
+
+            }
         }
 
         void CalacAlignItems(Dictionary<FrameworkElement, Rect> els, Size finalSize)

@@ -1,5 +1,6 @@
 ﻿using QSoft.WPF.Panel;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -38,9 +39,19 @@ namespace QSoft.WPF.PanelT
             var Combobox = sender as ComboBox;
             Panel.FlexPanel.SetAlignSelf(Combobox, (AlignSelf)Combobox.SelectedItem);
         }
+
+        private void ItemsControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void RadioButton_Click(object sender, RoutedEventArgs e)
+        {
+            var mainui = this.DataContext as MainUI;
+        }
     }
 
-    public class MainUI
+    public class MainUI:INotifyPropertyChanged
     {
         public ObservableCollection<QSoft.WPF.Panel.JustifyContent> JustifyContents { get; set; } =
         [
@@ -74,6 +85,20 @@ namespace QSoft.WPF.PanelT
             QSoft.WPF.Panel.AlignSelf.Stretch,
         ];
 
+        string m_RadioButton = "RadioButton4";
+        public string RadioButton
+        {
+            get => m_RadioButton;
+            set
+            {
+                if (m_RadioButton != value)
+                {
+                    m_RadioButton = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RadioButton)));
+                }
+            }
+        }
+
         public ObservableCollection<string> RadioButtons { get; set; } =
         [
             "RadioButton1",
@@ -81,6 +106,8 @@ namespace QSoft.WPF.PanelT
             "RadioButton3",
             "RadioButton4"
         ];
+
+        public event PropertyChangedEventHandler? PropertyChanged;
     }
 
     public class DpiDecorator : Decorator

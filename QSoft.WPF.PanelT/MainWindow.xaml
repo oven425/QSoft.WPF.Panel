@@ -14,8 +14,9 @@
                 <ResourceDictionary Source="RadioRoundButton.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
+
     </Window.Resources>
-    <TabControl SelectedIndex="0" TabStripPlacement="Right">
+    <TabControl SelectedIndex="2">
         <TabItem Header="Basic1">
             <Grid>
                 <Grid.RowDefinitions>
@@ -103,8 +104,10 @@
             </local:DpiDecorator>
         </TabItem>
         <TabItem Header="cc">
+
             <Grid>
                 <Grid.RowDefinitions>
+                    <RowDefinition/>
                     <RowDefinition/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
@@ -120,8 +123,40 @@
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                 </ItemsControl>
+                <ListBox  SelectedItem="{Binding RadioButton}" ItemsSource="{Binding RadioButtons}" Grid.Row="1">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <RadioButton Click="RadioButton_Click" FontSize="20" GroupName="bb" Content="{Binding}" IsChecked="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected, Mode=TwoWay}"></RadioButton>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <panel:FlexPanel Gap="8" JustifyContent="SpaceAround"/>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                </ListBox>
 
-                <RadioButton Content="test" Grid.Row="1"></RadioButton>
+                <ListBox BorderThickness="0" SelectedItem="{Binding RadioButton}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Grid.Row="2">
+                    <RadioButton FontSize="20" GroupName="cc" Content="CC1" IsChecked="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected, Mode=TwoWay}"></RadioButton>
+                    <RadioButton FontSize="20" GroupName="cc" Content="CC2" IsChecked="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected, Mode=TwoWay}"></RadioButton>
+
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <panel:FlexPanel Gap="8" JustifyContent="SpaceAround"/>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <ContentPresenter />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
 
             </Grid>
         </TabItem>
