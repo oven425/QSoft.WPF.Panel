@@ -15,7 +15,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
-    <TabControl SelectedIndex="0">
+    <TabControl SelectedIndex="0" TabStripPlacement="Right">
         <TabItem Header="Basic1">
             <Grid>
                 <Grid.RowDefinitions>

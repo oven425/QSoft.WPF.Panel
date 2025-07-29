@@ -271,38 +271,47 @@ namespace QSoft.WPF.Panel
 
         protected override Size MeasureOverride(Size availableSize)
         {
+
             if (InternalChildren.Count == 0)
                 return base.MeasureOverride(availableSize);
-            foreach (UIElement child in InternalChildren)
+            try
             {
-                child?.Measure(availableSize);
+                foreach (UIElement child in InternalChildren)
+                {
+                    child?.Measure(availableSize);
+                }
+                var ll = InternalChildren.OfType<FrameworkElement>().ToList();
+                var totalgap = TotalGap();
+                var sz = new Size(0, 0);
+                switch (this.FlexDirection)
+                {
+                    case FlexDirection.Row:
+                        sz.Width = ll.Sum(x => x.DesiredSize.Width) + totalgap;
+                        sz.Height = ll.Max(x => x.DesiredSize.Height);
+                        break;
+                    case FlexDirection.Column:
+                        sz.Width = ll.Max(x => x.DesiredSize.Width);
+                        sz.Height = ll.Sum(x => x.DesiredSize.Height) + totalgap;
+                        break;
+                }
+                sz.Width = sz.Width + this.Padding.Left + this.Padding.Right + this.BorderThickness.Left + this.BorderThickness.Right;
+                sz.Height = sz.Height + this.Padding.Top + this.Padding.Bottom + this.BorderThickness.Top + this.BorderThickness.Bottom;
+                if (sz.Width > availableSize.Width)
+                {
+                    sz.Width = availableSize.Width;
+                }
+                if (sz.Height > availableSize.Height)
+                {
+                    sz.Height = availableSize.Height;
+                }
+                System.Diagnostics.Debug.WriteLine($"{this.Name} MeasureOverride: {sz}");
+                return sz;
             }
-            var ll = InternalChildren.OfType<FrameworkElement>().ToList();
-            var totalgap = TotalGap();
-            var sz = new Size(0, 0);
-            switch (this.FlexDirection)
+            catch (Exception ex)
             {
-                case FlexDirection.Row:
-                    sz.Width = ll.Sum(x => x.DesiredSize.Width) + totalgap;
-                    sz.Height = ll.Max(x => x.DesiredSize.Height);
-                    break;
-                case FlexDirection.Column:
-                    sz.Width = ll.Max(x => x.DesiredSize.Width);
-                    sz.Height = ll.Sum(x => x.DesiredSize.Height) + totalgap;
-                    break;
+                System.Diagnostics.Debug.WriteLine($"Exception in MeasureOverride: {ex}");
+                throw;
             }
-            sz.Width = sz.Width + this.Padding.Left + this.Padding.Right+this.BorderThickness.Left+this.BorderThickness.Right;
-            sz.Height = sz.Height + this.Padding.Top + this.Padding.Bottom+this.BorderThickness.Top+this.BorderThickness.Bottom;
-            if (sz.Width > availableSize.Width)
-            {
-                sz.Width = availableSize.Width;
-            }
-            if (sz.Height > availableSize.Height)
-            {
-                sz.Height = availableSize.Height;
-            }
-            //System.Diagnostics.Debug.WriteLine($"{this.Name} MeasureOverride: {sz}");
-            return sz;
         }
 
 
@@ -394,11 +403,11 @@ namespace QSoft.WPF.Panel
                             {
                                 case FlexDirection.Row:
                                     rc.Y = this.Padding.Top+this.BorderThickness.Top;
-                                    rc.Height = finalSize.Height - this.Padding.Top - this.Padding.Bottom - this.BorderThickness.Top-this.BorderThickness.Bottom;
+                                    rc.Height = Math.Max(finalSize.Height - this.Padding.Top - this.Padding.Bottom - this.BorderThickness.Top - this.BorderThickness.Bottom,0);
                                     break;
                                 case FlexDirection.Column:
                                     rc.X = this.Padding.Left+this.BorderThickness.Left;
-                                    rc.Width = finalSize.Width - this.Padding.Left - this.Padding.Right - this.BorderThickness.Left - this.BorderThickness.Right;
+                                    rc.Width = Math.Max(finalSize.Width - this.Padding.Left - this.Padding.Right - this.BorderThickness.Left - this.BorderThickness.Right, 0);
                                     break;
                             }
 
@@ -560,15 +569,17 @@ namespace QSoft.WPF.Panel
                             {
                                 totalgapw = 0;
                             }
-                            var iw = (finalSize.Width - this.Padding.Left - this.Padding.Right - this.BorderThickness.Left - this.BorderThickness.Right - totalgapw) / InternalChildren.Count;
+                            var iw = (finalSize.Width - this.Padding.Left - this.Padding.Right - this.BorderThickness.Left - this.BorderThickness.Right - totalgapw);
+                            if(iw<0)
+                            {
+                                iw = 0;
+                            }
+                            else
+                            {
+                                iw = iw / InternalChildren.Count;
+                            }
                             foreach (var oo in els.Select(x => x.Key))
                             {
-                                item_w = oo.DesiredSize.Width;
-
-                                //if (iw > item_w)
-                                //{
-                                //    item_w = iw;
-                                //}
                                 item_w = iw;
                                 els[oo] = new Rect()
                                 {
@@ -586,15 +597,17 @@ namespace QSoft.WPF.Panel
                             {
                                 totalgaph = 0;
                             }
-                            var ih = (finalSize.Height - this.Padding.Top - this.Padding.Bottom - this.BorderThickness.Top - this.BorderThickness.Bottom - totalgaph) / InternalChildren.Count;
+                            var ih = (finalSize.Height - this.Padding.Top - this.Padding.Bottom - this.BorderThickness.Top - this.BorderThickness.Bottom - totalgaph);
+                            if(ih<0)
+                            {
+                                ih = 0;
+                            }
+                            else
+                            {
+                                ih = ih / InternalChildren.Count;
+                            }
                             foreach (var oo in els.Select(x => x.Key))
                             {
-                                item_h = oo.DesiredSize.Height;
-
-                                //if (ih > item_h)
-                                //{
-                                //    item_h = ih;
-                                //}
                                 item_h = ih;
                                 els[oo] = new Rect()
                                 {
@@ -618,7 +631,15 @@ namespace QSoft.WPF.Panel
                             {
                                 totalgapw = 0;
                             }
-                            var iw = (finalSize.Width - this.Padding.Left - this.Padding.Right - totalgapw) / InternalChildren.Count;
+                            var iw = (finalSize.Width - this.Padding.Left - this.Padding.Right - totalgapw);
+                            if (iw < 0)
+                            {
+                                iw = 0;
+                            }
+                            else
+                            {
+                                iw = iw / InternalChildren.Count;
+                            }
                             for (int i = 0; i < els.Count; i++)
                             {
                                 var child = els.ElementAt(i).Key;
@@ -673,7 +694,15 @@ namespace QSoft.WPF.Panel
                             {
                                 totalgaph = 0;
                             }
-                            var ih = (finalSize.Height - this.Padding.Top - this.Padding.Bottom - totalgaph) / InternalChildren.Count;
+                            var ih = (finalSize.Height - this.Padding.Top - this.Padding.Bottom - totalgaph);
+                            if (ih < 0)
+                            {
+                                ih = 0;
+                            }
+                            else
+                            {
+                                ih = ih / InternalChildren.Count;
+                            }
                             for (int i = 0; i < els.Count; i++)
                             {
                                 var child = els.ElementAt(i).Key;
@@ -728,6 +757,15 @@ namespace QSoft.WPF.Panel
                     break;
 
             }
+        }
+
+        void SetW(Rect rc, double w)
+        {
+            if(w<0)
+            {
+                rc.Width = 0;
+            }
+            rc.Width = w;
         }
     }
 }

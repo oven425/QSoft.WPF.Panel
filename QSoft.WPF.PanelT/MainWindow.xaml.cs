@@ -22,6 +22,8 @@ namespace QSoft.WPF.PanelT
         {
             InitializeComponent();
             this.DataContext = new MainUI();
+
+            
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
