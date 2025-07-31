@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:QSoft.WPF.PanelT"
         mc:Ignorable="d"
+        
         SnapsToDevicePixels="True"
         xmlns:panel="clr-namespace:QSoft.WPF.Panel;assembly=QSoft.WPF.Panel"
         Title="MainWindow" Height="400" Width="300">
@@ -16,7 +17,7 @@
         </ResourceDictionary>
 
     </Window.Resources>
-    <TabControl SelectedIndex="2">
+    <TabControl SelectedIndex="0">
         <TabItem Header="Basic1">
             <Grid>
                 <Grid.RowDefinitions>
@@ -28,9 +29,10 @@
                         <!--<Rectangle Width="50" Height="50" Fill="Red" Stroke="Black" StrokeThickness="1"/>
                         <Rectangle Width="100" Height="100" Fill="Green" Stroke="Black" StrokeThickness="1"/>
                         <Rectangle Width="200" Height="200" Fill="Blue" Stroke="Black" StrokeThickness="1"/>-->
-                        <Button panel:FlexPanel.AlignSelf="Stretch" Click="Button_Click">A</Button>
-                        <Button panel:FlexPanel.AlignSelf="Stretch" Click="Button_Click">B</Button>
-                        <Button panel:FlexPanel.AlignSelf="Stretch" Click="Button_Click">C</Button>
+                        <Button Click="Button_Click">A</Button>
+                        <Button panel:FlexPanel.Grow="1" Click="Button_Click">B1</Button>
+                        <Button panel:FlexPanel.Grow="2" Click="Button_Click">B2</Button>
+                        <Button Click="Button_Click">C</Button>
                         
                     </panel:FlexPanel>
                 </local:DpiDecorator>
@@ -135,28 +137,23 @@
                         </ItemsPanelTemplate>
                     </ListBox.ItemsPanel>
                 </ListBox>
-
-                <ListBox BorderThickness="0" SelectedItem="{Binding RadioButton}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Grid.Row="2">
-                    <RadioButton FontSize="20" GroupName="cc" Content="CC1" IsChecked="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected, Mode=TwoWay}"></RadioButton>
-                    <RadioButton FontSize="20" GroupName="cc" Content="CC2" IsChecked="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected, Mode=TwoWay}"></RadioButton>
-
-                    <ListBox.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <panel:FlexPanel Gap="8" JustifyContent="SpaceAround"/>
-                        </ItemsPanelTemplate>
-                    </ListBox.ItemsPanel>
-                    <ListBox.ItemContainerStyle>
-                        <Style TargetType="ListBoxItem">
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="ListBoxItem">
-                                        <ContentPresenter />
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </ListBox.ItemContainerStyle>
-                </ListBox>
+                <Grid Grid.Row="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <TextBox Text="{Binding Fix}"/>
+                    <ListBox x:Name="listbox_fix" SelectionChanged="listbox_fix_SelectionChanged" SelectedValuePath="Tag" SelectedValue="{Binding Fix}" Grid.Row="2">
+                        <RadioButton Tag="1" FontSize="20" GroupName="cc" Content="CC1" IsChecked="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected, Mode=TwoWay}"></RadioButton>
+                        <RadioButton Tag="2" FontSize="20" GroupName="cc" Content="CC2" IsChecked="{Binding RelativeSource={RelativeSource AncestorType=ListBoxItem}, Path=IsSelected, Mode=TwoWay}"></RadioButton>
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <panel:FlexPanel Gap="8" JustifyContent="SpaceAround"/>
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                    </ListBox>
+                </Grid>
+                
 
             </Grid>
         </TabItem>

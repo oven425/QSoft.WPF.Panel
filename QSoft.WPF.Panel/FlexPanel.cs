@@ -332,9 +332,12 @@ namespace QSoft.WPF.Panel
             {
                 rc.Add(child, new(0, 0, child.DesiredSize.Width, child.DesiredSize.Height));
             }
-
-            var grows = rc.Keys.Select(x => Math.Max(GetGrow(x),0)).ToList();
-            if (grows.Any(static x => x >0))
+            Dictionary<FrameworkElement, double> grows = [];
+            foreach (FrameworkElement child in InternalChildren)
+            {
+                grows.Add(child, Math.Max(GetGrow(child), 0));
+            }
+            if (grows.Values.Any(static x => x >0))
             {
                 this.CalacGrow(rc, finalSize, grows);
             }
@@ -351,11 +354,41 @@ namespace QSoft.WPF.Panel
             return finalSize;
         }
 
-        void CalacGrow(Dictionary<FrameworkElement, Rect> els, Size finalSize, List<double> grows)
+        void CalacGrow(Dictionary<FrameworkElement, Rect> els, Size finalSize, Dictionary<FrameworkElement, double> grows)
         {
-            switch(this.FlexDirection)
+            var item_w = 0.0;
+            var item_h = 0.0;
+            double x = this.Padding.Left + this.BorderThickness.Left;
+            double y = this.Padding.Top + this.BorderThickness.Top;
+            var sum = grows.Values.Sum();
+            switch (this.FlexDirection)
             {
-
+                case FlexDirection.Row:
+                    var grows_child = grows.Where(x => x.Value == 0)
+                        .Sum(x=>x.Key.DesiredSize.Width);
+                    var totalgap = TotalGap();
+                    var iw = Math.Max(finalSize.Width - grows_child - totalgap - this.Padding.Left - this.Padding.Right - this.BorderThickness.Left - this.BorderThickness.Right, 0);
+                    
+                    iw = iw / sum;
+                    foreach(var oo in els.Select((x,idx) => x.Key))
+                    {
+                        item_w = grows[oo] * iw;
+                        if(item_w <= 0)
+                        {
+                            item_w = oo.DesiredSize.Width;
+                        }
+                        els[oo] = new Rect()
+                        {
+                            X = x,
+                            Y = y,
+                            Height = oo.DesiredSize.Height,
+                            Width = item_w,
+                        };
+                        x += item_w + this.Gap;
+                    }
+                    break;
+                case FlexDirection.Column:
+                    break;
             }
         }
 
@@ -779,15 +812,6 @@ namespace QSoft.WPF.Panel
                     break;
 
             }
-        }
-
-        void SetW(Rect rc, double w)
-        {
-            if(w<0)
-            {
-                rc.Width = 0;
-            }
-            rc.Width = w;
         }
     }
 }

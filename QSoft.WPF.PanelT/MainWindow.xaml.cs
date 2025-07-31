@@ -49,6 +49,12 @@ namespace QSoft.WPF.PanelT
         {
             var mainui = this.DataContext as MainUI;
         }
+
+        private void listbox_fix_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var bb = sender as ListBox;
+            var bf = bb.SelectedValue;
+        }
     }
 
     public class MainUI:INotifyPropertyChanged
@@ -106,6 +112,20 @@ namespace QSoft.WPF.PanelT
             "RadioButton3",
             "RadioButton4"
         ];
+
+        int m_Fix = 2;
+        public int Fix
+        {
+            get => m_Fix;
+            set
+            {
+                if (m_Fix != value)
+                {
+                    m_Fix = value;
+                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Fix)));
+                }
+            }
+        }
 
         public event PropertyChangedEventHandler? PropertyChanged;
     }
