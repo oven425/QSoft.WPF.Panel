@@ -66,7 +66,7 @@ namespace QSoft.WPF.Panel
             get => (CornerRadius)GetValue(CornerRadiusProperty);
         }
 
-        public readonly static DependencyProperty BorderBrushProperty = DependencyProperty.Register("BorderBrush", typeof(Brush), typeof(FlexPanel), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure));
+        public readonly static DependencyProperty BorderBrushProperty = DependencyProperty.Register("BorderBrush", typeof(Brush), typeof(FlexPanel), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender));
         [Category("FlexPanel")]
         public Brush BorderBrush
         {
@@ -332,6 +332,7 @@ namespace QSoft.WPF.Panel
             {
                 rc.Add(child, new(0, 0, child.DesiredSize.Width, child.DesiredSize.Height));
             }
+            
             Dictionary<FrameworkElement, double> grows = [];
             foreach (FrameworkElement child in InternalChildren)
             {
@@ -360,14 +361,14 @@ namespace QSoft.WPF.Panel
             var item_h = 0.0;
             double x = this.Padding.Left + this.BorderThickness.Left;
             double y = this.Padding.Top + this.BorderThickness.Top;
+            var child_zerogrow = grows.Where(x => x.Value == 0);
             var sum = grows.Values.Sum();
+            var totalgap = TotalGap();
             switch (this.FlexDirection)
             {
                 case FlexDirection.Row:
-                    var grows_child = grows.Where(x => x.Value == 0)
-                        .Sum(x=>x.Key.DesiredSize.Width);
-                    var totalgap = TotalGap();
-                    var iw = Math.Max(finalSize.Width - grows_child - totalgap - this.Padding.Left - this.Padding.Right - this.BorderThickness.Left - this.BorderThickness.Right, 0);
+                    var zerogrow_w = child_zerogrow.Sum(x=>x.Key.DesiredSize.Width);
+                    var iw = Math.Max(finalSize.Width - zerogrow_w - totalgap - this.Padding.Left - this.Padding.Right - this.BorderThickness.Left - this.BorderThickness.Right, 0);
                     
                     iw = iw / sum;
                     foreach(var oo in els.Select((x,idx) => x.Key))
@@ -388,6 +389,27 @@ namespace QSoft.WPF.Panel
                     }
                     break;
                 case FlexDirection.Column:
+                    var zerogrow_h = child_zerogrow.Sum(x => x.Key.DesiredSize.Height);
+                    
+                    var ih = Math.Max(finalSize.Height - zerogrow_h - totalgap - this.Padding.Top - this.Padding.Bottom - this.BorderThickness.Top - this.BorderThickness.Bottom, 0);
+
+                    ih = ih / sum;
+                    foreach (var oo in els.Select((x, idx) => x.Key))
+                    {
+                        item_h = grows[oo] * ih;
+                        if (item_h <= 0)
+                        {
+                            item_h = oo.DesiredSize.Height;
+                        }
+                        els[oo] = new Rect()
+                        {
+                            X = x,
+                            Y = y,
+                            Height = item_h,
+                            Width = oo.DesiredSize.Width,
+                        };
+                        y += item_h + this.Gap;
+                    }
                     break;
             }
         }
@@ -416,7 +438,7 @@ namespace QSoft.WPF.Panel
                                     rc.Height = oo.Key.DesiredSize.Height;
                                     break;
                                 case FlexDirection.Column:
-                                    rc.X = this.Padding.Left;
+                                    rc.X = this.Padding.Left+this.BorderThickness.Left;
                                     rc.Width = oo.Key.DesiredSize.Width;
                                     break;
                             }
@@ -547,7 +569,7 @@ namespace QSoft.WPF.Panel
                             }
                             break;
                         case FlexDirection.Column:
-                            y = finalSize.Height - this.Padding.Bottom;
+                            y = finalSize.Height - this.Padding.Bottom - this.BorderThickness.Bottom;
                             for (int i = els.Count - 1; i >= 0; i--)
                             {
                                 var child = els.ElementAt(i).Key;

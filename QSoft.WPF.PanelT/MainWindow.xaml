@@ -5,17 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:QSoft.WPF.PanelT"
         mc:Ignorable="d"
-        
         SnapsToDevicePixels="True"
         xmlns:panel="clr-namespace:QSoft.WPF.Panel;assembly=QSoft.WPF.Panel"
-        Title="MainWindow" Height="400" Width="300">
+        Title="MainWindow" Height="400" Width="600">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="RadioRoundButton.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
-
     </Window.Resources>
     <TabControl SelectedIndex="0">
         <TabItem Header="Basic1">
@@ -25,14 +23,14 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <local:DpiDecorator>
-                    <panel:FlexPanel BorderBrush="Red" BorderThickness="5" CornerRadius="0" JustifyContent="SpaceAround"  x:Name="flexpanel" Background="Pink" Padding="0,0,0,0" Visibility="Visible">
-                        <!--<Rectangle Width="50" Height="50" Fill="Red" Stroke="Black" StrokeThickness="1"/>
+                    <panel:FlexPanel BorderBrush="Purple" BorderThickness="10,20,30,40" CornerRadius="0" JustifyContent="SpaceAround"  x:Name="flexpanel" Background="Pink" Padding="5,10,15,20" Visibility="Visible">
+                        <Rectangle Width="50" Height="50" Fill="Red" Stroke="Black" StrokeThickness="1"/>
                         <Rectangle Width="100" Height="100" Fill="Green" Stroke="Black" StrokeThickness="1"/>
-                        <Rectangle Width="200" Height="200" Fill="Blue" Stroke="Black" StrokeThickness="1"/>-->
-                        <Button Click="Button_Click">A</Button>
+                        <Rectangle Width="200" Height="200" Fill="Blue" Stroke="Black" StrokeThickness="1"/>
+                        <!--<Button Click="Button_Click">A</Button>
                         <Button panel:FlexPanel.Grow="1" Click="Button_Click">B1</Button>
                         <Button panel:FlexPanel.Grow="2" Click="Button_Click">B2</Button>
-                        <Button Click="Button_Click">C</Button>
+                        <Button Click="Button_Click">C</Button>-->
                         
                     </panel:FlexPanel>
                 </local:DpiDecorator>
@@ -41,10 +39,12 @@
                     <ComboBox ItemsSource="{Binding JustifyContents}" SelectedItem="{Binding JustifyContent, ElementName=flexpanel}" Width="110"/>
                     <ComboBox ItemsSource="{Binding AlignItems}" SelectedItem="{Binding AlignItems, ElementName=flexpanel}" Width="70"/>
                     <ComboBox ItemsSource="{Binding FlexDirections}" SelectedItem="{Binding FlexDirection, ElementName=flexpanel}" Width="80"/>
-                    <TextBox Text="{Binding Padding, ElementName=flexpanel}"/>
-                    <TextBox Text="{Binding Gap, ElementName=flexpanel}">
-
-                    </TextBox>
+                    <TextBlock Text="Padding:" VerticalAlignment="Center"/>
+                    <TextBox Text="{Binding Padding, ElementName=flexpanel, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Text="Thickness:" VerticalAlignment="Center"/>
+                    <TextBox Text="{Binding BorderThickness, ElementName=flexpanel, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBlock Text="Gap:" VerticalAlignment="Center"/>
+                    <TextBox Text="{Binding Gap, ElementName=flexpanel, UpdateSourceTrigger=PropertyChanged}"/>
                 </StackPanel>
             </Grid>
 
