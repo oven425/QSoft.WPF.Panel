@@ -274,6 +274,84 @@ namespace QSoft.WPF.Panel
             return geometry;
         }
 
+
+//        protected override Size MeasureOverride(Size availableSize)
+//        {
+//            // 如果沒有子元素，直接返回基礎實現或0
+//            if (InternalChildren.Count == 0)
+//            {
+//                return new Size(0, 0);
+//            }
+
+//            // 初始化這個 Panel 期望的尺寸
+//            var desiredSize = new Size(0, 0);
+//            // 複製一份可用的空間，因為我們會在迴圈中修改它
+//            var remainingSize = availableSize;
+
+//            bool isRow = this.FlexDirection == FlexDirection.Row;
+
+//            // --- 調整可用空間，先減去 Padding 和 Border ---
+//            // 這樣傳遞給子元素的才是真正可用的空間
+//            remainingSize.Width = Math.Max(0.0, remainingSize.Width - (this.Padding.Left + this.Padding.Right + this.BorderThickness.Left + this.BorderThickness.Right));
+//            remainingSize.Height = Math.Max(0.0, remainingSize.Height - (this.Padding.Top + this.Padding.Bottom + this.BorderThickness.Top + this.BorderThickness.Bottom));
+
+//            // --- 單次迴圈完成所有測量與計算 ---
+//            foreach (UIElement child in InternalChildren)
+//            {
+//                if (child == null) continue;
+
+//                // 核心修正：用剩餘的空間去測量子元素
+//                child.Measure(remainingSize);
+
+//                var childDesiredSize = child.DesiredSize;
+
+//                if (isRow)
+//                {
+//                    // Row 方向：寬度累加，高度取最大值
+//                    desiredSize.Width += childDesiredSize.Width;
+//                    desiredSize.Height = Math.Max(desiredSize.Height, childDesiredSize.Height);
+
+//                    // 更新剩餘可用寬度
+//                    remainingSize.Width -= childDesiredSize.Width;
+//                }
+//                else // Column 方向
+//                {
+//                    // Column 方向：寬度取最大值，高度累加
+//                    desiredSize.Width = Math.Max(desiredSize.Width, childDesiredSize.Width);
+//                    desiredSize.Height += childDesiredSize.Height;
+
+//                    // 更新剩餘可用高度
+//                    remainingSize.Height -= childDesiredSize.Height;
+//                }
+//            }
+
+//            // --- 加上 Gap 的空間 ---
+//            var totalGap = TotalGap(); // 假設 TotalGap() 的邏輯是正確的
+//            if (isRow)
+//            {
+//                desiredSize.Width += totalGap;
+//            }
+//            else
+//            {
+//                desiredSize.Height += totalGap;
+//            }
+
+//            // --- 最後加上 Padding 和 Border 的空間 ---
+//            desiredSize.Width += this.Padding.Left + this.Padding.Right + this.BorderThickness.Left + this.BorderThickness.Right;
+//            desiredSize.Height += this.Padding.Top + this.Padding.Bottom + this.BorderThickness.Top + this.BorderThickness.Bottom;
+
+//            // --- 約束最終尺寸不超過父容器提供的可用空間 ---
+//            // 這一部分邏輯保持不變，是正確的
+//            desiredSize.Width = Math.Min(desiredSize.Width, availableSize.Width);
+//            desiredSize.Height = Math.Min(desiredSize.Height, availableSize.Height);
+
+//#if DEBUG
+//            System.Diagnostics.Debug.WriteLine($"{this.Name} MeasureOverride: {desiredSize}");
+//#endif
+
+//            return desiredSize;
+//        }
+
         protected override Size MeasureOverride(Size availableSize)
         {
 
@@ -453,7 +531,7 @@ namespace QSoft.WPF.Panel
                                     rc.Height = oo.Key.DesiredSize.Height;
                                     break;
                                 case FlexDirection.Column:
-                                    rc.X = finalSize.Width - oo.Key.DesiredSize.Width - this.Padding.Right;
+                                    rc.X = finalSize.Width - oo.Key.DesiredSize.Width - this.Padding.Right - this.BorderThickness.Right;
                                     rc.Width = oo.Key.DesiredSize.Width;
                                     break;
                             }
@@ -771,7 +849,7 @@ namespace QSoft.WPF.Panel
                             {
                                 totalgaph = 0;
                             }
-                            var ih = (finalSize.Height - this.Padding.Top - this.Padding.Bottom - totalgaph);
+                            var ih = (finalSize.Height - this.Padding.Top - this.Padding.Bottom - this.BorderThickness.Top - this.BorderThickness.Bottom - totalgaph);
                             if (ih < 0)
                             {
                                 ih = 0;

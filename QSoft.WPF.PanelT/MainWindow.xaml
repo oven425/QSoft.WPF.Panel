@@ -23,7 +23,7 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <local:DpiDecorator>
-                    <panel:FlexPanel BorderBrush="Purple" BorderThickness="10,20,30,40" CornerRadius="0" JustifyContent="SpaceAround"  x:Name="flexpanel" Background="Pink" Padding="5,10,15,20" Visibility="Visible">
+                    <panel:FlexPanel VerticalAlignment="Center" HorizontalAlignment="Center" BorderBrush="Purple" BorderThickness="10,20,30,40" CornerRadius="0" JustifyContent="SpaceAround"  x:Name="flexpanel" Background="Pink" Padding="5,10,15,20" Visibility="Visible">
                         <Rectangle Width="50" Height="50" Fill="Red" Stroke="Black" StrokeThickness="1"/>
                         <Rectangle Width="100" Height="100" Fill="Green" Stroke="Black" StrokeThickness="1"/>
                         <Rectangle Width="200" Height="200" Fill="Blue" Stroke="Black" StrokeThickness="1"/>
@@ -42,9 +42,9 @@
                     <TextBlock Text="Padding:" VerticalAlignment="Center"/>
                     <TextBox Text="{Binding Padding, ElementName=flexpanel, UpdateSourceTrigger=PropertyChanged}"/>
                     <TextBlock Text="Thickness:" VerticalAlignment="Center"/>
-                    <TextBox Text="{Binding BorderThickness, ElementName=flexpanel, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox Text="{Binding BorderThickness, ElementName=flexpanel, UpdateSourceTrigger=PropertyChanged}" Width="70"/>
                     <TextBlock Text="Gap:" VerticalAlignment="Center"/>
-                    <TextBox Text="{Binding Gap, ElementName=flexpanel, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox Text="{Binding Gap, ElementName=flexpanel, UpdateSourceTrigger=PropertyChanged}" Width="25"/>
                 </StackPanel>
             </Grid>
 
