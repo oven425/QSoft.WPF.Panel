@@ -26,7 +26,8 @@ namespace QSoft.WPF.Panel
         End,
         Center,
         SpaceAround,
-        SpaceBetween
+        SpaceBetween,
+        SpaceEvenly
     }
 
     public enum AlignItems
@@ -275,127 +276,127 @@ namespace QSoft.WPF.Panel
         }
 
 
-//        protected override Size MeasureOverride(Size availableSize)
-//        {
-//            // 如果沒有子元素，直接返回基礎實現或0
-//            if (InternalChildren.Count == 0)
-//            {
-//                return new Size(0, 0);
-//            }
-
-//            // 初始化這個 Panel 期望的尺寸
-//            var desiredSize = new Size(0, 0);
-//            // 複製一份可用的空間，因為我們會在迴圈中修改它
-//            var remainingSize = availableSize;
-
-//            bool isRow = this.FlexDirection == FlexDirection.Row;
-
-//            // --- 調整可用空間，先減去 Padding 和 Border ---
-//            // 這樣傳遞給子元素的才是真正可用的空間
-//            remainingSize.Width = Math.Max(0.0, remainingSize.Width - (this.Padding.Left + this.Padding.Right + this.BorderThickness.Left + this.BorderThickness.Right));
-//            remainingSize.Height = Math.Max(0.0, remainingSize.Height - (this.Padding.Top + this.Padding.Bottom + this.BorderThickness.Top + this.BorderThickness.Bottom));
-
-//            // --- 單次迴圈完成所有測量與計算 ---
-//            foreach (UIElement child in InternalChildren)
-//            {
-//                if (child == null) continue;
-
-//                // 核心修正：用剩餘的空間去測量子元素
-//                child.Measure(remainingSize);
-
-//                var childDesiredSize = child.DesiredSize;
-
-//                if (isRow)
-//                {
-//                    // Row 方向：寬度累加，高度取最大值
-//                    desiredSize.Width += childDesiredSize.Width;
-//                    desiredSize.Height = Math.Max(desiredSize.Height, childDesiredSize.Height);
-
-//                    // 更新剩餘可用寬度
-//                    remainingSize.Width -= childDesiredSize.Width;
-//                }
-//                else // Column 方向
-//                {
-//                    // Column 方向：寬度取最大值，高度累加
-//                    desiredSize.Width = Math.Max(desiredSize.Width, childDesiredSize.Width);
-//                    desiredSize.Height += childDesiredSize.Height;
-
-//                    // 更新剩餘可用高度
-//                    remainingSize.Height -= childDesiredSize.Height;
-//                }
-//            }
-
-//            // --- 加上 Gap 的空間 ---
-//            var totalGap = TotalGap(); // 假設 TotalGap() 的邏輯是正確的
-//            if (isRow)
-//            {
-//                desiredSize.Width += totalGap;
-//            }
-//            else
-//            {
-//                desiredSize.Height += totalGap;
-//            }
-
-//            // --- 最後加上 Padding 和 Border 的空間 ---
-//            desiredSize.Width += this.Padding.Left + this.Padding.Right + this.BorderThickness.Left + this.BorderThickness.Right;
-//            desiredSize.Height += this.Padding.Top + this.Padding.Bottom + this.BorderThickness.Top + this.BorderThickness.Bottom;
-
-//            // --- 約束最終尺寸不超過父容器提供的可用空間 ---
-//            // 這一部分邏輯保持不變，是正確的
-//            desiredSize.Width = Math.Min(desiredSize.Width, availableSize.Width);
-//            desiredSize.Height = Math.Min(desiredSize.Height, availableSize.Height);
-
-//#if DEBUG
-//            System.Diagnostics.Debug.WriteLine($"{this.Name} MeasureOverride: {desiredSize}");
-//#endif
-
-//            return desiredSize;
-//        }
-
         protected override Size MeasureOverride(Size availableSize)
         {
-
+            // 如果沒有子元素，直接返回基礎實現或0
             if (InternalChildren.Count == 0)
-                return base.MeasureOverride(availableSize);
-            try
             {
-                foreach (UIElement child in InternalChildren)
-                {
-                    child?.Measure(availableSize);
-                }
-                var ll = InternalChildren.OfType<FrameworkElement>().ToList();
-                var totalgap = TotalGap();
-                var sz = new Size(0, 0);
-                switch (this.FlexDirection)
-                {
-                    case FlexDirection.Row:
-                        sz.Width = ll.Sum(x => x.DesiredSize.Width) + totalgap;
-                        sz.Height = ll.Max(x => x.DesiredSize.Height);
-                        break;
-                    case FlexDirection.Column:
-                        sz.Width = ll.Max(x => x.DesiredSize.Width);
-                        sz.Height = ll.Sum(x => x.DesiredSize.Height) + totalgap;
-                        break;
-                }
-                sz.Width = sz.Width + this.Padding.Left + this.Padding.Right + this.BorderThickness.Left + this.BorderThickness.Right;
-                sz.Height = sz.Height + this.Padding.Top + this.Padding.Bottom + this.BorderThickness.Top + this.BorderThickness.Bottom;
-                if (sz.Width > availableSize.Width)
-                {
-                    sz.Width = availableSize.Width;
-                }
-                if (sz.Height > availableSize.Height)
-                {
-                    sz.Height = availableSize.Height;
-                }
-                System.Diagnostics.Debug.WriteLine($"{this.Name} MeasureOverride: {sz}");
-                return sz;
+                return new Size(0, 0);
             }
-            catch (Exception ex)
+
+            // 初始化這個 Panel 期望的尺寸
+            var desiredSize = new Size(0, 0);
+            // 複製一份可用的空間，因為我們會在迴圈中修改它
+            var remainingSize = availableSize;
+
+            bool isRow = this.FlexDirection == FlexDirection.Row;
+
+            // --- 調整可用空間，先減去 Padding 和 Border ---
+            // 這樣傳遞給子元素的才是真正可用的空間
+            remainingSize.Width = Math.Max(0.0, remainingSize.Width - (this.Padding.Left + this.Padding.Right + this.BorderThickness.Left + this.BorderThickness.Right));
+            remainingSize.Height = Math.Max(0.0, remainingSize.Height - (this.Padding.Top + this.Padding.Bottom + this.BorderThickness.Top + this.BorderThickness.Bottom));
+
+            // --- 單次迴圈完成所有測量與計算 ---
+            foreach (UIElement child in InternalChildren)
             {
-                System.Diagnostics.Debug.WriteLine($"Exception in MeasureOverride: {ex}");
-                throw;
+                if (child == null) continue;
+
+                // 核心修正：用剩餘的空間去測量子元素
+                child.Measure(remainingSize);
+
+                var childDesiredSize = child.DesiredSize;
+
+                if (isRow)
+                {
+                    // Row 方向：寬度累加，高度取最大值
+                    desiredSize.Width += childDesiredSize.Width;
+                    desiredSize.Height = Math.Max(desiredSize.Height, childDesiredSize.Height);
+
+                    // 更新剩餘可用寬度
+                    remainingSize.Width -= childDesiredSize.Width;
+                }
+                else // Column 方向
+                {
+                    // Column 方向：寬度取最大值，高度累加
+                    desiredSize.Width = Math.Max(desiredSize.Width, childDesiredSize.Width);
+                    desiredSize.Height += childDesiredSize.Height;
+
+                    // 更新剩餘可用高度
+                    remainingSize.Height -= childDesiredSize.Height;
+                }
             }
+
+            // --- 加上 Gap 的空間 ---
+            var totalGap = TotalGap(); // 假設 TotalGap() 的邏輯是正確的
+            if (isRow)
+            {
+                desiredSize.Width += totalGap;
+            }
+            else
+            {
+                desiredSize.Height += totalGap;
+            }
+
+            // --- 最後加上 Padding 和 Border 的空間 ---
+            desiredSize.Width += this.Padding.Left + this.Padding.Right + this.BorderThickness.Left + this.BorderThickness.Right;
+            desiredSize.Height += this.Padding.Top + this.Padding.Bottom + this.BorderThickness.Top + this.BorderThickness.Bottom;
+
+            // --- 約束最終尺寸不超過父容器提供的可用空間 ---
+            // 這一部分邏輯保持不變，是正確的
+            desiredSize.Width = Math.Min(desiredSize.Width, availableSize.Width);
+            desiredSize.Height = Math.Min(desiredSize.Height, availableSize.Height);
+
+#if DEBUG
+            System.Diagnostics.Debug.WriteLine($"{this.Name} MeasureOverride: {desiredSize}");
+#endif
+
+            return desiredSize;
         }
+
+        //protected override Size MeasureOverride(Size availableSize)
+        //{
+
+        //    if (InternalChildren.Count == 0)
+        //        return new Size(0, 0);
+        //    try
+        //    {
+        //        foreach (UIElement child in InternalChildren)
+        //        {
+        //            child?.Measure(availableSize);
+        //        }
+        //        var ll = InternalChildren.OfType<FrameworkElement>().ToList();
+        //        var totalgap = TotalGap();
+        //        var sz = new Size(0, 0);
+        //        switch (this.FlexDirection)
+        //        {
+        //            case FlexDirection.Row:
+        //                sz.Width = ll.Sum(x => x.DesiredSize.Width) + totalgap;
+        //                sz.Height = ll.Max(x => x.DesiredSize.Height);
+        //                break;
+        //            case FlexDirection.Column:
+        //                sz.Width = ll.Max(x => x.DesiredSize.Width);
+        //                sz.Height = ll.Sum(x => x.DesiredSize.Height) + totalgap;
+        //                break;
+        //        }
+        //        sz.Width = sz.Width + this.Padding.Left + this.Padding.Right + this.BorderThickness.Left + this.BorderThickness.Right;
+        //        sz.Height = sz.Height + this.Padding.Top + this.Padding.Bottom + this.BorderThickness.Top + this.BorderThickness.Bottom;
+        //        if (sz.Width > availableSize.Width)
+        //        {
+        //            sz.Width = availableSize.Width;
+        //        }
+        //        if (sz.Height > availableSize.Height)
+        //        {
+        //            sz.Height = availableSize.Height;
+        //        }
+        //        System.Diagnostics.Debug.WriteLine($"{this.Name} MeasureOverride: {sz}");
+        //        return sz;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        System.Diagnostics.Debug.WriteLine($"Exception in MeasureOverride: {ex}");
+        //        throw;
+        //    }
+        //}
 
 
         protected override Size ArrangeOverride(Size finalSize)
@@ -575,10 +576,10 @@ namespace QSoft.WPF.Panel
 
         double TotalGap()
         {
-            var totalgap = this.Gap * (InternalChildren.Count - 1);
-            if (totalgap <= 0)
+            var totalgap = 0.0;
+            if(this.InternalChildren.Count >1)
             {
-                totalgap = 0;
+                totalgap = this.Gap * (InternalChildren.Count - 1);
             }
             return totalgap;
         }
@@ -714,79 +715,126 @@ namespace QSoft.WPF.Panel
                             break;
                     }
 
-                    break;
+                    break;              
                 case JustifyContent.SpaceAround:
                     switch (this.FlexDirection)
                     {
                         case FlexDirection.Row:
-                            var totalgapw = this.Gap * (els.Count - 1);
-                            if (totalgapw <= 0)
-                            {
-                                totalgapw = 0;
-                            }
-                            var iw = (finalSize.Width - this.Padding.Left - this.Padding.Right - this.BorderThickness.Left - this.BorderThickness.Right - totalgapw);
-                            if(iw<0)
+                            var totalgapw = this.TotalGap();
+                            var totalw = els.Keys.Sum(x => x.DesiredSize.Width);
+                            var iw = (finalSize.Width - this.Padding.Left - this.Padding.Right - this.BorderThickness.Left - this.BorderThickness.Right - totalgapw - totalw);
+                            if (iw < 0)
                             {
                                 iw = 0;
                             }
                             else
                             {
-                                iw = iw / InternalChildren.Count;
+                                iw = iw / (InternalChildren.Count*2);
                             }
+                            
                             foreach (var oo in els.Select(x => x.Key))
                             {
-                                item_w = iw;
+                                x = x + iw;
                                 els[oo] = new Rect()
                                 {
-                                    X = x + (iw - item_w) / 2,
+                                    X = x,
                                     Y = y,
                                     Height = finalSize.Height,
-                                    Width = item_w,
+                                    Width = oo.DesiredSize.Width,
                                 };
-                                x += iw + this.Gap;
+                                x += iw+oo.DesiredSize.Width + this.Gap;
                             }
                             break;
                         case FlexDirection.Column:
-                            var totalgaph = this.Gap * (els.Count - 1);
-                            if (totalgaph <= 0)
-                            {
-                                totalgaph = 0;
-                            }
-                            var ih = (finalSize.Height - this.Padding.Top - this.Padding.Bottom - this.BorderThickness.Top - this.BorderThickness.Bottom - totalgaph);
+                            var totalgaph = this.TotalGap();
+                            var totalh = els.Keys.Sum(x => x.DesiredSize.Height);
+                            var ih = (finalSize.Height - this.Padding.Top - this.Padding.Bottom - this.BorderThickness.Top - this.BorderThickness.Bottom - totalgaph - totalh);
                             if(ih<0)
                             {
                                 ih = 0;
                             }
                             else
                             {
-                                ih = ih / InternalChildren.Count;
+                                ih = ih / (InternalChildren.Count*2);
                             }
                             foreach (var oo in els.Select(x => x.Key))
                             {
-                                item_h = ih;
+                                y= y + ih;
                                 els[oo] = new Rect()
                                 {
                                     X = x,
-                                    Y = y + (ih - item_h) / 2,
-                                    Height = item_h,
+                                    Y = y,
+                                    Height = oo.DesiredSize.Height,
                                     Width = finalSize.Width,
                                 };
-                                y += ih + this.Gap;
+                                y += ih+oo.DesiredSize.Height + this.Gap;
                             }
                             break;
                     }
-
+                    break;
+                case JustifyContent.SpaceEvenly:
+                    {
+                        switch(this.FlexDirection)
+                        {
+                            case FlexDirection.Row:
+                                var totalgapw = this.TotalGap();
+                                var totalw = els.Keys.Sum(x => x.DesiredSize.Width);
+                                var iw = (finalSize.Width - this.Padding.Left - this.Padding.Right - this.BorderThickness.Left - this.BorderThickness.Right - totalgapw - totalw);
+                                if (iw < 0)
+                                {
+                                    iw = 0;
+                                }
+                                else
+                                {
+                                    iw = iw / (InternalChildren.Count +1);
+                                }
+                                x = x + iw;
+                                foreach (var oo in els.Select(x => x.Key))
+                                {
+                                    els[oo] = new Rect()
+                                    {
+                                        X = x,
+                                        Y = y,
+                                        Height = finalSize.Height,
+                                        Width = oo.DesiredSize.Width,
+                                    };
+                                    x += iw+oo.DesiredSize.Width + this.Gap;
+                                }
+                                break;
+                            case FlexDirection.Column:
+                                var totalgaph = this.TotalGap();
+                                var totalh = els.Keys.Sum(x => x.DesiredSize.Height);
+                                var ih = (finalSize.Height - this.Padding.Top - this.Padding.Bottom - this.BorderThickness.Top - this.BorderThickness.Bottom - totalgaph - totalh);
+                                if (ih < 0)
+                                {
+                                    ih = 0;
+                                }
+                                else
+                                {
+                                    ih = ih / (InternalChildren.Count + 1);
+                                }
+                                y = y + ih;
+                                foreach (var oo in els.Select(x => x.Key))
+                                {
+                                    els[oo] = new Rect()
+                                    {
+                                        X = x,
+                                        Y = y,
+                                        Height = oo.DesiredSize.Height,
+                                        Width = finalSize.Width,
+                                    };
+                                    y += ih + oo.DesiredSize.Height + this.Gap;
+                                }
+                                break;
+                        }
+                    }
                     break;
                 case JustifyContent.SpaceBetween:
                     switch (this.FlexDirection)
                     {
                         case FlexDirection.Row:
-                            var totalgapw = this.Gap * (els.Count - 1);
-                            if (totalgapw <= 0)
-                            {
-                                totalgapw = 0;
-                            }
-                            var iw = (finalSize.Width - this.Padding.Left - this.Padding.Right - totalgapw);
+                            var totalgapw = this.TotalGap();
+                            var iw = (finalSize.Width - this.Padding.Left - this.Padding.Right - this.BorderThickness.Left - this.BorderThickness.Right - totalgapw);
                             if (iw < 0)
                             {
                                 iw = 0;
@@ -844,11 +892,7 @@ namespace QSoft.WPF.Panel
                             }
                             break;
                         case FlexDirection.Column:
-                            var totalgaph = this.Gap * (els.Count - 1);
-                            if (totalgaph <= 0)
-                            {
-                                totalgaph = 0;
-                            }
+                            var totalgaph = this.TotalGap();
                             var ih = (finalSize.Height - this.Padding.Top - this.Padding.Bottom - this.BorderThickness.Top - this.BorderThickness.Bottom - totalgaph);
                             if (ih < 0)
                             {
