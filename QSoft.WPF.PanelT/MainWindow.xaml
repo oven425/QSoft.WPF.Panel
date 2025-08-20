@@ -7,6 +7,7 @@
         mc:Ignorable="d"
         SnapsToDevicePixels="True"
         xmlns:panel="clr-namespace:QSoft.WPF.Panel;assembly=QSoft.WPF.Panel"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         Title="MainWindow" Height="400" Width="600">
     <Window.Resources>
         <ResourceDictionary>
@@ -24,6 +25,16 @@
                 </Grid.RowDefinitions>
                 <local:DpiDecorator>
                     <panel:FlexPanel BorderBrush="Purple" BorderThickness="10,20,30,40" CornerRadius="0" JustifyContent="SpaceAround"  x:Name="flexpanel" Background="Pink" Padding="5,10,15,20" Visibility="Visible">
+                        <i:Interaction.Behaviors>
+                            <i:FluidMoveBehavior AppliesTo="Children" Duration="00:00:5">
+                                <i:FluidMoveBehavior.EaseY>
+                                    <QuinticEase EasingMode="EaseOut"/>
+                                </i:FluidMoveBehavior.EaseY>
+                                <i:FluidMoveBehavior.EaseX>
+                                    <QuinticEase EasingMode="EaseOut"/>
+                                </i:FluidMoveBehavior.EaseX>
+                            </i:FluidMoveBehavior>
+                        </i:Interaction.Behaviors>
                         <!--<Rectangle Width="50" Height="50" Fill="Red" Stroke="Black" StrokeThickness="1"/>
                         <Rectangle Width="100" Height="100" Fill="Green" Stroke="Black" StrokeThickness="1"/>
                         <Rectangle Width="200" Height="200" Fill="Blue" Stroke="Black" StrokeThickness="1"/>-->
