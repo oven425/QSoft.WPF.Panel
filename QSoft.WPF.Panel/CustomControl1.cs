@@ -44,11 +44,13 @@ namespace QSoft.WPF.Panel
     ///     <MyNamespace:CustomControl1/>
     ///
     /// </summary>
-    public class CustomControl1 : Control
+    public class CustomControl1 : System.Windows.Controls.Panel
     {
         static CustomControl1()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(CustomControl1), new FrameworkPropertyMetadata(typeof(CustomControl1)));
         }
+
+
     }
 }
