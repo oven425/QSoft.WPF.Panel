@@ -124,70 +124,70 @@ namespace QSoft.WPF.Panel
         public static void SetGrow(DependencyObject obj, double value) => obj.SetValue(GrowProperty, value);
 
 
-        protected override void OnRender(DrawingContext dc)
-        {
-            //base.OnRender(dc);
-            // 取得目前的邊框厚度、圓角和渲染尺寸
-            Thickness thickness = this.BorderThickness;
-            CornerRadius cornerRadius = this.CornerRadius;
+        //protected override void OnRender(DrawingContext dc)
+        //{
+        //    //base.OnRender(dc);
+        //    // 取得目前的邊框厚度、圓角和渲染尺寸
+        //    Thickness thickness = this.BorderThickness;
+        //    CornerRadius cornerRadius = this.CornerRadius;
 
-            // RenderSize 是控制項最終被分配到的繪圖區域大小
-            Rect renderRect = new Rect(new Point(0, 0), this.RenderSize);
+        //    // RenderSize 是控制項最終被分配到的繪圖區域大小
+        //    Rect renderRect = new Rect(new Point(0, 0), this.RenderSize);
 
-            // 1. 繪製背景
-            if (this.Background != null)
-            {
-                // 使用 DrawRoundedRectangle 繪製背景，Pen 設為 null 表示不繪製邊框
-                //dc.DrawRoundedRectangle(this.Background, null, renderRect, cornerRadius);
-            }
+        //    // 1. 繪製背景
+        //    if (this.Background != null)
+        //    {
+        //        // 使用 DrawRoundedRectangle 繪製背景，Pen 設為 null 表示不繪製邊框
+        //        //dc.DrawRoundedRectangle(this.Background, null, renderRect, cornerRadius);
+        //    }
 
-            // 2. 繪製邊框
-            // 檢查是否有邊框畫刷，且邊框厚度不為零
-            //if (this.BorderBrush != null && !thickness.Equals(new Thickness()))
-            {
-                // 使用最穩健的方法：建立一個代表邊框的 Geometry 並繪製它
+        //    // 2. 繪製邊框
+        //    // 檢查是否有邊框畫刷，且邊框厚度不為零
+        //    //if (this.BorderBrush != null && !thickness.Equals(new Thickness()))
+        //    {
+        //        // 使用最穩健的方法：建立一個代表邊框的 Geometry 並繪製它
 
-                // 定義外部矩形的邊界
-                Rect outerRect = renderRect;
+        //        // 定義外部矩形的邊界
+        //        Rect outerRect = renderRect;
 
-                // 根據邊框厚度計算內部矩形的邊界
-                // 內部矩形向內縮排
-                Rect innerRect = new Rect(
-                    outerRect.Left + thickness.Left,
-                    outerRect.Top + thickness.Top,
-                    Math.Max(0.0, outerRect.Width - thickness.Left - thickness.Right),
-                    Math.Max(0.0, outerRect.Height - thickness.Top - thickness.Bottom)
-                );
+        //        // 根據邊框厚度計算內部矩形的邊界
+        //        // 內部矩形向內縮排
+        //        Rect innerRect = new Rect(
+        //            outerRect.Left + thickness.Left,
+        //            outerRect.Top + thickness.Top,
+        //            Math.Max(0.0, outerRect.Width - thickness.Left - thickness.Right),
+        //            Math.Max(0.0, outerRect.Height - thickness.Top - thickness.Bottom)
+        //        );
 
-                // 計算內部圓角半徑
-                // 內部圓角需要根據外部圓角和邊框厚度進行縮減
-                CornerRadius innerCornerRadius = new CornerRadius(
-                    Math.Max(0.0, cornerRadius.TopLeft - Math.Max(thickness.Left, thickness.Top) / 2.0),
-                    Math.Max(0.0, cornerRadius.TopRight - Math.Max(thickness.Right, thickness.Top) / 2.0),
-                    Math.Max(0.0, cornerRadius.BottomRight - Math.Max(thickness.Right, thickness.Bottom) / 2.0),
-                    Math.Max(0.0, cornerRadius.BottomLeft - Math.Max(thickness.Left, thickness.Bottom) / 2.0)
-                );
+        //        // 計算內部圓角半徑
+        //        // 內部圓角需要根據外部圓角和邊框厚度進行縮減
+        //        CornerRadius innerCornerRadius = new CornerRadius(
+        //            Math.Max(0.0, cornerRadius.TopLeft - Math.Max(thickness.Left, thickness.Top) / 2.0),
+        //            Math.Max(0.0, cornerRadius.TopRight - Math.Max(thickness.Right, thickness.Top) / 2.0),
+        //            Math.Max(0.0, cornerRadius.BottomRight - Math.Max(thickness.Right, thickness.Bottom) / 2.0),
+        //            Math.Max(0.0, cornerRadius.BottomLeft - Math.Max(thickness.Left, thickness.Bottom) / 2.0)
+        //        );
 
-                // 建立外部和內部幾何圖形
-                // RoundedRectangleGeometry 是描述圓角矩形的 Geometry
-                var outerGeometry = FlexPanel.CreateRoundedRectangleGeometry(outerRect, cornerRadius);
-                var innerGeometry = FlexPanel.CreateRoundedRectangleGeometry(innerRect, innerCornerRadius);
+        //        // 建立外部和內部幾何圖形
+        //        // RoundedRectangleGeometry 是描述圓角矩形的 Geometry
+        //        var outerGeometry = FlexPanel.CreateRoundedRectangleGeometry(outerRect, cornerRadius);
+        //        var innerGeometry = FlexPanel.CreateRoundedRectangleGeometry(innerRect, innerCornerRadius);
 
-                // 使用 CombinedGeometry 將兩個幾何圖形組合起來
-                // GeometryCombineMode.Exclude 會從第一個圖形中減去第二個圖形
-                // 這樣就得到了中空的邊框形狀
-                var borderGeometry = new CombinedGeometry(
-                    GeometryCombineMode.Exclude,
-                    outerGeometry,
-                    innerGeometry
-                );
+        //        // 使用 CombinedGeometry 將兩個幾何圖形組合起來
+        //        // GeometryCombineMode.Exclude 會從第一個圖形中減去第二個圖形
+        //        // 這樣就得到了中空的邊框形狀
+        //        var borderGeometry = new CombinedGeometry(
+        //            GeometryCombineMode.Exclude,
+        //            outerGeometry,
+        //            innerGeometry
+        //        );
 
-                // 最後，使用 DrawGeometry 繪製這個計算出來的邊框形狀
-                // Pen 設為 null，因為我們是直接填充(Fill)這個 Geometry
-                dc.DrawGeometry(this.BorderBrush, null, borderGeometry);
-                dc.DrawGeometry(this.Background, null, innerGeometry);
-            }
-        }
+        //        // 最後，使用 DrawGeometry 繪製這個計算出來的邊框形狀
+        //        // Pen 設為 null，因為我們是直接填充(Fill)這個 Geometry
+        //        dc.DrawGeometry(this.BorderBrush, null, borderGeometry);
+        //        dc.DrawGeometry(this.Background, null, innerGeometry);
+        //    }
+        //}
 
         static PathGeometry CreateRoundedRectangleGeometry(Rect rect, CornerRadius cornerRadius)
         {

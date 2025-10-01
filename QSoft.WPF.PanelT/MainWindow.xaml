@@ -25,7 +25,7 @@
                 </Grid.RowDefinitions>
                 <local:DpiDecorator>
                     <panel:FlexPanel BorderBrush="Purple" BorderThickness="10,20,30,40" CornerRadius="0" JustifyContent="SpaceAround"  x:Name="flexpanel" Background="Pink" Padding="5,10,15,20" Visibility="Visible">
-                        <i:Interaction.Behaviors>
+                        <!--<i:Interaction.Behaviors>
                             <i:FluidMoveBehavior AppliesTo="Children" Duration="00:00:5">
                                 <i:FluidMoveBehavior.EaseY>
                                     <QuinticEase EasingMode="EaseOut"/>
@@ -34,13 +34,13 @@
                                     <QuinticEase EasingMode="EaseOut"/>
                                 </i:FluidMoveBehavior.EaseX>
                             </i:FluidMoveBehavior>
-                        </i:Interaction.Behaviors>
+                        </i:Interaction.Behaviors>-->
                         <!--<Rectangle Width="50" Height="50" Fill="Red" Stroke="Black" StrokeThickness="1"/>
                         <Rectangle Width="100" Height="100" Fill="Green" Stroke="Black" StrokeThickness="1"/>
                         <Rectangle Width="200" Height="200" Fill="Blue" Stroke="Black" StrokeThickness="1"/>-->
                         <Button Click="Button_Click">A</Button>
-                        <Button panel:FlexPanel.Grow="0" Click="Button_Click">B1</Button>
-                        <Button panel:FlexPanel.Grow="0" Click="Button_Click">B2</Button>
+                        <Button panel:FlexPanel.Grow="1" Click="Button_Click">B1</Button>
+                        <Button panel:FlexPanel.Grow="1" Click="Button_Click">B2</Button>
                         <Button Click="Button_Click">C</Button>
                         
                     </panel:FlexPanel>
@@ -117,7 +117,6 @@
             </local:DpiDecorator>
         </TabItem>
         <TabItem Header="cc">
-
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition/>

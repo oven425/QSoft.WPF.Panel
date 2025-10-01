@@ -1,0 +1,47 @@
+﻿<Window x:Class="WpfApp_FlexPanelT.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp_FlexPanelT"
+        mc:Ignorable="d"
+        xmlns:qpanel="clr-namespace:QSoft.WPF.Panel;assembly=QSoft.WPF.Panel"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <TabControl>
+            <TabItem Header="Containor">
+                <qpanel:FlexPanel FlexDirection="Column" Gap="8" JustifyContent="Start">
+                    <Button>Add Flex Item</Button>
+                    <qpanel:FlexPanel Gap="3" FlexDirection="Column" JustifyContent="Start">
+                        <TextBlock Text="Flex-direction"/>
+                        <ComboBox>
+                            <ComboBoxItem Content="{x:Static qpanel:FlexDirection.Row}" IsSelected="True"/>
+                            <ComboBoxItem Content="{x:Static qpanel:FlexDirection.Column}"/>
+                        </ComboBox>
+                    </qpanel:FlexPanel>
+                    <qpanel:FlexPanel Gap="3" FlexDirection="Column" JustifyContent="Start">
+                        <TextBlock Text="Flex-wrap"/>
+                        <ComboBox/>
+                    </qpanel:FlexPanel>
+                    <qpanel:FlexPanel Gap="3" FlexDirection="Column" JustifyContent="Start">
+                        <TextBlock Text="Justify-content"/>
+                        <ComboBox/>
+                    </qpanel:FlexPanel>
+                    <qpanel:FlexPanel Gap="3" FlexDirection="Column" JustifyContent="Start">
+                        <TextBlock Text="Align-items"/>
+                        <ComboBox/>
+                    </qpanel:FlexPanel>
+                </qpanel:FlexPanel>
+                
+            </TabItem>
+            <TabItem Header="Item">
+                
+            </TabItem>
+        </TabControl>
+        <qpanel:FlexPanel x:Name="flexpanel"/>
+    </Grid>
+</Window>
