@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.ObjectModel;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -20,5 +21,21 @@ namespace WpfApp_FlexPanelT
         {
             InitializeComponent();
         }
+
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var comboBox = sender as ComboBox;
+            var vv = comboBox.SelectedValue;
+            var citem
+                 = comboBox.SelectedItem as ComboBoxItem;
+            var fr = citem.Content.GetType();
+        }
+
+        private void button_addflex_Click(object sender, RoutedEventArgs e)
+        {
+            this.flexpanel.Children.Add(new FlexItem(new FlexItemVM()
+            { Name = $"index:{this.flexpanel.Children.Count}" }));
+        }
     }
+
 }
