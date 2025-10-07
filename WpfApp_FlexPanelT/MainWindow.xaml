@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp_FlexPanelT"
         mc:Ignorable="d"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:qpanel="clr-namespace:QSoft.WPF.Panel;assembly=QSoft.WPF.Panel"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
@@ -43,13 +44,17 @@
                             <ComboBoxItem Content="Stretch" Tag="{x:Static qpanel:AlignItems.Stretch}"/>
                         </ComboBox>
                     </qpanel:FlexPanel>
+                    <qpanel:FlexPanel Gap="3" FlexDirection="Column" JustifyContent="Start">
+                        <TextBlock Text="Gap"/>
+                        <TextBox Text="{Binding Gap, ElementName=flexpanel, UpdateSourceTrigger=PropertyChanged}"/>
+                    </qpanel:FlexPanel>
                 </qpanel:FlexPanel>
-                
             </TabItem>
             <TabItem Header="Item">
-                
+
             </TabItem>
         </TabControl>
-        <qpanel:FlexPanel x:Name="flexpanel" Grid.Column="1"/>
+        <qpanel:FlexPanel x:Name="flexpanel" Grid.Column="1">
+        </qpanel:FlexPanel>
     </Grid>
 </Window>

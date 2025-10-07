@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\QSoft.WPF.PanelT\QSoft.WPF.PanelT.csproj" />
   </ItemGroup>
 

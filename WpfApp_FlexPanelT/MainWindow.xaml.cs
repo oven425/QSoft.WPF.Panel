@@ -17,25 +17,33 @@ namespace WpfApp_FlexPanelT
     /// </summary>
     public partial class MainWindow : Window
     {
+        MainUI m_MainUI;
         public MainWindow()
         {
             InitializeComponent();
-        }
-
-        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            var comboBox = sender as ComboBox;
-            var vv = comboBox.SelectedValue;
-            var citem
-                 = comboBox.SelectedItem as ComboBoxItem;
-            var fr = citem.Content.GetType();
+            this.DataContext = this.m_MainUI = new MainUI();
         }
 
         private void button_addflex_Click(object sender, RoutedEventArgs e)
         {
-            this.flexpanel.Children.Add(new FlexItem(new FlexItemVM()
-            { Name = $"index:{this.flexpanel.Children.Count}" }));
+            var item = new FlexItem(new FlexItemVM()
+            { Name = $"index:{this.flexpanel.Children.Count}" });
+            item.Delete += Item_Delete;
+
+            this.flexpanel.Children.Add(item);
+
         }
+
+        private void Item_Delete(object sender, RoutedEventArgs e)
+        {
+            var item = sender as FlexItem;
+            this.flexpanel.Children.Remove(item);
+        }
+    }
+
+    public  class MainUI
+    {
+        public ObservableCollection<FlexItemVM> Items { get; set; } = new ObservableCollection<FlexItemVM>();
     }
 
 }
