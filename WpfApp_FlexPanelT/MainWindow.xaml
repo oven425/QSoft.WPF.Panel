@@ -5,26 +5,27 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp_FlexPanelT"
         mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=local:MainUI}"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:qpanel="clr-namespace:QSoft.WPF.Panel;assembly=QSoft.WPF.Panel"
-        Title="MainWindow" Height="450" Width="800">
+        Title="FlexPanel test site" Height="450" Width="800">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="200"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <TabControl>
-            <TabItem Header="Containor">
-                <qpanel:FlexPanel FlexDirection="Column" Gap="8" JustifyContent="Start">
+        <TabControl x:Name="tabcontrol">
+            <TabItem Header="Container">
+                <qpanel:FlexPanel FlexDirection="Column" Gap="8" AlignItems="Stretch">
                     <Button x:Name="button_addflex" Click="button_addflex_Click">Add Flex Item</Button>
-                    <qpanel:FlexPanel Gap="3" FlexDirection="Column" JustifyContent="Start">
+                    <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
                         <TextBlock Text="Flex-direction"/>
                         <ComboBox SelectedValuePath="Tag" SelectedValue="{Binding FlexDirection, ElementName=flexpanel}">
                             <ComboBoxItem Content="Row" Tag="{x:Static qpanel:FlexDirection.Row}"/>
                             <ComboBoxItem Content="Column" Tag="{x:Static qpanel:FlexDirection.Column}"/>
                         </ComboBox>
                     </qpanel:FlexPanel>
-                    <qpanel:FlexPanel Gap="3" FlexDirection="Column" JustifyContent="Start">
+                    <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
                         <TextBlock Text="Justify-content"/>
                         <ComboBox SelectedValuePath="Tag" SelectedValue="{Binding JustifyContent, ElementName=flexpanel}">
                             <ComboBoxItem Content="Start" Tag="{x:Static qpanel:JustifyContent.Start}"/>
@@ -35,7 +36,7 @@
                             <ComboBoxItem Content="SpaceEvenly" Tag="{x:Static qpanel:JustifyContent.SpaceEvenly}"/>
                         </ComboBox>
                     </qpanel:FlexPanel>
-                    <qpanel:FlexPanel Gap="3" FlexDirection="Column" JustifyContent="Start">
+                    <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
                         <TextBlock Text="Align-items"/>
                         <ComboBox SelectedValuePath="Tag" SelectedValue="{Binding AlignItems, ElementName=flexpanel}">
                             <ComboBoxItem Content="Start" Tag="{x:Static qpanel:AlignItems.Start}"/>
@@ -44,17 +45,46 @@
                             <ComboBoxItem Content="Stretch" Tag="{x:Static qpanel:AlignItems.Stretch}"/>
                         </ComboBox>
                     </qpanel:FlexPanel>
-                    <qpanel:FlexPanel Gap="3" FlexDirection="Column" JustifyContent="Start">
+                    <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
                         <TextBlock Text="Gap"/>
                         <TextBox Text="{Binding Gap, ElementName=flexpanel, UpdateSourceTrigger=PropertyChanged}"/>
+                    </qpanel:FlexPanel>
+                    <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
+                        <TextBlock Text="Padding"/>
+                        <TextBox Text="{Binding Padding, ElementName=flexpanel, UpdateSourceTrigger=PropertyChanged}"/>
                     </qpanel:FlexPanel>
                 </qpanel:FlexPanel>
             </TabItem>
             <TabItem Header="Item">
+                <i:Interaction.Triggers>
+                    <i:DataTrigger Binding="{Binding ItemData}" Value="{x:Null}">
+                        <i:ChangePropertyAction TargetName="flexpanel_itemdata" PropertyName="Visibility" Value="Hidden"/>
+                    </i:DataTrigger>
+                    <i:DataTrigger Binding="{Binding ItemData}" Comparison="NotEqual" Value="{x:Null}">
+                        <i:ChangePropertyAction TargetName="flexpanel_itemdata" PropertyName="Visibility" Value="Visible"/>
+                    </i:DataTrigger>
+                </i:Interaction.Triggers>
 
+                <qpanel:FlexPanel x:Name="flexpanel_itemdata"  FlexDirection="Column" Gap="8" AlignItems="Stretch">
+                    <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
+                        <TextBlock Text="Flex-Grow"/>
+                        <TextBox x:Name="textbox_flexgrow" TextChanged="textbox_flexgrow_TextChanged" Text="{Binding ItemData.FlexGrow, UpdateSourceTrigger=PropertyChanged}"/>
+                    </qpanel:FlexPanel>
+                    <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
+                        <TextBlock Text="Align-Self"/>
+                        <ComboBox x:Name="combobox_alighself" SelectionChanged="combobox_alighself_SelectionChanged" SelectedValuePath="Tag" SelectedValue="{Binding ItemData.AlignSelf}">
+                            <ComboBoxItem Content="Auto" Tag="{x:Static qpanel:AlignSelf.Auto}"/>
+                            <ComboBoxItem Content="Start" Tag="{x:Static qpanel:AlignSelf.Start}"/>
+                            <ComboBoxItem Content="End" Tag="{x:Static qpanel:AlignSelf.End}"/>
+                            <ComboBoxItem Content="Center" Tag="{x:Static qpanel:AlignSelf.Center}"/>
+                            <ComboBoxItem Content="Stretch" Tag="{x:Static qpanel:AlignSelf.Stretch}"/>
+                        </ComboBox>
+                    </qpanel:FlexPanel>
+                </qpanel:FlexPanel>
             </TabItem>
         </TabControl>
         <qpanel:FlexPanel x:Name="flexpanel" Grid.Column="1">
+            <Button Width="100" qpanel:FlexPanel.Grow="1">TT</Button>
         </qpanel:FlexPanel>
     </Grid>
 </Window>

@@ -21,8 +21,8 @@
                     <i:ChangePropertyAction TargetName="button_edit" PropertyName="Visibility" Value="Hidden"/>
                 </i:EventTrigger>
             </i:Interaction.Triggers>
-            <TextBlock Text="{Binding Name}"/>
-            <Button x:Name="button_edit" Content="Edit" Visibility="Hidden"/>
+            <Button Content="{Binding Name}"/>
+            <Button x:Name="button_edit" Click="button_edit_Click" Content="Edit" Visibility="Hidden"/>
         </Grid>
         <Button Grid.Column="1" x:Name="button_delete" Click="button_delete_Click">
             <Path Data="M9,3V4H4V6H5V19A2,2 0 0,0 7,21H17A2,2 0 0,0 19,19V6H20V4H15V3H9M7,6H17V19H7V6M9,8V17H11V8H9M13,8V17H15V8H13Z" Stroke="Black"/>

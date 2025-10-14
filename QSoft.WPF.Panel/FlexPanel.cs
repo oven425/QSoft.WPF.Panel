@@ -51,23 +51,27 @@ namespace QSoft.WPF.Panel
 
     public class FlexPanel : System.Windows.Controls.Panel
     {
+        [Obsolete("remove next version")]
         public readonly static DependencyProperty BorderThicknessProperty = DependencyProperty.Register("BorderThickness", typeof(Thickness), typeof(FlexPanel), new FrameworkPropertyMetadata(new Thickness(), FrameworkPropertyMetadataOptions.AffectsMeasure|FrameworkPropertyMetadataOptions.AffectsRender));
         [Category("FlexPanel")]
+        [Obsolete("remove next version")]
         public Thickness BorderThickness
         {
             set => this.SetValue(BorderThicknessProperty, value);
             get => (Thickness)GetValue(BorderThicknessProperty);
         }
-
+        [Obsolete("remove next version")]
         public readonly static DependencyProperty CornerRadiusProperty = DependencyProperty.Register("CornerRadius", typeof(CornerRadius), typeof(FlexPanel), new FrameworkPropertyMetadata(new CornerRadius(), FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender));
+        [Obsolete("remove next version")]
         [Category("FlexPanel")]
         public CornerRadius CornerRadius
         {
             set => this.SetValue(CornerRadiusProperty, value);
             get => (CornerRadius)GetValue(CornerRadiusProperty);
         }
-
+        [Obsolete("remove next version")]
         public readonly static DependencyProperty BorderBrushProperty = DependencyProperty.Register("BorderBrush", typeof(Brush), typeof(FlexPanel), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.AffectsRender));
+        [Obsolete("remove next version")]
         [Category("FlexPanel")]
         public Brush BorderBrush
         {
@@ -75,7 +79,7 @@ namespace QSoft.WPF.Panel
             get => (Brush)GetValue(BorderBrushProperty);
         }
 
-        public readonly static DependencyProperty JustifyContentProperty = DependencyProperty.Register("JustifyContent", typeof(JustifyContent), typeof(FlexPanel), new FrameworkPropertyMetadata(JustifyContent.SpaceBetween, FrameworkPropertyMetadataOptions.AffectsMeasure));
+        public readonly static DependencyProperty JustifyContentProperty = DependencyProperty.Register("JustifyContent", typeof(JustifyContent), typeof(FlexPanel), new FrameworkPropertyMetadata(JustifyContent.Start, FrameworkPropertyMetadataOptions.AffectsMeasure));
         [Category("FlexPanel")]
         public JustifyContent JustifyContent
         {
@@ -83,7 +87,7 @@ namespace QSoft.WPF.Panel
             get => (JustifyContent)GetValue(JustifyContentProperty);
         }
 
-        public readonly static DependencyProperty AlignItemsProperty = DependencyProperty.Register("AlignItems", typeof(AlignItems), typeof(FlexPanel), new FrameworkPropertyMetadata(AlignItems.Stretch, FrameworkPropertyMetadataOptions.AffectsMeasure));
+        public readonly static DependencyProperty AlignItemsProperty = DependencyProperty.Register("AlignItems", typeof(AlignItems), typeof(FlexPanel), new FrameworkPropertyMetadata(AlignItems.Start, FrameworkPropertyMetadataOptions.AffectsMeasure));
         [Category("FlexPanel")]
         public AlignItems AlignItems
         {

@@ -22,12 +22,17 @@ namespace WpfApp_FlexPanelT
     /// </summary>
     public partial class FlexItem : UserControl
     {
-        public  static readonly RoutedEvent DeleteEvent = EventManager.RegisterRoutedEvent(
-            "Delete", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(FlexItem));
+        public  static readonly RoutedEvent DeleteEvent = EventManager.RegisterRoutedEvent("Delete", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(FlexItem));
         public event RoutedEventHandler Delete
         {             
             add { AddHandler(DeleteEvent, value); }
             remove { RemoveHandler(DeleteEvent, value); }
+        }
+        public static readonly RoutedEvent EditEvent = EventManager.RegisterRoutedEvent("Edit", RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(FlexItem));
+        public event RoutedEventHandler Edit
+        {
+            add { AddHandler(EditEvent, value); }
+            remove { RemoveHandler(EditEvent, value); }
         }
         public FlexItem(FlexItemVM vm)
         {
@@ -38,6 +43,11 @@ namespace WpfApp_FlexPanelT
         private void button_delete_Click(object sender, RoutedEventArgs e)
         {
             RaiseEvent(new RoutedEventArgs(DeleteEvent));
+        }
+
+        private void button_edit_Click(object sender, RoutedEventArgs e)
+        {
+            RaiseEvent(new RoutedEventArgs(EditEvent));
         }
     }
 
