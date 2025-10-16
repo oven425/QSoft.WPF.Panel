@@ -1,6 +1,6 @@
-# QSoft.WPF.Panel 
+﻿# QSoft.WPF.Panel 
 ## Quick start
-1. install from [nuget]("https://www.nuget.org/packages/QSoft.WPF.Panel")
+1. install from [nuget](https://www.nuget.org/packages/QSoft.WPF.Panel)
 2. add qpanel into xaml
 ```xml
 <Window x:Class="WpfApp_FlexPanelT.MainWindow"
@@ -21,6 +21,26 @@
 
 </Window>
 ```
+## Direction: Row,Column
+### Row
+```xml
+ <qpanel:FlexPanel FlexDirection="Row" x:Name="flexpanel">
+    <Button>Test1</Button>
+    <Button>Test2</Button>
+    <Button>Test3</Button>
+</qpanel:FlexPanel>
+```
+![FlexDirection_Column](./flexpanel/FlexDirection_Row.jpg)
+### Column
+```xml
+ <qpanel:FlexPanel FlexDirection="Column" x:Name="flexpanel">
+    <Button>Test1</Button>
+    <Button>Test2</Button>
+    <Button>Test3</Button>
+</qpanel:FlexPanel>
+```
+![FlexDirection_Column](./flexpanel/FlexDirection_Column.jpg)
+
 
 ## FlexPanel
 only support bleow property
