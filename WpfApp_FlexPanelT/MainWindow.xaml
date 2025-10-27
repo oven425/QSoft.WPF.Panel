@@ -8,13 +8,13 @@
         d:DataContext="{d:DesignInstance Type=local:MainUI}"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:qpanel="clr-namespace:QSoft.WPF.Panel;assembly=QSoft.WPF.Panel"
-        Title="FlexPanel test site" Height="450" Width="800">
+        Title="FlexPanel test site" Height="400" Width="600">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <TabControl x:Name="tabcontrol">
+        <TabControl x:Name="tabcontrol" >
             <TabItem Header="Container">
                 <qpanel:FlexPanel FlexDirection="Column" Gap="8" AlignItems="Stretch">
                     <Button x:Name="button_addflex" Click="button_addflex_Click">Add Flex Item</Button>
@@ -71,6 +71,10 @@
                         <TextBox x:Name="textbox_flexgrow" TextChanged="textbox_flexgrow_TextChanged" Text="{Binding ItemData.FlexGrow, UpdateSourceTrigger=PropertyChanged}"/>
                     </qpanel:FlexPanel>
                     <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
+                        <TextBlock Text="Flex-Basis"/>
+                        <TextBox x:Name="textbox_flexbasis" TextChanged="textbox_flexbasis_TextChanged" Text="{Binding ItemData.FlexBasis, UpdateSourceTrigger=PropertyChanged}"/>
+                    </qpanel:FlexPanel>
+                    <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
                         <TextBlock Text="Align-Self"/>
                         <ComboBox x:Name="combobox_alighself" SelectionChanged="combobox_alighself_SelectionChanged" SelectedValuePath="Tag" SelectedValue="{Binding ItemData.AlignSelf}">
                             <ComboBoxItem Content="Auto" Tag="{x:Static qpanel:AlignSelf.Auto}"/>
@@ -83,8 +87,10 @@
                 </qpanel:FlexPanel>
             </TabItem>
         </TabControl>
-        <qpanel:FlexPanel x:Name="flexpanel" Grid.Column="1">
-            <Button Width="100" qpanel:FlexPanel.Grow="1">TT</Button>
+        <qpanel:FlexPanel FlexDirection="Row" x:Name="flexpanel" Grid.Column="1">
+            <!--<Button>Test1</Button>
+            <Button>Test2</Button>
+            <Button>Test3</Button>-->
         </qpanel:FlexPanel>
     </Grid>
 </Window>

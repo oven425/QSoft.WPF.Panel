@@ -13,7 +13,7 @@
         xmlns:qpanel="clr-namespace:QSoft.WPF.Panel;assembly=QSoft.WPF.Panel"
         Title="FlexPanel test site" Height="450" Width="800">
 
-        <qpanel:FlexPanel x:Name="flexpanel">
+        <qpanel:FlexPanel>
             <Button Width="100">Test1</Button>
             <Button Width="100">Test2</Button>
             <Button Width="100">Test3</Button>
@@ -22,36 +22,59 @@
 </Window>
 ```
 ## Direction: Row,Column
-### Row
 ```xml
- <qpanel:FlexPanel FlexDirection="Row" x:Name="flexpanel">
+<qpanel:FlexPanel FlexDirection="Row">
     <Button>Test1</Button>
     <Button>Test2</Button>
     <Button>Test3</Button>
 </qpanel:FlexPanel>
 ```
-![FlexDirection_Column](./flexpanel/FlexDirection_Row.jpg)
-### Column
+
+## JustifyContent: Start, End, Center, SpaceAround, SpaceBetween, SpaceEvenly
 ```xml
- <qpanel:FlexPanel FlexDirection="Column" x:Name="flexpanel">
+<qpanel:FlexPanel JustifyContent="Start">
     <Button>Test1</Button>
     <Button>Test2</Button>
     <Button>Test3</Button>
 </qpanel:FlexPanel>
 ```
-![FlexDirection_Column](./flexpanel/FlexDirection_Column.jpg)
 
+## AlignItems: Start, End, Center, Stretch
+```xml
+<qpanel:FlexPanel AlignItems="Start">
+    <Button>Test1</Button>
+    <Button>Test2</Button>
+    <Button>Test3</Button>
+</qpanel:FlexPanel>
+```
 
-## FlexPanel
-only support bleow property
-* flex direction
-* justify content
-* align items, but no baseline
-* align self, but no baseline
-* padding and gap
-* border properties
-* Flex grow
+## Gap
+```xml
+<qpanel:FlexPanel FlexDirection="Row" Gap="8">
+    <Button>Test1</Button>
+    <Button>Test2</Button>
+    <Button>Test3</Button>
+</qpanel:FlexPanel>
+```
 
+## AlignSelf: Auto, Start, End, Center, Stretch
+```xml
+<qpanel:FlexPanel FlexDirection="Row" Gap="8">
+    <Button qpanel:FlexPanel.AlignSelf="Start">Test1</Button>
+    <Button qpanel:FlexPanel.AlignSelf="End">Test2</Button>
+    <Button qpanel:FlexPanel.AlignSelf="Center">Test3</Button>
+</qpanel:FlexPanel>
+```
+
+## Grow
+> use Grow, not set Width/Hieght when Direction Row/Column
+```xml
+<qpanel:FlexPanel FlexDirection="Row" Gap="8">
+    <Button qpanel:FlexPanel.Grow="1">Test1</Button>
+    <Button>Test2</Button>
+    <Button>Test3</Button>
+</qpanel:FlexPanel>
+```
 
 ## Refrences
 [Flexbox Playground]("https://flexbox.tech/")
