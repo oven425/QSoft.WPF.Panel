@@ -1,0 +1,10 @@
+{
+  "files.associations": {
+    "*.tsx": "typescriptreact"
+  },
+  "tailwindCSS.includeLanguages": {
+    "typescript": "typescriptreact",
+    "typescriptreact": "html",
+    "javascript": "javascriptreact"
+  }
+}

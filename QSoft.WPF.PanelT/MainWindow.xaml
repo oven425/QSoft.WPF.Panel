@@ -24,7 +24,7 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <local:DpiDecorator>
-                    <panel:FlexPanel BorderBrush="Purple" BorderThickness="10,20,30,40" CornerRadius="0" JustifyContent="SpaceAround"  x:Name="flexpanel" Background="Pink" Padding="5,10,15,20" Visibility="Visible">
+                    <panel:FlexPanel JustifyContent="SpaceAround"  x:Name="flexpanel" Background="Pink" Padding="5,10,15,20" Visibility="Visible">
                         <!--<i:Interaction.Behaviors>
                             <i:FluidMoveBehavior AppliesTo="Children" Duration="00:00:5">
                                 <i:FluidMoveBehavior.EaseY>
