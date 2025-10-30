@@ -405,13 +405,13 @@ namespace QSoft.WPF.Panel
                             //    };
                             //    x = x + item_w + this.Gap;
                             //}
-                            //foreach (var oo in els.Select(x => x.Key))
-                            //{
-                            //    var rcc = els[oo];
-                            //    rcc.X = x;
-                            //    els[oo] = rcc;
-                            //    x = x + rcc.Width + this.Gap;
-                            //}
+                            foreach (var oo in els.Select(x => x.Key))
+                            {
+                                var rcc = els[oo];
+                                rcc.X = x;
+                                els[oo] = rcc;
+                                x = x + rcc.Width + this.Gap;
+                            }
                             //for(int i=0; i<els.Count; i++)
                             //{
                             //    var kv = els.ElementAt(i);
