@@ -47,7 +47,7 @@
                     </qpanel:FlexPanel>
                     <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
                         <TextBlock Text="Gap"/>
-                        <TextBox Text="{Binding Gap, ElementName=flexpanel, UpdateSourceTrigger=PropertyChanged}"/>
+                        <TextBox InputMethod.IsInputMethodEnabled="False" Text="{Binding Gap, ElementName=flexpanel, UpdateSourceTrigger=PropertyChanged}"/>
                     </qpanel:FlexPanel>
                     <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
                         <TextBlock Text="Padding"/>
