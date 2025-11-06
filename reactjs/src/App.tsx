@@ -33,30 +33,27 @@ function App() {
           <h1>Flex panel</h1>
         </div>   
         <div className='flex flex-row grow bg-yellow-200 '>
-          <form>
-            {/* https://ui.shadcn.com/docs/components/field */}
-            <FieldGroup>
-              <Field>
-                <FieldLabel htmlFor="checkout-7j9-card-name-43j">
-                  Justify-content
-                </FieldLabel>
-                <Select defaultValue="justify-start" onValueChange={e=>setDirection(e)}>
-                    <SelectTrigger id="checkout-exp-month-ts6">
-                      <SelectValue placeholder="MM" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="justify-start">Start</SelectItem>
-                      <SelectItem value="justify-center">Center</SelectItem>
-                      <SelectItem value="justify-end">End</SelectItem>
-                      <SelectItem value="justify-between">Between</SelectItem>
-                      <SelectItem value="justify-around">Around</SelectItem>
-                      <SelectItem value="justify-evenly">Evenly</SelectItem>
-                    </SelectContent>
-                  </Select>
-              </Field>
-            </FieldGroup>
-            <div className='bg-green-500 w-36 flex justify-start flex-col border-r-2'>
-
+          <div className='bg-green-500 w-36 flex justify-start flex-col border-r-2'>
+            <form>
+              <FieldSet>
+        <FieldGroup>
+          <Field>
+            <FieldLabel htmlFor="username">Username</FieldLabel>
+            <Input id="username" type="text" placeholder="Max Leiter" />
+            <FieldDescription>
+              Choose a unique username for your account.
+            </FieldDescription>
+          </Field>
+          <Field>
+            <FieldLabel htmlFor="password">Password</FieldLabel>
+            <FieldDescription>
+              Must be at least 8 characters long.
+            </FieldDescription>
+            <Input id="password" type="password" placeholder="••••••••" />
+          </Field>
+        </FieldGroup>
+      </FieldSet>
+            </form>
             <Button variant="secondary">Add item</Button>
             <h5>Direction</h5>
             <select value={direction} onChange={e=>setDirection(e.target.value)}>
@@ -84,7 +81,7 @@ function App() {
             <h5>Padding</h5>
             <input/>
           </div>
-          </form>
+
           
           <div style={{gap:`${gap}px`}} className={`bg-blue-500 flex ${direction} ${alignItems} ${justifyContent}  grow`}>
             <div className='bg-pink-500'>
