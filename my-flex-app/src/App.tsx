@@ -2,6 +2,7 @@
 import { useRef, useState, useEffect } from 'react'
 import './App.css'
 import deleteLogo from './delete-alert-outline.svg'
+import editLogo from './pencil.svg'
 function App() {
   const [gap, setGap] = useState("0");
   const [direction, setDirection] = useState('flex-row');
@@ -80,19 +81,26 @@ function App() {
     <>
       <div className='w-screen h-screen dark:bg-gray-900 dark:text-white flex flex-col'>
         <div className='border-b dark:border-gray-700'>
-          <h1 className='text-2xl font-semibold dark:text-white'>Flex test tool</h1>
+          <h1 className='text-2xl font-semibold dark:text-white ml-4'>Flex test tool</h1>
         </div>
         <div className='flex flex-row grow '>
-          <aside className='w-44 flex pl-1 pr-2 justify-start flex-col border-r dark:border-gray-700'>
-            <button className=' text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700' onClick={()=>addItem()}>add item</button>
+          <aside className='w-48 flex pl-1 pr-2 justify-start flex-col border-r dark:border-gray-700'>
+            <button className=' text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 font-medium rounded-sm text-sm px-5 py-2.5  dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700' onClick={()=>addItem()}>add item</button>
             <h4>Container</h4>
             <label htmlFor='direction' className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Direction</label>
-            <select id='direction' className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500' value={direction} onChange={e=>setDirection(e.target.value)}>
+            <select id='direction' className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white focus:ring-0' value={direction} onChange={e=>setDirection(e.target.value)}>
               <option value="flex-row">Row</option>
               <option value="flex-col">Column</option>
             </select>
-            <label htmlFor='direction' className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Justify-content</label>
-            <select className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500' value={justifyContent} onChange={e=>setJustifyContent(e.target.value)}>
+            {/* <div className="flex">
+              <input className="hidden grow" type="radio" id="male" value="male" name="gender" checked />
+              <label className="bg-gray-300 grow hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 cursor-pointer rounded-l" htmlFor="male">Male</label>
+              <input className="hidden grow" type="radio" id="female" value="female" name="gender" />
+              <label className="bg-gray-300 grow hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 cursor-pointer rounded-r" htmlFor="female">Female</label>
+
+            </div> */}
+            <label htmlFor='justifycontent' className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Justify-content</label>
+            <select className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500' value={justifyContent} onChange={e=>setJustifyContent(e.target.value)}>
               <option value="justify-start">Start</option>
               <option value="justify-center">Center</option>
               <option value="justify-end">End</option>
@@ -100,6 +108,7 @@ function App() {
               <option value="justify-around">Around</option>
               <option value="justify-evenly">Evenly</option>
             </select>
+            
             <h5>Align-items</h5>
             <select value={alignItems} onChange={e=>setAlignItems(e.target.value)}>
               <option value="items-start">Start</option>
@@ -108,7 +117,7 @@ function App() {
               <option value="items-stretch">Stretch</option>
             </select>
             <h5>Gap</h5>
-            <input value={gap} onChange={x=>setGap(x.target.value)} type='number'/>
+            <input value={gap} onChange={x=>setGap(x.target.value)} type='number' min="0"/>
             {/* <h5>Padding</h5>
             <input/> */}
             <div className={`${item === null ? "hidden" : "flex"} flex-col grow `}>
@@ -130,18 +139,26 @@ function App() {
             </div>
             
           </aside>
-          <div style={{gap:`${gap}px`}} className={`flex ${direction} ${alignItems} ${justifyContent} grow dark:bg-gray-950`}>
-            {
-              items.map((x,i)=>(
-                <div key={i} style={{flexGrow:`${x.grow}`, flexShrink:`${x.shrink}`, flexBasis:`${x.basis}`}} className={`bg-amber-400 flex ${x.alignSelf} p-0.5`} >
-                  <div onClick={()=>setItem(x)} className='self-center p-1 grow'>Index:{i}</div>
-                  <div onClick={()=>removeItem(x)} className='flex items-center bg-yellow-400 border-amber-900 w-10 hover:bg-red-500 hover:border-gray-700'>
-                    <img src={deleteLogo} className="logo react" alt="React logo" />
+          <div className='flex grow dark:bg-gray-900 p-1'>
+              <div style={{gap:`${gap}px`}} className={`flex ${direction} ${alignItems} ${justifyContent} grow dark:bg-gray-950`}>
+              {
+                items.map((x,i)=>(
+                  <div key={i} style={{flexGrow:`${x.grow}`, flexShrink:`${x.shrink}`, flexBasis:`${x.basis}`}} className={`bg-gray-800 flex ${x.alignSelf} p-0.5 border rounded-sm dark:border-gray-600`} >
+                    <div className='self-center px-3 py-1 grow'>index:{i}</div>
+                    <div className="border-r dark:border-gray-600"></div>
+                    <div onClick={()=>setItem(x)} className={`flex items-center w-10 ${item===x?"bg-gray-600":""}  dark:hover:bg-gray-600`}>
+                      <img src={editLogo}/>
+                    </div>
+                    <div className="border-r dark:border-gray-600"></div>
+                    <div onClick={()=>removeItem(x)} className='flex items-center w-10 dark:hover:bg-gray-600'>
+                      <img src={deleteLogo} className="logo react" alt="React logo" />
+                    </div>
                   </div>
-                </div>
-              ))
-            }
+                ))
+              }
           </div>
+          </div>
+          
         </div>
       </div>
     </>
