@@ -5,9 +5,4 @@ module.exports = {
     extend: {},
   },
   plugins: [],
-  safelist: [
-    {
-        pattern: /gap-[(.*)px]/,
-    }
-  ]
 }
