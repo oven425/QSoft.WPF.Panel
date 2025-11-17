@@ -1,6 +1,6 @@
 @import "tailwindcss";
-
-@custom-variant dark (&:where(.dark, .dark *));/* 要加這一個才能切換dark/ligh */
+/* 要加這一個才能切換dark/light */
+@custom-variant dark (&:where(.dark, .dark *));
 
 /* :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
