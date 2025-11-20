@@ -10,55 +10,16 @@ import ContainerSetting from './ContainerSetting'
 import ItemSetting from './ItemSetting'
 import type { ItemSettingContext } from './ItemSetting'
 
-type Kv<T1, T2>={
-    k: T1
-    v: T2
-  }
-
-const justifyContents:Kv<string, string>[] = [
-  {k:'Start', v:'justify-start'},
-  {k:'Center', v:'justify-center'},
-  {k:'End', v:'justify-end'},
-  {k:'Between', v:'justify-between'},
-  {k:'Around', v:'justify-around'},
-  {k:'Evenly', v:'justify-evenly'},
-]
-
-const directions:Kv<string, string>[] = [
-  {k:'Row', v:'flex-row'},
-  {k:'Column', v:'flex-col'},
-]
-
-const alignItems_:Kv<string, string>[] = [
-  {k:'Start', v:'items-start'},
-  {k:'Center', v:'items-center'},
-  {k:'End', v:'items-end'},
-  {k:'Stretch', v:'items-stretch'},
-]
-
-
 function App() {
-  //const [gap, setGap] = useState("0");
-  // const [direction, setDirection] = useState('flex-row');
-  //const [justifyContent, setJustifyContent] = useState('justify-start');
-  //const [alignItems, setAlignItems] = useState('items-start');
   const [containerSetting, setContainerSetting] = useState<ContainerSettingContext>({gap:'0', alignItems:'items-start', justifyContent:'justify-start', direction:'flex-row'});
-  const handleContainerChange = (name:string, value:string)=>{
-    setContainerSetting((prevSettings) => ({
-      ...prevSettings,
-      [name]: value
-    }));
-  }
-
-
   const [items, setItems] = useState<ItemSettingContext[]>([]);
   const [item, setItem] = useState<ItemSettingContext | null>(null);
-  const basisunit = useRef('px');
   const id = useRef(0);
-  
+  const [containerOpen, setContainerOpen] = useState(false);
+  const [itemOpen, setItemOpen] = useState(false);
   const [themeMode, setThemeMode] = useState<Theme>('system');
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
-  const [containerOpen, setContainerOpen] = useState(false);
+
   type Theme = "dark" | "light" | "system";
   useEffect(() => {
     if(themeMode === 'dark'){
@@ -91,14 +52,6 @@ function App() {
     document.documentElement.classList.toggle('dark', isDarkMode);
   },[isDarkMode])
 
-  // type Itemd = {
-  //   id: number
-  //   alignSelf: string
-  //   grow: number
-  //   shrink: number
-  //   basis: string
-  // };
-
   const addItem = () => {
     const admin: ItemSettingContext = {
       id: id.current++,
@@ -113,36 +66,9 @@ function App() {
   const removeItem = (x: ItemSettingContext) => {
     if (item !== null && x === item) {
       setItem(null);
+      setSS("selectContainer")
     }
     setItems(prevItems => prevItems.filter(item => item !== x));
-  }
-
-  const alignSelfChange = (newvalue: string) => {
-    setItem(x => x ? {
-      ...x
-      , alignSelf: newvalue
-    } : x);
-  }
-
-  const growChange = (newvalue: number) => {
-    setItem(x => x ? {
-      ...x
-      , grow: newvalue
-    } : x);
-  }
-
-  const shrinkChange = (newvalue: number) => {
-    setItem(x => x ? {
-      ...x
-      , shrink: newvalue
-    } : x);
-  }
-
-  const basisChange = (newvalue: string) => {
-    setItem(x => x ? {
-      ...x
-      , basis: newvalue
-    } : x);
   }
 
   useEffect(() => {
@@ -157,7 +83,14 @@ function App() {
     });
   }, [item]);
 
+  type settingSelect = "selectContainer"|"selectItem";
+  const [ss, setSS] = useState<settingSelect>("selectContainer");
 
+  const editItem = (x:ItemSettingContext)=>{
+    setItem(x);
+    setSS('selectItem');
+    setItemOpen(true);
+  }
 
   return (
     <>
@@ -176,10 +109,13 @@ function App() {
                 <svg viewBox="0 0 28 28" fill="none"><path d="M10.5 9.99914C10.5 14.1413 13.8579 17.4991 18 17.4991C19.0332 17.4991 20.0176 17.2902 20.9132 16.9123C19.7761 19.6075 17.109 21.4991 14 21.4991C9.85786 21.4991 6.5 18.1413 6.5 13.9991C6.5 10.8902 8.39167 8.22304 11.0868 7.08594C10.7089 7.98159 10.5 8.96597 10.5 9.99914Z" stroke="currentColor" stroke-linejoin="round"></path><path d="M16.3561 6.50754L16.5 5.5L16.6439 6.50754C16.7068 6.94752 17.0525 7.29321 17.4925 7.35607L18.5 7.5L17.4925 7.64393C17.0525 7.70679 16.7068 8.05248 16.6439 8.49246L16.5 9.5L16.3561 8.49246C16.2932 8.05248 15.9475 7.70679 15.5075 7.64393L14.5 7.5L15.5075 7.35607C15.9475 7.29321 16.2932 6.94752 16.3561 6.50754Z" fill="currentColor" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path><path d="M20.3561 11.5075L20.5 10.5L20.6439 11.5075C20.7068 11.9475 21.0525 12.2932 21.4925 12.3561L22.5 12.5L21.4925 12.6439C21.0525 12.7068 20.7068 13.0525 20.6439 13.4925L20.5 14.5L20.3561 13.4925C20.2932 13.0525 19.9475 12.7068 19.5075 12.6439L18.5 12.5L19.5075 12.3561C19.9475 12.2932 20.2932 11.9475 20.3561 11.5075Z" fill="currentColor" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path></svg>
               </div>
             </div>
-            <div className='hidden md:flex items-center w-8'>
-              <img src={gitubWhiteLogo} className='hidden dark:block' alt="GitHub logo" />
-              <img src={githubLogo} className='block dark:hidden' alt="GitHub logo" />
-            </div>
+            <a href='https://github.com/oven425/QSoft.WPF.Panel/tree/master/my-flex-app' target="_blank">
+              <div className='hidden md:flex items-center w-8'>
+                <img src={gitubWhiteLogo} className='hidden dark:block' alt="GitHub logo" />
+                <img src={githubLogo} className='block dark:hidden' alt="GitHub logo" />
+              </div>
+            </a>
+            <button className='md:hidden text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 font-medium rounded-sm text-sm px-5 py-2.5  dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700' onClick={() => addItem()}>add item</button>
             <div onClick={()=>setContainerOpen(true)} className='stroke-gray-300 flex md:hidden items-center w-8'>
               <svg fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" className="size-6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
@@ -188,87 +124,16 @@ function App() {
             </div>
           </div>
         </header>
-        <div className='flex flex-row grow '>
-          <aside className='hidden md:flex w-52 pt-1 pl-1 pr-2 justify-start flex-col border-r border-neutral-400 dark:border-gray-700'>
+        <div className='flex flex-row grow'>
+          <aside className='hidden md:flex gap-1 w-52 pt-1 pl-1 pr-2 justify-start flex-col border-r border-neutral-400 dark:border-gray-700'>
             <button className=' text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 font-medium rounded-sm text-sm px-5 py-2.5  dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700' onClick={() => addItem()}>add item</button>
-            <div className='flex'>
-              <h4 className='grow'>Container</h4>
-              <h4 className={`grow`}>Item</h4>
-            </div>
-            <h4>Container</h4>
-            <ContainerSetting setContainerSetting={setContainerSetting} containerSetting={containerSetting}/>
-            <div className='hidden'>
-              {/* <label htmlFor='direction' className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Direction</label>
-              <select id='direction' className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white focus:ring-0' value={direction} onChange={e => setDirection(e.target.value)}>
-                <option value="flex-row">Row</option>
-                <option value="flex-col">Column</option>
-              </select> */}
-              <h5>Direction</h5>
-              <div className='grid grid-cols-2 gap-0.5 rounded-sm border border-neutral-500  dark:bg-gray-950 dark:border-gray-700 p-0.5 '>
-                {
-                  directions.map((x,i)=>(
-                    <div key={i} onClick={()=>handleContainerChange('direction', x.v)} className={`flex justify-center ${x.v===containerSetting.direction?'dark:bg-gray-800 bg-neutral-300':''} rounded-sm p-1`}>{x.k}</div>
-                ))
-                }
+            <div className='grid grid-cols-2 '>
+              <div className={`${ss==='selectContainer'?'dark:bg-gray-800 bg-neutral-300':''} rounded-sm p-1`} onClick={()=>setSS("selectContainer")}>Container</div>
+              <div className={`${item === null ? "invisible" : "visible"} ${ss==='selectItem'?'dark:bg-gray-800 bg-neutral-300':''} rounded-sm p-1`} onClick={()=>setSS("selectItem")}>Item</div>
+              <div className='col-span-2'>
+                <ContainerSetting className={`${ss==='selectContainer'?'block':'hidden'}`} setContainerSetting={setContainerSetting} containerSetting={containerSetting}/>
+                <ItemSetting className={`${item === null||ss==='selectContainer' ? "hidden" : "block"}`} itemSetting={item!} setItemSetting={setItem}/>
               </div>
-              {/* <label htmlFor='justifycontent' className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Justify-content</label> */}
-              {/* <select className='bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500' value={justifyContent} onChange={e => setJustifyContent(e.target.value)}>
-                <option value="justify-start">Start</option>
-                <option value="justify-center">Center</option>
-                <option value="justify-end">End</option>
-                <option value="justify-between">Between</option>
-                <option value="justify-around">Around</option>
-                <option value="justify-evenly">Evenly</option>
-              </select> */}
-              <h5>Justify-content</h5>
-              <div className='grid grid-cols-2 gap-0.5 rounded-sm border border-neutral-500  dark:bg-gray-950 dark:border-gray-700 p-0.5 '>
-                {
-                  justifyContents.map((x,i)=>(
-                    <div key={i} onClick={()=>handleContainerChange('justifyContent', x.v)} className={`flex justify-center ${x.v===containerSetting.justifyContent?'dark:bg-gray-800 bg-neutral-300':''} rounded-sm p-1`}>{x.k}</div>
-                ))
-                }
-              </div>
-              
-              {/* <h5>Align-items</h5>
-              <select value={alignItems} onChange={e => setAlignItems(e.target.value)}>
-                <option value="items-start">Start</option>
-                <option value="items-center">Center</option>
-                <option value="items-end">End</option>
-                <option value="items-stretch">Stretch</option>
-              </select> */}
-
-              <h5>Align-items</h5>
-              <div className='grid grid-cols-2 gap-0.5 rounded-sm border border-neutral-500  dark:bg-gray-950 dark:border-gray-700 p-0.5 '>
-                {
-                  alignItems_.map((x,i)=>(
-                    <div key={i} onClick={()=>handleContainerChange('alignItems', x.v)} className={`flex justify-center ${x.v===containerSetting.alignItems?'dark:bg-gray-800 bg-neutral-300':''} rounded-sm p-1`}>{x.k}</div>
-                ))
-                }
-              </div>
-
-              <h5>Gap(px)</h5>
-              <input value={containerSetting.gap} onChange={x => handleContainerChange('gap',x.target.value)} type='number' min="0" />
-            </div>
-            <div className={`${item === null ? "hidden" : "flex"} flex-col grow `}>
-              <h4>Item</h4>
-              <ItemSetting itemSetting={item!} setItemSetting={setItem}/>
-              <div className='hidden'>
-                <h5>Align-self</h5>
-                <select value={item?.alignSelf} onChange={e => alignSelfChange(e.target.value)}>
-                  <option value="self-auto">Auto</option>
-                  <option value="self-start">Start</option>
-                  <option value="self-center">Center</option>
-                  <option value="self-end">End</option>
-                  <option value="self-stretch">Stretch</option>
-                </select>
-                <h5>Flex-grow</h5>
-                <input value={item?.grow} onChange={x => growChange(Number(x.target.value))} type='number' />
-                <h5>Flex-shrink</h5>
-                <input value={item?.shrink} onChange={x => shrinkChange(Number(x.target.value))} type='number' />
-                <h5>Flex-basis({basisunit.current})</h5>
-                <input placeholder="auto" value={item?.basis} onChange={x => basisChange(x.target.value)} />
-              </div>
-              
             </div>
           </aside>
           <div className='p-1 overflow-auto flex grow'>
@@ -278,7 +143,7 @@ function App() {
                   <div key={i} style={{ flexGrow: `${x.grow}`, flexShrink: `${x.shrink}`, flexBasis: `${x.basis}px` }} className={`dark:bg-gray-800 bg-white border-neutral-400 flex ${x.alignSelf} p-0.5 border rounded-sm dark:border-gray-600`} >
                     <div className='self-center px-3 py-1 grow'>index:{i}</div>
                     <div className="border-r dark:border-gray-600 border-neutral-400"></div>
-                    <div onClick={() => setItem(x)} className={`flex items-center w-10 ${item === x ? "dark:bg-gray-600 bg-neutral-200" : ""}  dark:hover:bg-gray-600`}>
+                    <div onClick={() => editItem(x)} className={`flex items-center w-10 ${item === x ? "dark:bg-gray-600 bg-neutral-200" : ""}  dark:hover:bg-gray-600`}>
                       <img src={editLogo} />
                     </div>
                     <div className="border-r dark:border-gray-600 border-neutral-400"></div>
@@ -292,7 +157,10 @@ function App() {
           </div>
         </div>
         <Modal open={containerOpen} onClose={() => setContainerOpen(false)}>
-          <ContainerSetting setContainerSetting={setContainerSetting} containerSetting={containerSetting}/>
+          <ContainerSetting className={``} setContainerSetting={setContainerSetting} containerSetting={containerSetting}/>
+        </Modal>
+        <Modal className={`md:hidden`} open={itemOpen} onClose={() => setItemOpen(false)}>
+          <ItemSetting className={``} itemSetting={item!} setItemSetting={setItem}/>
         </Modal>
       </div>
     </>

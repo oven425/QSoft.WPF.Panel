@@ -28,13 +28,14 @@ export type ContainerSettingContext = {
   direction: string;
   justifyContent:string;
   alignItems:string;
-  gap:string
+  gap:string;
 }
 type ContainerSettingProps = {
   containerSetting: ContainerSettingContext;
   setContainerSetting: React.Dispatch<React.SetStateAction<ContainerSettingContext>>;
+  className:string|null;
 }
-function ContainerSetting({ containerSetting, setContainerSetting }: ContainerSettingProps){
+function ContainerSetting({ containerSetting, setContainerSetting, className }: ContainerSettingProps){
     const handleContainerChange = (name:string, value:string)=>{
         setContainerSetting(x=> ({
         ...x,
@@ -42,7 +43,7 @@ function ContainerSetting({ containerSetting, setContainerSetting }: ContainerSe
         }));
     }
     return(
-        <div className="flex flex-col">
+        <div className={`${className} flex flex-col`}>
             <h5>Direction</h5>
             <div className='grid grid-cols-2 gap-0.5 rounded-sm border border-neutral-500  dark:bg-gray-950 dark:border-gray-700 p-0.5 '>
               {

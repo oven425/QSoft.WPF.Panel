@@ -11,6 +11,7 @@ export type ItemSettingContext = {
 type ItemSettingProps = {
     itemSetting: ItemSettingContext|null;
     setItemSetting: React.Dispatch<React.SetStateAction<ItemSettingContext|null>>;
+    className:string|null
 }
 
 type Kv<T1, T2>={
@@ -40,15 +41,8 @@ function ItemSetting(props: ItemSettingProps) {
         });
     };
     return (
-        <div className="flex flex-col">
+        <div className={`${props.className} flex flex-col`}>
             <h5>Align-self</h5>
-            {/* <select value={props.itemSetting?.alignSelf} onChange={e => handleItemChange('alignSelf', e.target.value)}>
-                <option value="self-auto">Auto</option>
-                <option value="self-start">Start</option>
-                <option value="self-center">Center</option>
-                <option value="self-end">End</option>
-                <option value="self-stretch">Stretch</option>
-            </select> */}
             <div className='grid grid-cols-2 gap-0.5 rounded-sm border border-neutral-500  dark:bg-gray-950 dark:border-gray-700 p-0.5 '>
               {
                 alignSelfs.map((x,i)=>(
