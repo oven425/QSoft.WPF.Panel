@@ -92,10 +92,16 @@ function App() {
     setItemOpen(true);
   }
 
+  const closeItemSettingModal = ()=>{
+    setItem(null);
+    setSS('selectContainer');
+    setItemOpen(false);
+  }
+
   return (
     <>
       <div className='w-screen h-screen bg-white text-neutral-700 dark:bg-gray-900 dark:text-white flex flex-col'>
-        <header className='flex border-b border-neutral-400 dark:border-gray-700 py-2 justify-between'>
+        <header className='flex border-b border-neutral-400 h-15 dark:border-gray-700 py-2 justify-between'>
           <h1 className='text-3xl font-semibold dark:text-white ml-4'>Flex test tool</h1>
           <div className='flex pr-4 gap-2'>
             <div className='hidden md:flex items-end border rounded-sm  border-neutral-500  dark:bg-gray-950 dark:border-gray-700 p-1'>
@@ -109,11 +115,9 @@ function App() {
                 <svg viewBox="0 0 28 28" fill="none"><path d="M10.5 9.99914C10.5 14.1413 13.8579 17.4991 18 17.4991C19.0332 17.4991 20.0176 17.2902 20.9132 16.9123C19.7761 19.6075 17.109 21.4991 14 21.4991C9.85786 21.4991 6.5 18.1413 6.5 13.9991C6.5 10.8902 8.39167 8.22304 11.0868 7.08594C10.7089 7.98159 10.5 8.96597 10.5 9.99914Z" stroke="currentColor" stroke-linejoin="round"></path><path d="M16.3561 6.50754L16.5 5.5L16.6439 6.50754C16.7068 6.94752 17.0525 7.29321 17.4925 7.35607L18.5 7.5L17.4925 7.64393C17.0525 7.70679 16.7068 8.05248 16.6439 8.49246L16.5 9.5L16.3561 8.49246C16.2932 8.05248 15.9475 7.70679 15.5075 7.64393L14.5 7.5L15.5075 7.35607C15.9475 7.29321 16.2932 6.94752 16.3561 6.50754Z" fill="currentColor" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path><path d="M20.3561 11.5075L20.5 10.5L20.6439 11.5075C20.7068 11.9475 21.0525 12.2932 21.4925 12.3561L22.5 12.5L21.4925 12.6439C21.0525 12.7068 20.7068 13.0525 20.6439 13.4925L20.5 14.5L20.3561 13.4925C20.2932 13.0525 19.9475 12.7068 19.5075 12.6439L18.5 12.5L19.5075 12.3561C19.9475 12.2932 20.2932 11.9475 20.3561 11.5075Z" fill="currentColor" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path></svg>
               </div>
             </div>
-            <a href='https://github.com/oven425/QSoft.WPF.Panel/tree/master/my-flex-app' target="_blank">
-              <div className='hidden md:flex items-center w-8'>
-                <img src={gitubWhiteLogo} className='hidden dark:block' alt="GitHub logo" />
-                <img src={githubLogo} className='block dark:hidden' alt="GitHub logo" />
-              </div>
+            <a className='hidden md:flex items-center w-8' href='https://github.com/oven425/QSoft.WPF.Panel/tree/master/my-flex-app' target="_blank">
+              <img src={gitubWhiteLogo} className='hidden dark:block' alt="GitHub logo" />
+              <img src={githubLogo} className='block dark:hidden' alt="GitHub logo" />
             </a>
             <button className='md:hidden text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 font-medium rounded-sm text-sm px-5 py-2.5  dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700' onClick={() => addItem()}>add item</button>
             <div onClick={()=>setContainerOpen(true)} className='stroke-gray-300 flex md:hidden items-center w-8'>
@@ -125,7 +129,7 @@ function App() {
           </div>
         </header>
         <div className='flex flex-row grow'>
-          <aside className='hidden md:flex gap-1 w-52 pt-1 pl-1 pr-2 justify-start flex-col border-r border-neutral-400 dark:border-gray-700'>
+          <aside className='hidden md:flex shrink-0 gap-1 w-52 pt-1 pl-1 pr-2 justify-start flex-col border-r border-neutral-400 dark:border-gray-700'>
             <button className=' text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 font-medium rounded-sm text-sm px-5 py-2.5  dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700' onClick={() => addItem()}>add item</button>
             <div className='grid grid-cols-2 '>
               <div className={`${ss==='selectContainer'?'dark:bg-gray-800 bg-neutral-300':''} rounded-sm p-1`} onClick={()=>setSS("selectContainer")}>Container</div>
@@ -136,8 +140,8 @@ function App() {
               </div>
             </div>
           </aside>
-          <div className='p-1 overflow-auto flex grow'>
-            <div style={{ gap:`${containerSetting.gap}px`}} className={`flex ${containerSetting.direction} ${containerSetting.alignItems} ${containerSetting.justifyContent} grow  dark:bg-gray-950 bg-neutral-200 rounded-sm`}>
+          <div className={`p-1 flex ${containerSetting.direction=='flex-row'?'flex-row':'flex-col'} overflow-auto h-[calc(100vh-3.75rem)] grow`}>
+            <div style={{ gap:`${containerSetting.gap}px`}} className={`flex ${containerSetting.direction} ${containerSetting.alignItems} ${containerSetting.justifyContent} grow dark:bg-gray-950 bg-neutral-200 rounded-sm`}>
               {
                 items.map((x, i) => (
                   <div key={i} style={{ flexGrow: `${x.grow}`, flexShrink: `${x.shrink}`, flexBasis: `${x.basis}px` }} className={`dark:bg-gray-800 bg-white border-neutral-400 flex ${x.alignSelf} p-0.5 border rounded-sm dark:border-gray-600`} >
@@ -156,10 +160,11 @@ function App() {
             </div>
           </div>
         </div>
-        <Modal open={containerOpen} onClose={() => setContainerOpen(false)}>
+        
+        <Modal className={`md:hidden`} open={containerOpen} onClose={() => setContainerOpen(false)}>
           <ContainerSetting className={``} setContainerSetting={setContainerSetting} containerSetting={containerSetting}/>
         </Modal>
-        <Modal className={`md:hidden`} open={itemOpen} onClose={() => setItemOpen(false)}>
+        <Modal className={`md:hidden`} open={itemOpen} onClose={() => closeItemSettingModal()}>
           <ItemSetting className={``} itemSetting={item!} setItemSetting={setItem}/>
         </Modal>
       </div>
