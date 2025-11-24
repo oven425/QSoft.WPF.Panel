@@ -29,6 +29,7 @@ export type ContainerSettingContext = {
   justifyContent:string;
   alignItems:string;
   gap:string;
+  isShowScrollbar:boolean;
 }
 type ContainerSettingProps = {
   containerSetting: ContainerSettingContext;
@@ -36,7 +37,7 @@ type ContainerSettingProps = {
   className:string|null;
 }
 function ContainerSetting({ containerSetting, setContainerSetting, className }: ContainerSettingProps){
-    const handleContainerChange = (name:string, value:string)=>{
+    const handleContainerChange = (name:string, value:string| boolean)=>{
         setContainerSetting(x=> ({
         ...x,
         [name]: value
@@ -70,6 +71,10 @@ function ContainerSetting({ containerSetting, setContainerSetting, className }: 
             </div>
             <h5>Gap(px)</h5>
             <input value={containerSetting.gap} onChange={x => handleContainerChange('gap',x.target.value)} type='number' min="0" />
+            <label className="flex items-center gap-1 ">
+              <input type="checkbox" onChange={e=>handleContainerChange('isShowScrollbar', e.target.checked)} checked={containerSetting.isShowScrollbar}></input>
+              Scrooll bar
+            </label>
         </div>
     )
 }
