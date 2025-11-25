@@ -11,6 +11,7 @@
         Title="FlexPanel test site" Height="400" Width="600">
     <Grid>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition MinWidth="150" Width="Auto"/>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
@@ -53,6 +54,7 @@
                         <TextBlock Text="Padding"/>
                         <TextBox Text="{Binding Padding, ElementName=flexpanel, UpdateSourceTrigger=PropertyChanged}"/>
                     </qpanel:FlexPanel>
+                    <CheckBox>Scrollbar</CheckBox>
                 </qpanel:FlexPanel>
             </TabItem>
             <TabItem Header="Item">
@@ -65,7 +67,7 @@
                     </i:DataTrigger>
                 </i:Interaction.Triggers>
 
-                <qpanel:FlexPanel x:Name="flexpanel_itemdata"  FlexDirection="Column" Gap="8" AlignItems="Stretch">
+                <qpanel:FlexPanel Padding="1,0,3,0" x:Name="flexpanel_itemdata"  FlexDirection="Column" Gap="8" AlignItems="Stretch">
                     <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
                         <TextBlock Text="Flex-Grow"/>
                         <TextBox x:Name="textbox_flexgrow" TextChanged="textbox_flexgrow_TextChanged" Text="{Binding ItemData.FlexGrow, UpdateSourceTrigger=PropertyChanged}"/>
@@ -87,10 +89,21 @@
                 </qpanel:FlexPanel>
             </TabItem>
         </TabControl>
-        <qpanel:FlexPanel FlexDirection="Row" x:Name="flexpanel" Grid.Column="1">
-            <!--<Button>Test1</Button>
-            <Button>Test2</Button>
-            <Button>Test3</Button>-->
+        <GridSplitter Grid.Column="1" Width="2" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray"/>
+        <qpanel:FlexPanel FlexDirection="Row" x:Name="flexpanel" Grid.Column="2">
+
         </qpanel:FlexPanel>
+        <!--<ItemsControl Grid.Column="2" x:Name="itemscontrol_flexpanel">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <local:FlexItem DataContext="{Binding}"/>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <qpanel:FlexPanel x:Name="flexpanel" FlexDirection="Row"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>-->
     </Grid>
 </Window>

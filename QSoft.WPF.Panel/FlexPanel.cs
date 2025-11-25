@@ -106,56 +106,42 @@ namespace QSoft.WPF.Panel
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            // 如果沒有子元素，直接返回基礎實現或0
             if (InternalChildren.Count == 0)
             {
                 return new Size(0, 0);
             }
 
-            // 初始化這個 Panel 期望的尺寸
             var desiredSize = new Size(0, 0);
-            // 複製一份可用的空間，因為我們會在迴圈中修改它
             var remainingSize = availableSize;
 
             bool isRow = this.FlexDirection == FlexDirection.Row;
-
-            // --- 調整可用空間，先減去 Padding 和 Border ---
-            // 這樣傳遞給子元素的才是真正可用的空間
             remainingSize.Width = Math.Max(0.0, remainingSize.Width - (this.Padding.Left + this.Padding.Right));
             remainingSize.Height = Math.Max(0.0, remainingSize.Height - (this.Padding.Top + this.Padding.Bottom));
-
-            // --- 單次迴圈完成所有測量與計算 ---
             foreach (UIElement child in InternalChildren)
             {
                 if (child == null) continue;
 
-                // 核心修正：用剩餘的空間去測量子元素
                 child.Measure(remainingSize);
 
                 var childDesiredSize = child.DesiredSize;
 
                 if (isRow)
                 {
-                    // Row 方向：寬度累加，高度取最大值
                     desiredSize.Width += childDesiredSize.Width;
                     desiredSize.Height = Math.Max(desiredSize.Height, childDesiredSize.Height);
 
-                    // 更新剩餘可用寬度
                     remainingSize.Width -= childDesiredSize.Width;
                 }
-                else // Column 方向
+                else
                 {
-                    // Column 方向：寬度取最大值，高度累加
                     desiredSize.Width = Math.Max(desiredSize.Width, childDesiredSize.Width);
                     desiredSize.Height += childDesiredSize.Height;
 
-                    // 更新剩餘可用高度
                     remainingSize.Height -= childDesiredSize.Height;
                 }
             }
 
-            // --- 加上 Gap 的空間 ---
-            var totalGap = TotalGap(); // 假設 TotalGap() 的邏輯是正確的
+            var totalGap = TotalGap();
             if (isRow)
             {
                 desiredSize.Width += totalGap;
@@ -165,12 +151,9 @@ namespace QSoft.WPF.Panel
                 desiredSize.Height += totalGap;
             }
 
-            // --- 最後加上 Padding 和 Border 的空間 ---
             desiredSize.Width += this.Padding.Left + this.Padding.Right;
             desiredSize.Height += this.Padding.Top + this.Padding.Bottom;
 
-            // --- 約束最終尺寸不超過父容器提供的可用空間 ---
-            // 這一部分邏輯保持不變，是正確的
             desiredSize.Width = Math.Min(desiredSize.Width, availableSize.Width);
             desiredSize.Height = Math.Min(desiredSize.Height, availableSize.Height);
 
@@ -193,9 +176,9 @@ namespace QSoft.WPF.Panel
             {
                 Rect rcc = new(0, 0, child.DesiredSize.Width, child.DesiredSize.Height);
                 var basis = GetBasis(child);
-                if(basis != 0)
+                if (basis != 0)
                 {
-                    if(this.FlexDirection == FlexDirection.Row)
+                    if (this.FlexDirection == FlexDirection.Row)
                     {
                         rcc.Width = basis;
                     }
@@ -204,10 +187,10 @@ namespace QSoft.WPF.Panel
                         rcc.Height = basis;
                     }
                 }
-                
+
                 rc.Add(child, rcc);
             }
-            
+
             Dictionary<FrameworkElement, double> grows = [];
             foreach (FrameworkElement child in InternalChildren)
             {
@@ -393,37 +376,9 @@ namespace QSoft.WPF.Panel
                     switch (this.FlexDirection)
                     {
                         case FlexDirection.Row:
-                            //foreach (var oo in els.Select(x => x.Key))
-                            //{
-                            //    item_w = oo.DesiredSize.Width;
-                            //    els[oo] = new Rect()
-                            //    {
-                            //        X = x,
-                            //        Y = y,
-                            //        Height = finalSize.Height,
-                            //        Width = item_w,
-                            //    };
-                            //    x = x + item_w + this.Gap;
-                            //}
-                            foreach (var oo in els.Select(x => x.Key))
-                            {
-                                var rcc = els[oo];
-                                rcc.X = x;
-                                els[oo] = rcc;
-                                x = x + rcc.Width + this.Gap;
-                            }
-                            //for(int i=0; i<els.Count; i++)
-                            //{
-                            //    var kv = els.ElementAt(i);
-                            //    var rcc = kv.Value;
-                            //    rcc.X = x;
-                            //    els[kv.Key] = rcc;
-                            //    x = x + rcc.Width + this.Gap;
-                            //}
                             using (var enumerator = els.GetEnumerator())
                             {
-                                double currentX = 0;
-
+                                double currentX = this.Padding.Left;
                                 while (enumerator.MoveNext())
                                 {
                                     var kvp = enumerator.Current;
@@ -433,8 +388,6 @@ namespace QSoft.WPF.Panel
                                     els[kvp.Key] = rcc;
                                 }
                             }
-
-                                
                             break;
                         case FlexDirection.Column:
                             foreach (var oo in els.Select(x => x.Key))

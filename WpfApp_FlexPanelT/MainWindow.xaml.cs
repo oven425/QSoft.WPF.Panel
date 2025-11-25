@@ -33,26 +33,30 @@ namespace WpfApp_FlexPanelT
             var item = new FlexItem(new FlexItemVM()
             { Name = $"Index:{this.flexpanel.Children.Count}" });
             //item.Width = 100;
-            FlexPanel.SetBasis(item, 100);
+            //FlexPanel.SetBasis(item, 100);
             item.Delete += Item_Delete;
             item.Edit += Item_Edit;
             this.flexpanel.Children.Add(item);
 
         }
 
-        DependencyObject? m_EditSelfObj;
+        FrameworkElement? m_EditSelfObj;
 
         private void Item_Edit(object sender, RoutedEventArgs e)
         {
-            if(sender is DependencyObject dp)
+            if(sender is FrameworkElement dp)
             {
                 m_EditSelfObj = dp;
-                var item = new ItemData
+                //var item = new ItemData
+                //{
+                //    AlignSelf = FlexPanel.GetAlignSelf(dp),
+                //    FlexGrow = FlexPanel.GetGrow(dp)
+                //};
+                //this.m_MainUI.ItemData = item;
+                if(dp.DataContext is FlexItemVM vm)
                 {
-                    AlignSelf = FlexPanel.GetAlignSelf(dp),
-                    FlexGrow = FlexPanel.GetGrow(dp)
-                };
-                this.m_MainUI.ItemData = item;
+                    this.m_MainUI.ItemData = vm;
+                }
                 this.tabcontrol.SelectedIndex = 1;
             }
         }
@@ -91,6 +95,7 @@ namespace WpfApp_FlexPanelT
         {
             if (this.m_EditSelfObj is not null && this.m_MainUI.ItemData is not null)
             {
+                
                 FlexPanel.SetBasis(this.m_EditSelfObj, this.m_MainUI.ItemData.FlexBasis);
             }
         }
@@ -98,9 +103,9 @@ namespace WpfApp_FlexPanelT
 
     public  class MainUI: INotifyPropertyChanged
     {
-        public ObservableCollection<FlexItemVM> Items { get; set; } = [];
-        ItemData? m_ItemData;
-        public ItemData? ItemData
+        //public ObservableCollection<FlexItemVM> Items { get; set; } = [];
+        FlexItemVM? m_ItemData;
+        public FlexItemVM? ItemData
         {
             get => m_ItemData;
             set { m_ItemData = value; Update(); }
@@ -109,11 +114,11 @@ namespace WpfApp_FlexPanelT
         void Update([CallerMemberName]string name="")=>this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 
-    public class ItemData
-    {
-        public AlignSelf AlignSelf { get; set; }
-        public double FlexGrow { set; get; }
-        public double FlexBasis { set; get; }
-    }
+    //public class ItemData
+    //{
+    //    public AlignSelf AlignSelf { get; set; }
+    //    public double FlexGrow { set; get; }
+    //    public double FlexBasis { set; get; }
+    //}
 
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using QSoft.WPF.Panel;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -61,6 +62,9 @@ namespace WpfApp_FlexPanelT
                 m_Name = value; Update();
             }
         }
+        public AlignSelf AlignSelf { get; set; }
+        public double FlexGrow { set; get; }
+        public double FlexBasis { set; get; }
         public event PropertyChangedEventHandler? PropertyChanged;
         void Update([CallerMemberName] string name="")=>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
