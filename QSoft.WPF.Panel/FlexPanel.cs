@@ -409,11 +409,29 @@ namespace QSoft.WPF.Panel
                     switch (this.FlexDirection)
                     {
                         case FlexDirection.Row:
+                            //x = finalSize.Width - this.Padding.Right;
+                            //for (int i = els.Count - 1; i >= 0; i--)
+                            //{
+                            //    var child = els.ElementAt(i).Key;
+                            //    item_w = child.DesiredSize.Width;
+                            //    x = x - item_w;
+
+                            //    els[child] = new Rect()
+                            //    {
+                            //        X = x,
+                            //        Y = 0,
+                            //        Height = finalSize.Height,
+                            //        Width = item_w,
+                            //    };
+                            //    x -= this.Gap;
+                            //}
+
                             x = finalSize.Width - this.Padding.Right;
                             for (int i = els.Count - 1; i >= 0; i--)
                             {
                                 var child = els.ElementAt(i).Key;
-                                item_w = child.DesiredSize.Width;
+                                Rect rcc = els[child];
+                                item_w = rcc.Width;
                                 x = x - item_w;
 
                                 els[child] = new Rect()
@@ -451,7 +469,27 @@ namespace QSoft.WPF.Panel
                     switch (this.FlexDirection)
                     {
                         case FlexDirection.Row:
-                            var totalw = els.Keys.Sum(x => x.DesiredSize.Width);
+                            //var totalw = els.Keys.Sum(x => x.DesiredSize.Width);
+                            //var totalgap = this.Gap * (els.Count - 1);
+                            //if (totalgap <= 0)
+                            //{
+                            //    totalgap = 0;
+                            //}
+                            //x = (finalSize.Width - totalw - totalgap) / 2;
+                            //foreach (var oo in els.Select(x => x.Key))
+                            //{
+                            //    item_w = oo.DesiredSize.Width;
+                            //    els[oo] = new Rect()
+                            //    {
+                            //        X = x,
+                            //        Y = 0,
+                            //        Height = finalSize.Height,
+                            //        Width = item_w,
+                            //    };
+                            //    x += item_w + this.Gap;
+                            //}
+
+                            var totalw = els.Values.Sum(x => x.Width);
                             var totalgap = this.Gap * (els.Count - 1);
                             if (totalgap <= 0)
                             {
@@ -460,7 +498,8 @@ namespace QSoft.WPF.Panel
                             x = (finalSize.Width - totalw - totalgap) / 2;
                             foreach (var oo in els.Select(x => x.Key))
                             {
-                                item_w = oo.DesiredSize.Width;
+                                Rect rcc = els[oo];
+                                item_w = rcc.Width;
                                 els[oo] = new Rect()
                                 {
                                     X = x,
@@ -499,8 +538,33 @@ namespace QSoft.WPF.Panel
                     switch (this.FlexDirection)
                     {
                         case FlexDirection.Row:
+                            //var totalgapw = this.TotalGap();
+                            //var totalw = els.Keys.Sum(x => x.DesiredSize.Width);
+                            //var iw = (finalSize.Width - this.Padding.Left - this.Padding.Right - totalgapw - totalw);
+                            //if (iw < 0)
+                            //{
+                            //    iw = 0;
+                            //}
+                            //else
+                            //{
+                            //    iw = iw / (InternalChildren.Count*2);
+                            //}
+
+                            //foreach (var oo in els.Select(x => x.Key))
+                            //{
+                            //    x = x + iw;
+                            //    els[oo] = new Rect()
+                            //    {
+                            //        X = x,
+                            //        Y = y,
+                            //        Height = finalSize.Height,
+                            //        Width = oo.DesiredSize.Width,
+                            //    };
+                            //    x += iw+oo.DesiredSize.Width + this.Gap;
+                            //}
+
                             var totalgapw = this.TotalGap();
-                            var totalw = els.Keys.Sum(x => x.DesiredSize.Width);
+                            var totalw = els.Values.Sum(x => x.Width);
                             var iw = (finalSize.Width - this.Padding.Left - this.Padding.Right - totalgapw - totalw);
                             if (iw < 0)
                             {
@@ -508,20 +572,21 @@ namespace QSoft.WPF.Panel
                             }
                             else
                             {
-                                iw = iw / (InternalChildren.Count*2);
+                                iw = iw / (InternalChildren.Count * 2);
                             }
-                            
+
                             foreach (var oo in els.Select(x => x.Key))
                             {
                                 x = x + iw;
+                                item_w = els[oo].Width;
                                 els[oo] = new Rect()
                                 {
                                     X = x,
                                     Y = y,
                                     Height = finalSize.Height,
-                                    Width = oo.DesiredSize.Width,
+                                    Width = item_w,
                                 };
-                                x += iw+oo.DesiredSize.Width + this.Gap;
+                                x += iw + item_w + this.Gap;
                             }
                             break;
                         case FlexDirection.Column:
@@ -556,8 +621,32 @@ namespace QSoft.WPF.Panel
                         switch(this.FlexDirection)
                         {
                             case FlexDirection.Row:
+                                //var totalgapw = this.TotalGap();
+                                //var totalw = els.Keys.Sum(x => x.DesiredSize.Width);
+                                //var iw = (finalSize.Width - this.Padding.Left - this.Padding.Right - totalgapw - totalw);
+                                //if (iw < 0)
+                                //{
+                                //    iw = 0;
+                                //}
+                                //else
+                                //{
+                                //    iw = iw / (InternalChildren.Count +1);
+                                //}
+                                //x = x + iw;
+                                //foreach (var oo in els.Select(x => x.Key))
+                                //{
+                                //    els[oo] = new Rect()
+                                //    {
+                                //        X = x,
+                                //        Y = y,
+                                //        Height = finalSize.Height,
+                                //        Width = oo.DesiredSize.Width,
+                                //    };
+                                //    x += iw+oo.DesiredSize.Width + this.Gap;
+                                //}
+
                                 var totalgapw = this.TotalGap();
-                                var totalw = els.Keys.Sum(x => x.DesiredSize.Width);
+                                var totalw = els.Values.Sum(x => x.Width);
                                 var iw = (finalSize.Width - this.Padding.Left - this.Padding.Right - totalgapw - totalw);
                                 if (iw < 0)
                                 {
@@ -565,19 +654,20 @@ namespace QSoft.WPF.Panel
                                 }
                                 else
                                 {
-                                    iw = iw / (InternalChildren.Count +1);
+                                    iw = iw / (InternalChildren.Count + 1);
                                 }
                                 x = x + iw;
                                 foreach (var oo in els.Select(x => x.Key))
                                 {
+                                    item_w = els[oo].Width;
                                     els[oo] = new Rect()
                                     {
                                         X = x,
                                         Y = y,
                                         Height = finalSize.Height,
-                                        Width = oo.DesiredSize.Width,
+                                        Width = item_w,
                                     };
-                                    x += iw+oo.DesiredSize.Width + this.Gap;
+                                    x += iw + item_w + this.Gap;
                                 }
                                 break;
                             case FlexDirection.Column:
@@ -612,6 +702,64 @@ namespace QSoft.WPF.Panel
                     switch (this.FlexDirection)
                     {
                         case FlexDirection.Row:
+                            //var totalgapw = this.TotalGap();
+                            //var iw = (finalSize.Width - this.Padding.Left - this.Padding.Right - totalgapw);
+                            //if (iw < 0)
+                            //{
+                            //    iw = 0;
+                            //}
+                            //else
+                            //{
+                            //    iw = iw / InternalChildren.Count;
+                            //}
+                            //for (int i = 0; i < els.Count; i++)
+                            //{
+                            //    var child = els.ElementAt(i).Key;
+
+                            //    item_w = child.DesiredSize.Width;
+                            //    if (double.IsNaN(child.Width))
+                            //    {
+                            //        //item_w = iw;
+                            //    }
+                            //    else if (item_w > iw)
+                            //    {
+                            //        item_w = iw;
+                            //    }
+                            //    Rect rc;
+                            //    if (i == 0)
+                            //    {
+                            //        rc = new Rect()
+                            //        {
+                            //            X = x,
+                            //            Y = y,
+                            //            Height = finalSize.Height,
+                            //            Width = item_w,
+                            //        };
+                            //    }
+                            //    else if (i == InternalChildren.Count - 1)
+                            //    {
+                            //        rc = new Rect()
+                            //        {
+                            //            X = x + (iw - item_w),
+                            //            Y = y,
+                            //            Height = finalSize.Height,
+                            //            Width = item_w,
+                            //        };
+                            //    }
+                            //    else
+                            //    {
+                            //        rc = new Rect()
+                            //        {
+                            //            X = x + (iw - item_w) / 2,
+                            //            Y = y,
+                            //            Height = finalSize.Height,
+                            //            Width = item_w,
+                            //        };
+                            //    }
+                            //    els[child] = rc;
+                            //    x += iw + this.Gap;
+                            //}
+
                             var totalgapw = this.TotalGap();
                             var iw = (finalSize.Width - this.Padding.Left - this.Padding.Right - totalgapw);
                             if (iw < 0)
@@ -626,7 +774,7 @@ namespace QSoft.WPF.Panel
                             {
                                 var child = els.ElementAt(i).Key;
 
-                                item_w = child.DesiredSize.Width;
+                                item_w = els[child].Width;
                                 if (double.IsNaN(child.Width))
                                 {
                                     //item_w = iw;
