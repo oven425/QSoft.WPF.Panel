@@ -65,6 +65,7 @@ namespace WpfApp_FlexPanelT
         public AlignSelf AlignSelf { get; set; }
         public double FlexGrow { set; get; }
         public double FlexBasis { set; get; }
+        public double FlexShrink { set; get; }
         public event PropertyChangedEventHandler? PropertyChanged;
         void Update([CallerMemberName] string name="")=>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
