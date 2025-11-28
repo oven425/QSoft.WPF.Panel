@@ -99,6 +99,39 @@ namespace WpfApp_FlexPanelT
                 FlexPanel.SetBasis(this.m_EditSelfObj, this.m_MainUI.ItemData.FlexBasis);
             }
         }
+
+        private void checkbox_ishowscrollbar_Checked(object sender, RoutedEventArgs e)
+        {
+            scollviwer_panel.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+            scollviwer_panel.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
+        }
+
+        private void checkbox_ishowscrollbar_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is CheckBox checkbox)
+            {
+                ShowScrollbar(checkbox.IsChecked == true);
+            }
+        }
+
+        void ShowScrollbar(bool data)
+        {
+            if (data == true)
+            {
+                scollviwer_panel.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+                scollviwer_panel.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
+            }
+            else
+            {
+                scollviwer_panel.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+                scollviwer_panel.HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled;
+            }
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.ShowScrollbar(checkbox_ishowscrollbar.IsChecked == true);
+        }
     }
 
     public  class MainUI: INotifyPropertyChanged

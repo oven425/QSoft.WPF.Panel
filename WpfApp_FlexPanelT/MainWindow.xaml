@@ -8,6 +8,7 @@
         d:DataContext="{d:DesignInstance Type=local:MainUI}"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:qpanel="clr-namespace:QSoft.WPF.Panel;assembly=QSoft.WPF.Panel"
+        Loaded="Window_Loaded"
         Title="FlexPanel test site" Height="400" Width="600">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -59,7 +60,7 @@
                             <TextBlock Text="Padding"/>
                             <TextBox Text="{Binding Padding, ElementName=flexpanel, UpdateSourceTrigger=PropertyChanged}"/>
                         </qpanel:FlexPanel>
-                        <CheckBox>Scrollbar</CheckBox>
+                        <CheckBox x:Name="checkbox_ishowscrollbar" IsChecked="True" Click="checkbox_ishowscrollbar_Click">Scrollbar</CheckBox>
                     </qpanel:FlexPanel>
                 </TabItem>
                 <TabItem Header="Item">
@@ -101,9 +102,12 @@
 
         </qpanel:FlexPanel>
         <GridSplitter Grid.Column="1" Width="2" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray"/>
-        <qpanel:FlexPanel FlexDirection="Row" x:Name="flexpanel" Grid.Column="2">
+        <ScrollViewer x:Name="scollviwer_panel" Grid.Column="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+            <qpanel:FlexPanel FlexDirection="Row" x:Name="flexpanel" Grid.Column="2">
 
-        </qpanel:FlexPanel>
+            </qpanel:FlexPanel>
+
+        </ScrollViewer>
         <!--<ItemsControl Grid.Column="2" x:Name="itemscontrol_flexpanel">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
