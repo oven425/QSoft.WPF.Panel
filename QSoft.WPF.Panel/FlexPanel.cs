@@ -99,18 +99,29 @@ namespace QSoft.WPF.Panel
         public static double GetGrow(DependencyObject obj) => (double)obj.GetValue(GrowProperty);
         public static void SetGrow(DependencyObject obj, double value) => obj.SetValue(GrowProperty, value);
 
-        public static readonly DependencyProperty BasisProperty = DependencyProperty.RegisterAttached("Basis", typeof(double), typeof(FlexPanel), new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+        public static readonly DependencyProperty BasisProperty = DependencyProperty.RegisterAttached("Basis", typeof(double), typeof(FlexPanel), new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsParentArrange|FrameworkPropertyMetadataOptions.AffectsParentMeasure | FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
         public static double GetBasis(DependencyObject obj) => (double)obj.GetValue(BasisProperty);
         public static void SetBasis(DependencyObject obj, double value) => obj.SetValue(BasisProperty, value);
         
         public static readonly DependencyProperty ShrinkProperty = DependencyProperty.RegisterAttached("Shrink", typeof(double), typeof(FlexPanel), new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
         public static double GetShrink(DependencyObject obj) => (double)obj.GetValue(ShrinkProperty);
         public static void SetShrink(DependencyObject obj, double value) => obj.SetValue(ShrinkProperty, value);
+
+
+        Dictionary<FrameworkElement, double> m_Shrinks = [];
+        Dictionary<FrameworkElement, double> m_Basiss = [];
         protected override Size MeasureOverride(Size availableSize)
         {
             if (InternalChildren.Count == 0)
             {
                 return new Size(0, 0);
+            }
+            m_Shrinks.Clear();
+            m_Basiss.Clear();
+            foreach (FrameworkElement child in InternalChildren)
+            {
+                m_Shrinks[child] = GetShrink(child);
+                m_Basiss[child] = GetBasis(child);
             }
 
             var desiredSize = new Size(0, 0);
@@ -126,20 +137,28 @@ namespace QSoft.WPF.Panel
                 child.Measure(remainingSize);
 
                 var childDesiredSize = child.DesiredSize;
-
+                var basis = GetBasis(child);
+                if(isRow && basis >0)
+                {
+                    childDesiredSize.Width = basis;
+                }
+                else if(!isRow && basis >0)
+                {
+                    childDesiredSize.Height = basis;
+                }
                 if (isRow)
                 {
                     desiredSize.Width += childDesiredSize.Width;
                     desiredSize.Height = Math.Max(desiredSize.Height, childDesiredSize.Height);
 
-                    remainingSize.Width -= childDesiredSize.Width;
+                    //remainingSize.Width -= childDesiredSize.Width;
                 }
                 else
                 {
                     desiredSize.Width = Math.Max(desiredSize.Width, childDesiredSize.Width);
                     desiredSize.Height += childDesiredSize.Height;
 
-                    remainingSize.Height -= childDesiredSize.Height;
+                    //remainingSize.Height -= childDesiredSize.Height;
                 }
             }
 
