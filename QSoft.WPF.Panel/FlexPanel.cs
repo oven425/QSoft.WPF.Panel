@@ -103,26 +103,19 @@ namespace QSoft.WPF.Panel
         public static double GetBasis(DependencyObject obj) => (double)obj.GetValue(BasisProperty);
         public static void SetBasis(DependencyObject obj, double value) => obj.SetValue(BasisProperty, value);
         
-        public static readonly DependencyProperty ShrinkProperty = DependencyProperty.RegisterAttached("Shrink", typeof(double), typeof(FlexPanel), new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
-        public static double GetShrink(DependencyObject obj) => (double)obj.GetValue(ShrinkProperty);
-        public static void SetShrink(DependencyObject obj, double value) => obj.SetValue(ShrinkProperty, value);
+        //public static readonly DependencyProperty ShrinkProperty = DependencyProperty.RegisterAttached("Shrink", typeof(double), typeof(FlexPanel), new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+        //public static double GetShrink(DependencyObject obj) => (double)obj.GetValue(ShrinkProperty);
+        //public static void SetShrink(DependencyObject obj, double value) => obj.SetValue(ShrinkProperty, value);
 
 
-        Dictionary<FrameworkElement, double> m_Shrinks = [];
-        Dictionary<FrameworkElement, double> m_Basiss = [];
         protected override Size MeasureOverride(Size availableSize)
         {
             if (InternalChildren.Count == 0)
             {
                 return new Size(0, 0);
             }
-            m_Shrinks.Clear();
-            m_Basiss.Clear();
-            foreach (FrameworkElement child in InternalChildren)
-            {
-                m_Shrinks[child] = GetShrink(child);
-                m_Basiss[child] = GetBasis(child);
-            }
+            var totalGap = TotalGap();
+
 
             var desiredSize = new Size(0, 0);
             var remainingSize = availableSize;
@@ -130,19 +123,24 @@ namespace QSoft.WPF.Panel
             bool isRow = this.FlexDirection == FlexDirection.Row;
             remainingSize.Width = Math.Max(0.0, remainingSize.Width - (this.Padding.Left + this.Padding.Right));
             remainingSize.Height = Math.Max(0.0, remainingSize.Height - (this.Padding.Top + this.Padding.Bottom));
-            foreach (UIElement child in InternalChildren)
+            foreach (FrameworkElement child in InternalChildren)
             {
                 if (child == null) continue;
+                Size sz = new(remainingSize.Width, remainingSize.Height);
+                var basis = GetBasis(child);
 
                 child.Measure(remainingSize);
 
                 var childDesiredSize = child.DesiredSize;
-                var basis = GetBasis(child);
-                if(isRow && basis >0)
+
+                if (isRow && basis > 0)
                 {
-                    childDesiredSize.Width = basis;
+                    if (basis > child.MinWidth && basis < child.MaxWidth)
+                    {
+                        childDesiredSize.Width = basis;
+                    }
                 }
-                else if(!isRow && basis >0)
+                else if (!isRow && basis > 0)
                 {
                     childDesiredSize.Height = basis;
                 }
@@ -150,19 +148,17 @@ namespace QSoft.WPF.Panel
                 {
                     desiredSize.Width += childDesiredSize.Width;
                     desiredSize.Height = Math.Max(desiredSize.Height, childDesiredSize.Height);
-
-                    //remainingSize.Width -= childDesiredSize.Width;
+                    remainingSize.Width = Math.Max(0.0, remainingSize.Width - childDesiredSize.Width);
                 }
                 else
                 {
                     desiredSize.Width = Math.Max(desiredSize.Width, childDesiredSize.Width);
                     desiredSize.Height += childDesiredSize.Height;
-
-                    //remainingSize.Height -= childDesiredSize.Height;
+                    remainingSize.Height = Math.Max(0.0, remainingSize.Height - childDesiredSize.Height);
                 }
             }
 
-            var totalGap = TotalGap();
+            
             if (isRow)
             {
                 desiredSize.Width += totalGap;
@@ -192,14 +188,11 @@ namespace QSoft.WPF.Panel
 
             System.Diagnostics.Debug.WriteLine($"{this.Name} ArrangeOverride: {finalSize}");
 
-            Dictionary<FrameworkElement, double> shrinks = [];
             Dictionary<FrameworkElement, Rect> rc = [];
             foreach (FrameworkElement child in InternalChildren)
             {
                 Rect rcc = new(0, 0, child.DesiredSize.Width, child.DesiredSize.Height);
                 var basis = GetBasis(child);
-                var shrink = GetShrink(child);
-                shrinks[child] = shrink;
                 if (basis != 0)
                 {
                     if (this.FlexDirection == FlexDirection.Row)
