@@ -56,7 +56,10 @@ function App() {
       alignSelf: 'self-auto',
       grow: 0,
       shrink: 0,
-      basis: "auto"
+      basis: "auto",
+      minWidth:'auto',
+      maxWidth:'none',
+      width:'auto'
     };
     setItems(prevItems => [...prevItems, admin]);
 
@@ -94,6 +97,13 @@ function App() {
     setItem(null);
     setSS('selectContainer');
     setItemOpen(false);
+  }
+
+  const pixelConvert = (data:string, dfv:string):string=>{
+    if(data === "")return dfv
+    let num = Number(data);
+    if(Number.isNaN(num)) return dfv
+    return data+'px';
   }
 
   return (
@@ -142,7 +152,7 @@ function App() {
             <div style={{ gap:`${containerSetting.gap}px`}} className={`flex ${containerSetting.direction} ${containerSetting.alignItems} ${containerSetting.justifyContent} grow dark:bg-gray-950 bg-neutral-200 rounded-sm`}>
               {
                 items.map((x, i) => (
-                  <div key={i} style={{ flexGrow: `${x.grow}`, flexShrink: `${x.shrink}`, flexBasis: `${x.basis}px` }} className={`dark:bg-gray-800 bg-white border-neutral-400 flex ${x.alignSelf} p-0.5 border rounded-sm dark:border-gray-600`} >
+                  <div key={i} style={{ width:`${pixelConvert(x.width,'auto')}`, minWidth:`${pixelConvert(x.minWidth,'auto')}` ,maxWidth:`${pixelConvert(x.maxWidth,'none')}`, flexGrow: `${x.grow}`, flexShrink: `${x.shrink}`, flexBasis: `${pixelConvert(x.basis,'auto')}` }} className={`dark:bg-gray-800 bg-white border-neutral-400 flex ${x.alignSelf} p-0.5 border rounded-sm dark:border-gray-600`} >
                     <div className='self-center px-3 py-1 grow'>index:{i}</div>
                     <div className="border-r dark:border-gray-600 border-neutral-400"></div>
                     <div onClick={() => editItem(x)} className={`flex items-center fill-gray-950 w-10 ${item === x ? "dark:bg-gray-600 bg-neutral-200" : ""}  dark:hover:bg-gray-600`}>
