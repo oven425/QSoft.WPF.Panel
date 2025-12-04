@@ -47,12 +47,6 @@ namespace WpfApp_FlexPanelT
             if(sender is FrameworkElement dp)
             {
                 m_EditSelfObj = dp;
-                //var item = new ItemData
-                //{
-                //    AlignSelf = FlexPanel.GetAlignSelf(dp),
-                //    FlexGrow = FlexPanel.GetGrow(dp)
-                //};
-                //this.m_MainUI.ItemData = item;
                 if(dp.DataContext is FlexItemVM vm)
                 {
                     this.m_MainUI.ItemData = vm;
@@ -95,7 +89,6 @@ namespace WpfApp_FlexPanelT
         {
             if (this.m_EditSelfObj is not null && this.m_MainUI.ItemData is not null)
             {
-                
                 FlexPanel.SetBasis(this.m_EditSelfObj, this.m_MainUI.ItemData.FlexBasis);
             }
         }
@@ -131,6 +124,30 @@ namespace WpfApp_FlexPanelT
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             this.ShowScrollbar(checkbox_ishowscrollbar.IsChecked == true);
+        }
+
+        private void textbox_minwidth_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (this.m_EditSelfObj is not null && this.m_MainUI.ItemData is not null)
+            {
+                this.m_EditSelfObj.MinWidth = this.m_MainUI.ItemData.MinWidth;
+            }
+        }
+
+        private void textbox_maxwidth_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (this.m_EditSelfObj is not null && this.m_MainUI.ItemData is not null)
+            {
+                this.m_EditSelfObj.MaxWidth = this.m_MainUI.ItemData.MaxWidth;
+            }
+        }
+
+        private void textbox_width_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (this.m_EditSelfObj is not null && this.m_MainUI.ItemData is not null)
+            {
+                this.m_EditSelfObj.Width = this.m_MainUI.ItemData.Width;
+            }
         }
     }
 

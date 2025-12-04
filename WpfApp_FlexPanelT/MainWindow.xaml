@@ -96,6 +96,18 @@
                                 <ComboBoxItem Content="Stretch" Tag="{x:Static qpanel:AlignSelf.Stretch}"/>
                             </ComboBox>
                         </qpanel:FlexPanel>
+                        <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
+                            <TextBlock Text="MinWidth"/>
+                            <TextBox x:Name="textbox_minwidth" TextChanged="textbox_minwidth_TextChanged" Text="{Binding ItemData.MinWidth, UpdateSourceTrigger=PropertyChanged}" />
+                        </qpanel:FlexPanel>
+                        <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
+                            <TextBlock Text="MaxWidth"/>
+                            <TextBox x:Name="textbox_maxwidth" TextChanged="textbox_maxwidth_TextChanged" Text="{Binding ItemData.MaxWidth, UpdateSourceTrigger=PropertyChanged}" />
+                        </qpanel:FlexPanel>
+                        <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
+                            <TextBlock Text="Width"/>
+                            <TextBox x:Name="textbox_width" TextChanged="textbox_width_TextChanged" Text="{Binding ItemData.Width, UpdateSourceTrigger=PropertyChanged}" />
+                        </qpanel:FlexPanel>
                     </qpanel:FlexPanel>
                 </TabItem>
             </TabControl>

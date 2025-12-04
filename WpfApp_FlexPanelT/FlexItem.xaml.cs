@@ -66,6 +66,9 @@ namespace WpfApp_FlexPanelT
         public double FlexGrow { set; get; }
         public double FlexBasis { set; get; }
         public double FlexShrink { set; get; }
+        public double MinWidth { set; get; }
+        public double MaxWidth { set; get; } = double.PositiveInfinity;
+        public double Width { set; get; } = double.NaN;
         public event PropertyChangedEventHandler? PropertyChanged;
         void Update([CallerMemberName] string name="")=>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
