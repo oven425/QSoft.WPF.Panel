@@ -135,10 +135,15 @@ namespace QSoft.WPF.Panel
 
                 if (isRow && basis > 0)
                 {
-                    if (basis > child.MinWidth && basis < child.MaxWidth)
+                    if(basis > child.MaxWidth)
                     {
-                        childDesiredSize.Width = basis;
+                        basis = child.MaxWidth;
                     }
+                    else if(basis < child.MinWidth)
+                    {
+                        basis = child.MinWidth;
+                    }
+                    childDesiredSize.Width = basis;
                 }
                 else if (!isRow && basis > 0)
                 {
