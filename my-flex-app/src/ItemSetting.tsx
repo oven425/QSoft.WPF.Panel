@@ -49,7 +49,7 @@ function ItemSetting(props: ItemSettingProps) {
             <input placeholder="auto" value={props.itemSetting?.basis} onChange={x => onInputChange('basis', x.target.value)} />
             <div>
                 <h5>Min-width({basisunit.current})</h5>
-                <input placeholder="auto" value={props.itemSetting?.minWidth} onChange={x => onInputChange('minWidth', x.target.value)}/>
+                <input placeholder="0" value={props.itemSetting?.minWidth} onChange={x => onInputChange('minWidth', x.target.value)}/>
                 <h5>Max-width</h5>
                 <input placeholder="none" value={props.itemSetting?.maxWidth} onChange={x => onInputChange('maxWidth', x.target.value)}/>
                 <h5>Width</h5>
