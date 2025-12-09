@@ -102,11 +102,19 @@ namespace QSoft.WPF.Panel
         public static readonly DependencyProperty BasisProperty = DependencyProperty.RegisterAttached("Basis", typeof(double), typeof(FlexPanel), new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsParentArrange|FrameworkPropertyMetadataOptions.AffectsParentMeasure | FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
         public static double GetBasis(DependencyObject obj) => (double)obj.GetValue(BasisProperty);
         public static void SetBasis(DependencyObject obj, double value) => obj.SetValue(BasisProperty, value);
-        
+
         //public static readonly DependencyProperty ShrinkProperty = DependencyProperty.RegisterAttached("Shrink", typeof(double), typeof(FlexPanel), new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
         //public static double GetShrink(DependencyObject obj) => (double)obj.GetValue(ShrinkProperty);
         //public static void SetShrink(DependencyObject obj, double value) => obj.SetValue(ShrinkProperty, value);
 
+        protected override void OnVisualChildrenChanged(DependencyObject visualAdded, DependencyObject visualRemoved)
+        {
+            base.OnVisualChildrenChanged(visualAdded, visualRemoved);
+            var fe = visualAdded as FrameworkElement;
+            
+        }
+
+        
 
         protected override Size MeasureOverride(Size availableSize)
         {
@@ -202,6 +210,14 @@ namespace QSoft.WPF.Panel
                 {
                     if (this.FlexDirection == FlexDirection.Row)
                     {
+                        if (basis > child.MaxWidth)
+                        {
+                            basis = child.MaxWidth;
+                        }
+                        else if (basis < child.MinWidth)
+                        {
+                            basis = child.MinWidth;
+                        }
                         rcc.Width = basis;
                     }
                     else
