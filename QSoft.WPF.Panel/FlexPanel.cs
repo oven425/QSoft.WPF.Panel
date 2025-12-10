@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -106,15 +107,48 @@ namespace QSoft.WPF.Panel
         //public static readonly DependencyProperty ShrinkProperty = DependencyProperty.RegisterAttached("Shrink", typeof(double), typeof(FlexPanel), new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
         //public static double GetShrink(DependencyObject obj) => (double)obj.GetValue(ShrinkProperty);
         //public static void SetShrink(DependencyObject obj, double value) => obj.SetValue(ShrinkProperty, value);
+        readonly DependencyPropertyDescriptor MaxWidthDesciptor = DependencyPropertyDescriptor.FromProperty(FrameworkElement.MaxWidthProperty, typeof(FrameworkElement));
 
         protected override void OnVisualChildrenChanged(DependencyObject visualAdded, DependencyObject visualRemoved)
         {
             base.OnVisualChildrenChanged(visualAdded, visualRemoved);
-            var fe = visualAdded as FrameworkElement;
-            
+            if(visualAdded is FrameworkElement addfe)
+            {
+                MaxWidthDesciptor.AddValueChanged(addfe, OnMaxWidthChanged);
+                
+            }
+            if (visualAdded is FrameworkElement removefe)
+            {
+                MaxWidthDesciptor.RemoveValueChanged(removefe, OnMaxWidthChanged);
+            }
         }
 
-        
+
+        void OnMaxWidthChanged(object? sender, EventArgs e)
+        {
+            if(sender is FrameworkElement fe)
+            {
+                var basis = FlexPanel.GetBasis(fe);
+                if(basis > 0)
+                {
+                    if(basis > fe.MaxWidth)
+                    {
+                        //this.InvalidateMeasure();
+                    }
+                }
+            }
+
+            //var basis = FlexPanel.GetBasis(addfe);
+            //if (basis > 0 && addfe.MaxWidth != double.PositiveInfinity)
+            //{
+            //    if (basis > addfe.MaxWidth)
+            //    {
+            //        this.InvalidateMeasure();
+            //    }
+
+            //}
+        }
+
 
         protected override Size MeasureOverride(Size availableSize)
         {
