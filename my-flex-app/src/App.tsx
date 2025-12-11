@@ -144,7 +144,7 @@ function App() {
               <div className={`${item === null ? "invisible" : "visible"} ${ss === 'selectItem' ? 'dark:bg-gray-800 bg-neutral-300' : ''} rounded-sm p-1`} onClick={() => setSS("selectItem")}>Item</div>
               <div className='col-span-2'>
                 <ContainerSetting className={`${ss === 'selectContainer' ? 'block' : 'hidden'}`} setContainerSetting={setContainerSetting} containerSetting={containerSetting} />
-                <div className='overflow-auto'>
+                <div>
                   <ItemSetting className={`${item === null || ss === 'selectContainer' ? "hidden" : "block"}`} itemSetting={item!} setItemSetting={setItem} />
                 </div>
               </div>

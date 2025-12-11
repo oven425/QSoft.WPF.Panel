@@ -149,6 +149,21 @@ namespace WpfApp_FlexPanelT
                 this.m_EditSelfObj.Width = this.m_MainUI.ItemData.Width;
             }
         }
+
+        private void textbox_minheight_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void textbox_maxheight_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
+
+        private void textbox_height_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
     }
 
     public  class MainUI: INotifyPropertyChanged

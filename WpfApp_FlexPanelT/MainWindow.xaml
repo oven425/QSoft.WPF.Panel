@@ -84,7 +84,7 @@
                         </qpanel:FlexPanel>
                         <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
                             <TextBlock Text="Flex-Basis"/>
-                            <TextBox x:Name="textbox_flexbasis" TextChanged="textbox_flexbasis_TextChanged" Text="{Binding ItemData.FlexBasis, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBox x:Name="textbox_flexbasis" InputMethod.IsInputMethodEnabled="False" TextChanged="textbox_flexbasis_TextChanged" Text="{Binding ItemData.FlexBasis, UpdateSourceTrigger=PropertyChanged}"/>
                         </qpanel:FlexPanel>
                         <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
                             <TextBlock Text="Align-Self"/>
@@ -96,18 +96,40 @@
                                 <ComboBoxItem Content="Stretch" Tag="{x:Static qpanel:AlignSelf.Stretch}"/>
                             </ComboBox>
                         </qpanel:FlexPanel>
-                        <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
-                            <TextBlock Text="MinWidth"/>
-                            <TextBox x:Name="textbox_minwidth" TextChanged="textbox_minwidth_TextChanged" Text="{Binding ItemData.MinWidth, UpdateSourceTrigger=PropertyChanged}" />
+                        
+
+                        <qpanel:FlexPanel Gap="3">
+                            <qpanel:FlexPanel qpanel:FlexPanel.Grow="1" FlexDirection="Column" AlignItems="Stretch">
+                                <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
+                                    <TextBlock Text="MinWidth"/>
+                                    <TextBox x:Name="textbox_minwidth" InputMethod.IsInputMethodEnabled="False" TextChanged="textbox_minwidth_TextChanged" Text="{Binding ItemData.MinWidth, UpdateSourceTrigger=PropertyChanged}" />
+                                </qpanel:FlexPanel>
+                                <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
+                                    <TextBlock Text="MaxWidth"/>
+                                    <TextBox x:Name="textbox_maxwidth" InputMethod.IsInputMethodEnabled="False" TextChanged="textbox_maxwidth_TextChanged" Text="{Binding ItemData.MaxWidth, UpdateSourceTrigger=PropertyChanged}" />
+                                </qpanel:FlexPanel>
+                                <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
+                                    <TextBlock Text="Width"/>
+                                    <TextBox x:Name="textbox_width" TextChanged="textbox_width_TextChanged" Text="{Binding ItemData.Width, UpdateSourceTrigger=PropertyChanged}" />
+                                </qpanel:FlexPanel>
+                            </qpanel:FlexPanel>
+                            <qpanel:FlexPanel FlexDirection="Column" qpanel:FlexPanel.Grow="1" Grid.Column="1" AlignItems="Stretch">
+                                <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
+                                    <TextBlock Text="MinHieght"/>
+                                    <TextBox x:Name="textbox_minheight" InputMethod.IsInputMethodEnabled="False" TextChanged="textbox_minheight_TextChanged" Text="{Binding ItemData.MinWidth, UpdateSourceTrigger=PropertyChanged}" />
+                                </qpanel:FlexPanel>
+                                <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
+                                    <TextBlock Text="MaxHieght"/>
+                                    <TextBox x:Name="textbox_maxheight" InputMethod.IsInputMethodEnabled="False" TextChanged="textbox_maxheight_TextChanged" Text="{Binding ItemData.MaxWidth, UpdateSourceTrigger=PropertyChanged}" />
+                                </qpanel:FlexPanel>
+                                <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
+                                    <TextBlock Text="Hieght"/>
+                                    <TextBox x:Name="textbox_height" TextChanged="textbox_height_TextChanged" Text="{Binding ItemData.Width, UpdateSourceTrigger=PropertyChanged}" />
+                                </qpanel:FlexPanel>
+                            </qpanel:FlexPanel>
+
                         </qpanel:FlexPanel>
-                        <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
-                            <TextBlock Text="MaxWidth"/>
-                            <TextBox x:Name="textbox_maxwidth" TextChanged="textbox_maxwidth_TextChanged" Text="{Binding ItemData.MaxWidth, UpdateSourceTrigger=PropertyChanged}" />
-                        </qpanel:FlexPanel>
-                        <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
-                            <TextBlock Text="Width"/>
-                            <TextBox x:Name="textbox_width" TextChanged="textbox_width_TextChanged" Text="{Binding ItemData.Width, UpdateSourceTrigger=PropertyChanged}" />
-                        </qpanel:FlexPanel>
+                        
                     </qpanel:FlexPanel>
                 </TabItem>
             </TabControl>

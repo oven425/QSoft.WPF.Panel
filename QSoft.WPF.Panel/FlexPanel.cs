@@ -107,46 +107,52 @@ namespace QSoft.WPF.Panel
         //public static readonly DependencyProperty ShrinkProperty = DependencyProperty.RegisterAttached("Shrink", typeof(double), typeof(FlexPanel), new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
         //public static double GetShrink(DependencyObject obj) => (double)obj.GetValue(ShrinkProperty);
         //public static void SetShrink(DependencyObject obj, double value) => obj.SetValue(ShrinkProperty, value);
-        readonly DependencyPropertyDescriptor MaxWidthDesciptor = DependencyPropertyDescriptor.FromProperty(FrameworkElement.MaxWidthProperty, typeof(FrameworkElement));
-
+        static readonly DependencyPropertyDescriptor MaxWidthDesciptor = DependencyPropertyDescriptor.FromProperty(FrameworkElement.MaxWidthProperty, typeof(FrameworkElement));
+        static readonly DependencyPropertyDescriptor MaxHeightDesciptor = DependencyPropertyDescriptor.FromProperty(FrameworkElement.MaxHeightProperty, typeof(FrameworkElement));
         protected override void OnVisualChildrenChanged(DependencyObject visualAdded, DependencyObject visualRemoved)
         {
             base.OnVisualChildrenChanged(visualAdded, visualRemoved);
             if(visualAdded is FrameworkElement addfe)
             {
                 MaxWidthDesciptor.AddValueChanged(addfe, OnMaxWidthChanged);
-                
+                MaxHeightDesciptor.AddValueChanged(addfe, OnMaxHeightChanged);
             }
-            if (visualAdded is FrameworkElement removefe)
+            if (visualRemoved is FrameworkElement removefe)
             {
                 MaxWidthDesciptor.RemoveValueChanged(removefe, OnMaxWidthChanged);
+                MaxHeightDesciptor.RemoveValueChanged(removefe, OnMaxHeightChanged);
             }
         }
 
 
         void OnMaxWidthChanged(object? sender, EventArgs e)
         {
-            if(sender is FrameworkElement fe)
+            if (this.FlexDirection != FlexDirection.Row) return;
+            if (sender is FrameworkElement fe)
             {
-                var basis = FlexPanel.GetBasis(fe);
-                if(basis > 0)
+                if(fe.MaxWidth != double.PositiveInfinity && FlexPanel.GetBasis(fe) > 0)
                 {
-                    if(basis > fe.MaxWidth)
+                    if(fe.MaxWidth != fe.ActualWidth)
                     {
-                        //this.InvalidateMeasure();
+                        this.InvalidateMeasure();
                     }
                 }
             }
+        }
 
-            //var basis = FlexPanel.GetBasis(addfe);
-            //if (basis > 0 && addfe.MaxWidth != double.PositiveInfinity)
-            //{
-            //    if (basis > addfe.MaxWidth)
-            //    {
-            //        this.InvalidateMeasure();
-            //    }
-
-            //}
+        void OnMaxHeightChanged(object? sender, EventArgs e)
+        {
+            if (this.FlexDirection != FlexDirection.Column) return;
+            if (sender is FrameworkElement fe)
+            {
+                if (fe.MaxHeight != double.PositiveInfinity && FlexPanel.GetBasis(fe) > 0)
+                {
+                    if (fe.MaxHeight != fe.ActualHeight)
+                    {
+                        this.InvalidateMeasure();
+                    }
+                }
+            }
         }
 
 
