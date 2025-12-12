@@ -75,7 +75,7 @@ function ContainerSetting({ containerSetting, setContainerSetting, className }: 
       <input value={containerSetting.gap} onChange={x => handleContainerChange('gap', x.target.value)} type='number' min="0" />
       <label className="flex items-center gap-1 ">
         <input type="checkbox" onChange={e => handleContainerChange('isShowScrollbar', e.target.checked)} checked={containerSetting.isShowScrollbar}></input>
-        Scrooll bar
+        Scroll bar
       </label>
     </div>
   )
