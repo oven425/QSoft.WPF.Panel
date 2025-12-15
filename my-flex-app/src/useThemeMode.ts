@@ -37,6 +37,6 @@ const useThemeMode = (theme:Theme='system') => {
         document.documentElement.classList.toggle('dark', isDarkMode);
     }, [isDarkMode])
 
-    return [themeMode, setThemeMode];
+    return [themeMode, setThemeMode] as const;
 }
 export default useThemeMode;

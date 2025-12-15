@@ -47,16 +47,16 @@ function ItemSetting(props: ItemSettingProps) {
             <input value={props.itemSetting?.shrink} onChange={x => onInputChange('shrink', x.target.value)} type='number' />
             <h5>Flex-basis({basisunit.current})</h5>
             <input placeholder="auto" value={props.itemSetting?.basis} onChange={x => onInputChange('basis', x.target.value)} />
-            <div className="flex flex-row gap-1">
-                <div className="flex flex-col grow">
+            <div className="grid grid-cols-2 gap-x-1">
+                <div className="flex flex-col">
                     <h5>Min-width({basisunit.current})</h5>
-                    <input placeholder="0" value={props.itemSetting?.minWidth} onChange={x => onInputChange('minWidth', x.target.value)} />
+                    <input className="grow" placeholder="0" value={props.itemSetting?.minWidth} onChange={x => onInputChange('minWidth', x.target.value)} />
                     <h5>Max-width</h5>
-                    <input placeholder="none" value={props.itemSetting?.maxWidth} onChange={x => onInputChange('maxWidth', x.target.value)} />
+                    <input className="grow" placeholder="none" value={props.itemSetting?.maxWidth} onChange={x => onInputChange('maxWidth', x.target.value)} />
                     <h5>Width</h5>
-                    <input placeholder="auto" value={props.itemSetting?.width} onChange={x => onInputChange('width', x.target.value)} />
+                    <input className="grow" placeholder="auto" value={props.itemSetting?.width} onChange={x => onInputChange('width', x.target.value)} />
                 </div>
-                <div className="flex flex-col grow">
+                <div className="flex flex-col">
                     <h5>Min-height({basisunit.current})</h5>
                     <input placeholder="0" value={props.itemSetting?.minWidth} onChange={x => onInputChange('minWidth', x.target.value)} />
                     <h5>Max-height</h5>

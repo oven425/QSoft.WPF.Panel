@@ -7,6 +7,7 @@ import { type ContainerSettingContext } from './ContainerSetting'
 import ContainerSetting from './ContainerSetting'
 import ItemSetting from './ItemSetting'
 import type { ItemSettingContext } from './ItemSetting'
+import useThemeMode from './useThemeMode'
 
 function App() {
   const [containerSetting, setContainerSetting] = useState<ContainerSettingContext>({ gap: '0', alignItems: 'items-start', justifyContent: 'justify-start', direction: 'flex-row', isShowScrollbar: false });
@@ -15,40 +16,41 @@ function App() {
   const id = useRef(0);
   const [containerOpen, setContainerOpen] = useState(false);
   const [itemOpen, setItemOpen] = useState(false);
-  const [themeMode, setThemeMode] = useState<Theme>('system');
-  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
+  const [themeMode, setThemeMode] = useThemeMode();
+  // const [themeMode, setThemeMode] = useState<Theme>('system');
+  // const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
 
-  type Theme = "dark" | "light" | "system";
-  useEffect(() => {
-    if (themeMode === 'dark') {
-      setIsDarkMode(true);
-    }
-    else if (themeMode === 'system') {
-      let systemdark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      setIsDarkMode(systemdark);
-    }
-    else {
-      setIsDarkMode(false)
-    }
-  }, [themeMode]);
+  // type Theme = "dark" | "light" | "system";
+  // useEffect(() => {
+  //   if (themeMode === 'dark') {
+  //     setIsDarkMode(true);
+  //   }
+  //   else if (themeMode === 'system') {
+  //     let systemdark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  //     setIsDarkMode(systemdark);
+  //   }
+  //   else {
+  //     setIsDarkMode(false)
+  //   }
+  // }, [themeMode]);
 
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (e: MediaQueryListEvent) => {
-      if (themeMode === 'system') {
-        const isDark = e.matches;
-        setIsDarkMode(isDark);
-      }
-    };
-    mediaQuery.addEventListener('change', handleChange);
-    return () => {
-      mediaQuery.removeEventListener('change', handleChange);
-    };
-  }, []);
+  // useEffect(() => {
+  //   const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+  //   const handleChange = (e: MediaQueryListEvent) => {
+  //     if (themeMode === 'system') {
+  //       const isDark = e.matches;
+  //       setIsDarkMode(isDark);
+  //     }
+  //   };
+  //   mediaQuery.addEventListener('change', handleChange);
+  //   return () => {
+  //     mediaQuery.removeEventListener('change', handleChange);
+  //   };
+  // }, []);
 
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', isDarkMode);
-  }, [isDarkMode])
+  // useEffect(() => {
+  //   document.documentElement.classList.toggle('dark', isDarkMode);
+  // }, [isDarkMode])
 
   const addItem = () => {
     const admin: ItemSettingContext = {
@@ -137,7 +139,7 @@ function App() {
           </div>
         </header>
         <div className='flex flex-row grow'>
-          <aside className='hidden md:flex shrink-0 gap-1 w-56 pt-1 pl-1 pr-2 justify-start flex-col border-r border-neutral-400 dark:border-gray-700'>
+          <aside className='hidden md:flex shrink-0 gap-1 w-66 pt-1 pl-1 pr-2 justify-start flex-col border-r border-neutral-400 dark:border-gray-700'>
             <button className=' text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 font-medium rounded-sm text-sm px-5 py-2.5  dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700' onClick={() => addItem()}>add item</button>
             <div className='grid grid-cols-2 '>
               <div className={`${ss === 'selectContainer' ? 'dark:bg-gray-800 bg-neutral-300' : ''} rounded-sm p-1`} onClick={() => setSS("selectContainer")}>Container</div>
