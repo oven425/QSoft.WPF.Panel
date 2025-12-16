@@ -116,15 +116,15 @@
                             <qpanel:FlexPanel FlexDirection="Column" qpanel:FlexPanel.Grow="1" Grid.Column="1" AlignItems="Stretch">
                                 <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
                                     <TextBlock Text="MinHieght"/>
-                                    <TextBox x:Name="textbox_minheight" InputMethod.IsInputMethodEnabled="False" TextChanged="textbox_minheight_TextChanged" Text="{Binding ItemData.MinWidth, UpdateSourceTrigger=PropertyChanged}" />
+                                    <TextBox x:Name="textbox_minheight" InputMethod.IsInputMethodEnabled="False" TextChanged="textbox_minheight_TextChanged" Text="{Binding ItemData.MinHeight, UpdateSourceTrigger=PropertyChanged}" />
                                 </qpanel:FlexPanel>
                                 <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
                                     <TextBlock Text="MaxHieght"/>
-                                    <TextBox x:Name="textbox_maxheight" InputMethod.IsInputMethodEnabled="False" TextChanged="textbox_maxheight_TextChanged" Text="{Binding ItemData.MaxWidth, UpdateSourceTrigger=PropertyChanged}" />
+                                    <TextBox x:Name="textbox_maxheight" InputMethod.IsInputMethodEnabled="False" TextChanged="textbox_maxheight_TextChanged" Text="{Binding ItemData.MaxHeight, UpdateSourceTrigger=PropertyChanged}" />
                                 </qpanel:FlexPanel>
                                 <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
                                     <TextBlock Text="Hieght"/>
-                                    <TextBox x:Name="textbox_height" TextChanged="textbox_height_TextChanged" Text="{Binding ItemData.Width, UpdateSourceTrigger=PropertyChanged}" />
+                                    <TextBox x:Name="textbox_height" TextChanged="textbox_height_TextChanged" Text="{Binding ItemData.Height, UpdateSourceTrigger=PropertyChanged}" />
                                 </qpanel:FlexPanel>
                             </qpanel:FlexPanel>
 

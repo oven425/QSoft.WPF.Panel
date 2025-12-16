@@ -152,17 +152,26 @@ namespace WpfApp_FlexPanelT
 
         private void textbox_minheight_TextChanged(object sender, TextChangedEventArgs e)
         {
-
+            if (this.m_EditSelfObj is not null && this.m_MainUI.ItemData is not null)
+            {
+                this.m_EditSelfObj.MinHeight = this.m_MainUI.ItemData.MinHeight;
+            }
         }
 
         private void textbox_maxheight_TextChanged(object sender, TextChangedEventArgs e)
         {
-
+            if (this.m_EditSelfObj is not null && this.m_MainUI.ItemData is not null)
+            {
+                this.m_EditSelfObj.MaxHeight = this.m_MainUI.ItemData.MaxHeight;
+            }
         }
 
         private void textbox_height_TextChanged(object sender, TextChangedEventArgs e)
         {
-
+            if (this.m_EditSelfObj is not null && this.m_MainUI.ItemData is not null)
+            {
+                this.m_EditSelfObj.Height = this.m_MainUI.ItemData.Height;
+            }
         }
     }
 

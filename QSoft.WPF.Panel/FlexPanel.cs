@@ -195,6 +195,14 @@ namespace QSoft.WPF.Panel
                 }
                 else if (!isRow && basis > 0)
                 {
+                    if (basis > child.MaxHeight)
+                    {
+                        basis = child.MaxHeight;
+                    }
+                    else if (basis < child.MinHeight)
+                    {
+                        basis = child.MinHeight;
+                    }
                     childDesiredSize.Height = basis;
                 }
                 if (isRow)
@@ -262,6 +270,14 @@ namespace QSoft.WPF.Panel
                     }
                     else
                     {
+                        if (basis > child.MaxHeight)
+                        {
+                            basis = child.MaxHeight;
+                        }
+                        else if (basis < child.MinHeight)
+                        {
+                            basis = child.MinHeight;
+                        }
                         rcc.Height = basis;
                     }
                 }
