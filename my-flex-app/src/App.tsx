@@ -17,40 +17,6 @@ function App() {
   const [containerOpen, setContainerOpen] = useState(false);
   const [itemOpen, setItemOpen] = useState(false);
   const [themeMode, setThemeMode] = useThemeMode();
-  // const [themeMode, setThemeMode] = useState<Theme>('system');
-  // const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
-
-  // type Theme = "dark" | "light" | "system";
-  // useEffect(() => {
-  //   if (themeMode === 'dark') {
-  //     setIsDarkMode(true);
-  //   }
-  //   else if (themeMode === 'system') {
-  //     let systemdark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-  //     setIsDarkMode(systemdark);
-  //   }
-  //   else {
-  //     setIsDarkMode(false)
-  //   }
-  // }, [themeMode]);
-
-  // useEffect(() => {
-  //   const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-  //   const handleChange = (e: MediaQueryListEvent) => {
-  //     if (themeMode === 'system') {
-  //       const isDark = e.matches;
-  //       setIsDarkMode(isDark);
-  //     }
-  //   };
-  //   mediaQuery.addEventListener('change', handleChange);
-  //   return () => {
-  //     mediaQuery.removeEventListener('change', handleChange);
-  //   };
-  // }, []);
-
-  // useEffect(() => {
-  //   document.documentElement.classList.toggle('dark', isDarkMode);
-  // }, [isDarkMode])
 
   const addItem = () => {
     const admin: ItemSettingContext = {

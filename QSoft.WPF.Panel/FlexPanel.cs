@@ -167,7 +167,7 @@ namespace QSoft.WPF.Panel
 
             var desiredSize = new Size(0, 0);
             var remainingSize = availableSize;
-
+            
             bool isRow = this.FlexDirection == FlexDirection.Row;
             remainingSize.Width = Math.Max(0.0, remainingSize.Width - (this.Padding.Left + this.Padding.Right));
             remainingSize.Height = Math.Max(0.0, remainingSize.Height - (this.Padding.Top + this.Padding.Bottom));
@@ -177,8 +177,8 @@ namespace QSoft.WPF.Panel
                 Size sz = new(remainingSize.Width, remainingSize.Height);
                 var basis = GetBasis(child);
 
-                child.Measure(remainingSize);
-
+                //child.Measure(remainingSize);
+                child.Measure(availableSize);
                 var childDesiredSize = child.DesiredSize;
 
                 if (isRow && basis > 0)
@@ -238,7 +238,6 @@ namespace QSoft.WPF.Panel
 #if DEBUG
             System.Diagnostics.Debug.WriteLine($"{this.Name} MeasureOverride: {desiredSize}");
 #endif
-
             return desiredSize;
         }
 
