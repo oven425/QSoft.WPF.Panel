@@ -8,25 +8,14 @@
              d:DataContext="{d:DesignInstance Type=local:FlexItemVM}"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              d:DesignHeight="450" d:DesignWidth="800">
-    <Border BorderThickness="1" Background="Green" BorderBrush="Red" Padding="5">
+    <Border BorderThickness="1" CornerRadius="3" Background="Green" BorderBrush="Red" Padding="5">
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Grid>
-                <!--<i:Interaction.Triggers>
-                <i:EventTrigger EventName="MouseEnter">
-                    <i:ChangePropertyAction TargetName="button_edit" PropertyName="Visibility" Value="Visible"/>
-                </i:EventTrigger>
-                <i:EventTrigger EventName="MouseLeave">
-                    <i:ChangePropertyAction TargetName="button_edit" PropertyName="Visibility" Value="Hidden"/>
-                </i:EventTrigger>
-            </i:Interaction.Triggers>-->
-                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                <!--<Button x:Name="button_edit" Click="button_edit_Click" Content="Edit" Visibility="Hidden"/>-->
-            </Grid>
+            <TextBlock Text="{Binding Name}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             <Button Grid.Column="1" x:Name="button_edit" Click="button_edit_Click">
                 <Path Fill="#000000" Data="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z" />
             </Button>

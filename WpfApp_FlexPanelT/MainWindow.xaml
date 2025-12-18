@@ -136,8 +136,11 @@
 
         </qpanel:FlexPanel>
         <GridSplitter Grid.Column="1" Width="2" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray"/>
-        <ScrollViewer x:Name="scollviwer_panel" Grid.Column="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+        <ScrollViewer Padding="3" Background="Gray" x:Name="scollviwer_panel" Grid.Column="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
             <qpanel:FlexPanel FlexDirection="Row" x:Name="flexpanel" Grid.Column="2">
+                <qpanel:FlexPanel.Background>
+                    <SolidColorBrush Color="{local:Oklch 0.21, 0.034, 264.665}"/>
+                </qpanel:FlexPanel.Background>
 
             </qpanel:FlexPanel>
 

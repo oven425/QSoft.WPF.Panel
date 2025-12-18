@@ -17,7 +17,7 @@ namespace WpfApp_FlexPanelT
         {
             var clr = _uiSettings.GetColorValue(UIColorType.Background);
             SystemEvents.UserPreferenceChanged += SystemEvents_UserPreferenceChanged;
-            base.OnStartup(e);
+            base.OnStartup(e); 
         }
 
         private void SystemEvents_UserPreferenceChanged(object sender, UserPreferenceChangedEventArgs e)

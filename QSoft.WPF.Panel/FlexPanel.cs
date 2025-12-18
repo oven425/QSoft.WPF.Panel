@@ -124,7 +124,6 @@ namespace QSoft.WPF.Panel
             }
         }
 
-
         void OnMaxWidthChanged(object? sender, EventArgs e)
         {
             if (this.FlexDirection != FlexDirection.Row) return;
@@ -166,15 +165,15 @@ namespace QSoft.WPF.Panel
 
 
             var desiredSize = new Size(0, 0);
-            var remainingSize = availableSize;
+            //var remainingSize = availableSize;
             
             bool isRow = this.FlexDirection == FlexDirection.Row;
-            remainingSize.Width = Math.Max(0.0, remainingSize.Width - (this.Padding.Left + this.Padding.Right));
-            remainingSize.Height = Math.Max(0.0, remainingSize.Height - (this.Padding.Top + this.Padding.Bottom));
+            //remainingSize.Width = Math.Max(0.0, remainingSize.Width - (this.Padding.Left + this.Padding.Right));
+            //remainingSize.Height = Math.Max(0.0, remainingSize.Height - (this.Padding.Top + this.Padding.Bottom));
             foreach (FrameworkElement child in InternalChildren)
             {
                 if (child == null) continue;
-                Size sz = new(remainingSize.Width, remainingSize.Height);
+                //Size sz = new(remainingSize.Width, remainingSize.Height);
                 var basis = GetBasis(child);
 
                 //child.Measure(remainingSize);
@@ -209,16 +208,15 @@ namespace QSoft.WPF.Panel
                 {
                     desiredSize.Width += childDesiredSize.Width;
                     desiredSize.Height = Math.Max(desiredSize.Height, childDesiredSize.Height);
-                    remainingSize.Width = Math.Max(0.0, remainingSize.Width - childDesiredSize.Width);
+                    //remainingSize.Width = Math.Max(0.0, remainingSize.Width - childDesiredSize.Width);
                 }
                 else
                 {
                     desiredSize.Width = Math.Max(desiredSize.Width, childDesiredSize.Width);
                     desiredSize.Height += childDesiredSize.Height;
-                    remainingSize.Height = Math.Max(0.0, remainingSize.Height - childDesiredSize.Height);
+                    //remainingSize.Height = Math.Max(0.0, remainingSize.Height - childDesiredSize.Height);
                 }
             }
-
             
             if (isRow)
             {
@@ -446,14 +444,17 @@ namespace QSoft.WPF.Panel
         }
 
         double TotalGap()
-        {
-            var totalgap = 0.0;
-            if(this.InternalChildren.Count >1)
-            {
-                totalgap = this.Gap * (InternalChildren.Count - 1);
-            }
-            return totalgap;
-        }
+            => this.InternalChildren.Count > 1 
+            ? this.Gap * (InternalChildren.Count - 1)
+            : 0;
+        //{
+        //    var totalgap = 0.0;
+        //    if(this.InternalChildren.Count >1)
+        //    {
+        //        totalgap = this.Gap * (InternalChildren.Count - 1);
+        //    }
+        //    return totalgap;
+        //}
 
         void CalacJustifyContent(Dictionary<FrameworkElement, Rect> els, Size finalSize)
         {
