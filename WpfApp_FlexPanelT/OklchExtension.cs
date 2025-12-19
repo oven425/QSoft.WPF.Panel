@@ -22,7 +22,15 @@ namespace WpfApp_FlexPanelT
         // 必須覆寫的核心方法：返回 XAML 屬性的值
         public override object ProvideValue(IServiceProvider serviceProvider)
         {
-            return OklchConverter.ToSrgb(L, C, H);
+            try
+            {
+                return OklchConverter.ToSrgb(L, C, H);
+            }
+            catch(Exception)
+            {
+
+            }
+            return Colors.Transparent;
         }
     }
 

@@ -139,7 +139,7 @@
         <ScrollViewer Padding="3" Background="Gray" x:Name="scollviwer_panel" Grid.Column="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
             <qpanel:FlexPanel FlexDirection="Row" x:Name="flexpanel" Grid.Column="2">
                 <qpanel:FlexPanel.Background>
-                    <SolidColorBrush Color="{local:Oklch 0.21, 0.034, 264.665}"/>
+                    <SolidColorBrush Color="#00FFFFFF"/>
                 </qpanel:FlexPanel.Background>
 
             </qpanel:FlexPanel>
