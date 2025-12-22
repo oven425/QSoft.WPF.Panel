@@ -3,8 +3,11 @@ using System.Windows.Media;
 
 namespace WpfApp_FlexPanelT
 {
+    [ContentProperty(nameof(CssOklch))]
+    [MarkupExtensionReturnType(typeof(Color))]
     public class OklchExtension : MarkupExtension
     {
+        public string CssOklch { get; set; }
         // 核心屬性：接收 Oklch 分量
         public double L { get; set; } // Lightness (0.0 to 100.0)
         public double C { get; set; } // Chroma (0.0 to ~0.37)
@@ -18,12 +21,32 @@ namespace WpfApp_FlexPanelT
             H = h;  
         }
 
+        public OklchExtension(string cssOklch)
+        {
+            CssOklch = cssOklch;
+        }
+
+
+
+
         public OklchExtension() { }
         // 必須覆寫的核心方法：返回 XAML 屬性的值
         public override object ProvideValue(IServiceProvider serviceProvider)
         {
             try
             {
+                if(!string.IsNullOrEmpty(CssOklch))
+                {
+                    CssOklch = CssOklch.Replace("oklch", "").Replace("(","").Replace(")", "");
+                    // 解析 RawString，格式假設為 "L,C,H"
+                    var parts = CssOklch.Split(' ');
+                    if (parts.Length == 3)
+                    {
+                        L = double.Parse(parts[0].Replace("%","").Trim());
+                        C = double.Parse(parts[1].Trim());
+                        H = double.Parse(parts[2].Trim());
+                    }
+                }
                 return OklchConverter.ToSrgb(L, C, H);
             }
             catch(Exception)

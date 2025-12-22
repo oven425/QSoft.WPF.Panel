@@ -109,7 +109,7 @@ namespace WpfApp_FlexPanelT
 
         void ShowScrollbar(bool data)
         {
-            if (data == true)
+            if (data)
             {
                 scollviwer_panel.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
                 scollviwer_panel.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
@@ -172,6 +172,27 @@ namespace WpfApp_FlexPanelT
             {
                 this.m_EditSelfObj.Height = this.m_MainUI.ItemData.Height;
             }
+        }
+
+        private void radiobutton_system_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void radiobutton_light_Click(object sender, RoutedEventArgs e)
+        {
+            var dicts = Application.Current.Resources.MergedDictionaries;
+            ResourceDictionary themeDict = new ResourceDictionary { Source = new Uri("/Theme/Light.xaml", UriKind.RelativeOrAbsolute) };
+            dicts.Clear();
+            dicts.Add(themeDict);
+        }
+
+        private void radiobutton_dark_Click(object sender, RoutedEventArgs e)
+        {
+            var dicts = Application.Current.Resources.MergedDictionaries;
+            ResourceDictionary themeDict = new ResourceDictionary { Source = new Uri("/Theme/Dark.xaml", UriKind.RelativeOrAbsolute) };
+            dicts.Clear();
+            dicts.Add(themeDict);
         }
     }
 

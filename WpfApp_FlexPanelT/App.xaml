@@ -4,6 +4,12 @@
              xmlns:local="clr-namespace:WpfApp_FlexPanelT"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <ResourceDictionary Source="/Theme/DarkColor.xaml"/>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!--<ResourceDictionary Source="/Theme/Color.xaml"/>-->
+                <ResourceDictionary Source="/Theme/Light.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+        
     </Application.Resources>
 </Application>

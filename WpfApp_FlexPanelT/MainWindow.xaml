@@ -139,7 +139,7 @@
         <ScrollViewer Padding="3" Background="Gray" x:Name="scollviwer_panel" Grid.Column="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
             <qpanel:FlexPanel FlexDirection="Row" x:Name="flexpanel" Grid.Column="2">
                 <qpanel:FlexPanel.Background>
-                    <SolidColorBrush Color="#00FFFFFF"/>
+                    <SolidColorBrush Color="{DynamicResource color-gray-950}"/>
                 </qpanel:FlexPanel.Background>
 
             </qpanel:FlexPanel>
@@ -157,5 +157,12 @@
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
         </ItemsControl>-->
+        <StackPanel>
+            <RadioButton x:Name="radiobutton_system" Click="radiobutton_system_Click">System</RadioButton>
+            <RadioButton x:Name="radiobutton_light" IsChecked="True" Click="radiobutton_light_Click">Light</RadioButton>
+            <RadioButton x:Name="radiobutton_dark" Click="radiobutton_dark_Click">Dark</RadioButton>
+            <Border BorderThickness="1" BorderBrush="Red" Width="100" Height="100" Background="{DynamicResource border_br}"/>
+
+        </StackPanel>
     </Grid>
 </Window>
