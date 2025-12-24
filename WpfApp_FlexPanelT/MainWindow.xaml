@@ -17,12 +17,8 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <qpanel:FlexPanel FlexDirection="Column" AlignItems="Stretch" Gap="5">
-            <!--<Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>-->
             <Button x:Name="button_addflex" Click="button_addflex_Click">Add Flex Item</Button>
-            <TabControl x:Name="tabcontrol" qpanel:FlexPanel.Grow="1" Grid.Row="1" >
+            <TabControl x:Name="tabcontrol" qpanel:FlexPanel.Grow="1" Grid.Row="1">
                 <TabItem Header="Container">
                     <qpanel:FlexPanel FlexDirection="Column" Gap="8" AlignItems="Stretch">
                         <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
@@ -136,13 +132,20 @@
 
         </qpanel:FlexPanel>
         <GridSplitter Grid.Column="1" Width="2" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray"/>
-        <ScrollViewer Padding="3" Background="Gray" x:Name="scollviwer_panel" Grid.Column="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-            <qpanel:FlexPanel FlexDirection="Row" x:Name="flexpanel" Grid.Column="2">
-                <qpanel:FlexPanel.Background>
-                    <SolidColorBrush Color="{DynamicResource color-gray-950}"/>
-                </qpanel:FlexPanel.Background>
+        <ScrollViewer Padding="6" x:Name="scollviwer_panel" Grid.Column="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+            <qpanel:FlexPanel FlexDirection="Row" x:Name="flexpanel" Grid.Column="2" Background="{DynamicResource br-gray-950}">
+                <Button qpanel:FlexPanel.Basis="100">Test1</Button>
+                <Button qpanel:FlexPanel.Basis="200">Test2</Button>
+                <Button qpanel:FlexPanel.Basis="300">Test3</Button>
+
 
             </qpanel:FlexPanel>
+
+            <!--<qpanel:FlexPanel FlexDirection="Row" Gap="8">
+                <Button qpanel:FlexPanel.Basis="200">Test1</Button>
+                <Button qpanel:FlexPanel.AlignSelf="End">Test2</Button>
+                <Button qpanel:FlexPanel.AlignSelf="Center">Test3</Button>
+            </qpanel:FlexPanel>-->
 
         </ScrollViewer>
         <!--<ItemsControl Grid.Column="2" x:Name="itemscontrol_flexpanel">
@@ -157,12 +160,12 @@
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
         </ItemsControl>-->
-        <StackPanel>
+        <!--<StackPanel>
             <RadioButton x:Name="radiobutton_system" Click="radiobutton_system_Click">System</RadioButton>
             <RadioButton x:Name="radiobutton_light" IsChecked="True" Click="radiobutton_light_Click">Light</RadioButton>
             <RadioButton x:Name="radiobutton_dark" Click="radiobutton_dark_Click">Dark</RadioButton>
             <Border BorderThickness="1" BorderBrush="Red" Width="100" Height="100" Background="{DynamicResource border_br}"/>
 
-        </StackPanel>
+        </StackPanel>-->
     </Grid>
 </Window>

@@ -65,7 +65,6 @@
     <Button qpanel:FlexPanel.AlignSelf="Center">Test3</Button>
 </qpanel:FlexPanel>
 ```
-
 ## Grow
 > use Grow, not set Width/Hieght when Direction Row/Column
 ```xml
@@ -75,7 +74,14 @@
     <Button>Test3</Button>
 </qpanel:FlexPanel>
 ```
-
+## Basis: 0~double.PositiveInfinity
+```xml
+<qpanel:FlexPanel FlexDirection="Row" Gap="8">
+    <Button qpanel:FlexPanel.Basis="100">Test1</Button>
+    <Button qpanel:FlexPanel.Basis="200">Test2</Button>
+    <Button qpanel:FlexPanel.Basis="300">Test3</Button>
+</qpanel:FlexPanel>
+```
 ## Refrences
 [Flexbox test](https://oven425.github.io/my-flex-app)
 

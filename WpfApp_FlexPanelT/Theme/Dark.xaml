@@ -4,6 +4,6 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="Color.xaml"/>
     </ResourceDictionary.MergedDictionaries>
-    <SolidColorBrush x:Key="border_br" Color="{DynamicResource color-gray-900}"/>
-
+    <SolidColorBrush x:Key="br-gray-900" Color="{DynamicResource color-gray-900}"/>
+    <SolidColorBrush x:Key="br-gray-950" Color="{DynamicResource color-gray-950}"/>
 </ResourceDictionary>
