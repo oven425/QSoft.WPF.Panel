@@ -12,7 +12,7 @@
     <PackageProjectUrl>https://github.com/oven425/QSoft.WPF/tree/master/QSoft.WPF.Panel</PackageProjectUrl>
     <RepositoryUrl>https://github.com/oven425/QSoft.WPF.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>Flex</PackageTags>
+    <PackageTags>Flex;WPF</PackageTags>
     <Description>custom panel of WPF
 FlexPanel like css flex</Description>
     <PackageIcon>40429294503_2b2a198be1_o.jpg</PackageIcon>

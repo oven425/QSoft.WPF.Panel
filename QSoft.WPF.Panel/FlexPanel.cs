@@ -47,7 +47,7 @@ namespace QSoft.WPF.Panel
         End,
         Center,
         Stretch,
-        //BaeseLine
+        BaeseLine
     }
 
     public class FlexPanel : System.Windows.Controls.Panel

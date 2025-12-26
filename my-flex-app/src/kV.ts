@@ -22,6 +22,7 @@ export const alignItems_:Kv<string, string>[] = [
   {k:'Center', v:'items-center'},
   {k:'End', v:'items-end'},
   {k:'Stretch', v:'items-stretch'},
+  {k:'Baseline', v:'items-baseline'}
 ]
 
 export const alignSelfs: Kv<string, string>[] = [

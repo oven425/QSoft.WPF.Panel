@@ -11,6 +11,9 @@ export type ItemSettingContext = {
     minWidth: string
     maxWidth: string
     width: string
+    minHeight:string
+    maxHeight:string
+    height:string
 }
 
 type ItemSettingProps = {
@@ -50,31 +53,21 @@ function ItemSetting(props: ItemSettingProps) {
             <div className="grid grid-cols-2 gap-x-1">
                 <div className="flex flex-col">
                     <h5>Min-width({basisunit.current})</h5>
-                    <input className="grow" placeholder="0" value={props.itemSetting?.minWidth} onChange={x => onInputChange('minWidth', x.target.value)} />
+                    <input placeholder="0" value={props.itemSetting?.minWidth} onChange={x => onInputChange('minWidth', x.target.value)} />
                     <h5>Max-width</h5>
-                    <input className="grow" placeholder="none" value={props.itemSetting?.maxWidth} onChange={x => onInputChange('maxWidth', x.target.value)} />
+                    <input placeholder="none" value={props.itemSetting?.maxWidth} onChange={x => onInputChange('maxWidth', x.target.value)} />
                     <h5>Width</h5>
-                    <input className="grow" placeholder="auto" value={props.itemSetting?.width} onChange={x => onInputChange('width', x.target.value)} />
+                    <input placeholder="auto" value={props.itemSetting?.width} onChange={x => onInputChange('width', x.target.value)} />
                 </div>
                 <div className="flex flex-col">
                     <h5>Min-height({basisunit.current})</h5>
-                    <input placeholder="0" value={props.itemSetting?.minWidth} onChange={x => onInputChange('minWidth', x.target.value)} />
+                    <input placeholder="0" value={props.itemSetting?.minHeight} onChange={x => onInputChange('minHeight', x.target.value)} />
                     <h5>Max-height</h5>
-                    <input placeholder="none" value={props.itemSetting?.maxWidth} onChange={x => onInputChange('maxWidth', x.target.value)} />
+                    <input placeholder="none" value={props.itemSetting?.maxHeight} onChange={x => onInputChange('maxHeight', x.target.value)} />
                     <h5>Height</h5>
-                    <input placeholder="auto" value={props.itemSetting?.width} onChange={x => onInputChange('width', x.target.value)} />
+                    <input placeholder="auto" value={props.itemSetting?.height} onChange={x => onInputChange('height', x.target.value)} />
                 </div>
             </div>
-
-            {/* <div>
-                <h5>Min-width({basisunit.current})</h5>
-                <input placeholder="auto" value={props.itemSetting?.minWidth} onChange={x => onInputChange('minWidth', x.target.value)}/>
-                <h5>Max-width</h5>
-                <input placeholder="none" value={props.itemSetting?.maxWidth} onChange={x => onInputChange('maxWidth', x.target.value)}/>
-                <h5>Width</h5>
-                <input placeholder="auto" value={props.itemSetting?.width} onChange={x => onInputChange('width', x.target.value)}/>
-            </div> */}
-
         </div>
     )
 }
