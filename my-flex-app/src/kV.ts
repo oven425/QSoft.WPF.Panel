@@ -31,5 +31,6 @@ export const alignSelfs: Kv<string, string>[] = [
     { k: 'Center', v: 'self-center' },
     { k: 'End', v: 'self-end' },
     { k: 'Stretch', v: 'self-stretch' },
+    { k: 'Baseline', v: 'self-baseline' },
 ]
 

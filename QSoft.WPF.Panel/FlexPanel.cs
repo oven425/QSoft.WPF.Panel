@@ -447,14 +447,6 @@ namespace QSoft.WPF.Panel
             => this.InternalChildren.Count > 1 
             ? this.Gap * (InternalChildren.Count - 1)
             : 0;
-        //{
-        //    var totalgap = 0.0;
-        //    if(this.InternalChildren.Count >1)
-        //    {
-        //        totalgap = this.Gap * (InternalChildren.Count - 1);
-        //    }
-        //    return totalgap;
-        //}
 
         void CalacJustifyContent(Dictionary<FrameworkElement, Rect> els, Size finalSize)
         {
