@@ -76,7 +76,7 @@
                         </qpanel:FlexPanel>
                         <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
                             <TextBlock Text="Flex-Shrink"/>
-                            <TextBox x:Name="textbox_flexshrink"  Text="{Binding ItemData.FlexShrink, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBox x:Name="textbox_flexshrink" TextChanged="textbox_flexshrink_TextChanged"  Text="{Binding ItemData.FlexShrink, UpdateSourceTrigger=PropertyChanged}"/>
                         </qpanel:FlexPanel>
                         <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
                             <TextBlock Text="Flex-Basis"/>
@@ -134,11 +134,6 @@
         <GridSplitter Grid.Column="1" Width="2" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray"/>
         <ScrollViewer Padding="6" x:Name="scollviwer_panel" Grid.Column="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
             <qpanel:FlexPanel FlexDirection="Row" x:Name="flexpanel" Grid.Column="2" Background="{DynamicResource br-gray-950}">
-                <Button qpanel:FlexPanel.Basis="100">Test1</Button>
-                <Button qpanel:FlexPanel.Basis="200">Test2</Button>
-                <Button qpanel:FlexPanel.Basis="300">Test3</Button>
-
-
             </qpanel:FlexPanel>
 
             <!--<qpanel:FlexPanel FlexDirection="Row" Gap="8">

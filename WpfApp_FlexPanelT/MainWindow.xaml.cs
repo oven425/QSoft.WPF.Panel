@@ -194,6 +194,14 @@ namespace WpfApp_FlexPanelT
             dicts.Clear();
             dicts.Add(themeDict);
         }
+
+        private void textbox_flexshrink_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (this.m_EditSelfObj is not null && this.m_MainUI.ItemData is not null)
+            {
+                FlexPanel.SetShrink(this.m_EditSelfObj, this.m_MainUI.ItemData.FlexShrink);
+            }
+        }
     }
 
     public  class MainUI: INotifyPropertyChanged
