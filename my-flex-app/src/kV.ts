@@ -15,6 +15,7 @@ export const justifyContents:Kv<string, string>[] = [
 export const directions:Kv<string, string>[] = [
   {k:'Row', v:'flex-row'},
   {k:'Column', v:'flex-col'},
+  {k:'Row-Reverse', v:'flex-row-reverse'}
 ]
 
 export const alignItems_:Kv<string, string>[] = [

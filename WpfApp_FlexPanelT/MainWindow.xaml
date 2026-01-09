@@ -26,6 +26,7 @@
                             <ComboBox SelectedValuePath="Tag" SelectedValue="{Binding FlexDirection, ElementName=flexpanel}">
                                 <ComboBoxItem Content="Row" Tag="{x:Static qpanel:FlexDirection.Row}"/>
                                 <ComboBoxItem Content="Column" Tag="{x:Static qpanel:FlexDirection.Column}"/>
+                                <ComboBoxItem Content="RowReverse" Tag="{x:Static qpanel:FlexDirection.RowReverse}"/>
                             </ComboBox>
                         </qpanel:FlexPanel>
                         <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
@@ -133,14 +134,14 @@
         </qpanel:FlexPanel>
         <GridSplitter Grid.Column="1" Width="2" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray"/>
         <ScrollViewer Padding="6" x:Name="scollviwer_panel" Grid.Column="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-            <!--<qpanel:FlexPanel FlexDirection="Row" x:Name="flexpanel" Grid.Column="2" Background="{DynamicResource br-gray-950}">
-            </qpanel:FlexPanel>-->
+            <qpanel:FlexPanel FlexDirection="Row" x:Name="flexpanel" Grid.Column="2" Background="{DynamicResource br-gray-950}">
+            </qpanel:FlexPanel>
 
-            <qpanel:FlexPanel FlexDirection="Row" Gap="8">
+            <!--<qpanel:FlexPanel FlexDirection="Row" Gap="8">
                 <Border Width="30" Padding="3" BorderBrush="Red" BorderThickness="1">
                     <TextBlock Text="123456789"/>
                 </Border>
-            </qpanel:FlexPanel>
+            </qpanel:FlexPanel>-->
 
         </ScrollViewer>
         <!--<ItemsControl Grid.Column="2" x:Name="itemscontrol_flexpanel">

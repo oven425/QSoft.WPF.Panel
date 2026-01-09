@@ -139,7 +139,7 @@ function App() {
                 ))
               }
 
-              <div className='bg-gray-400 min-w-0 w-16 overflow-hidden flex p-0.5 border rounded-sm dark:border-gray-600'>
+              {/* <div className='bg-gray-400 min-w-0 w-16 overflow-hidden flex p-0.5 border rounded-sm dark:border-gray-600'>
                 <p className='self-center px-3 py-1 overflow-hidden '>1234567890</p>
                 <div className="border-r dark:border-gray-600 border-neutral-400"></div>
                 <div className={`flex items-center  fill-gray-950 w-10 dark:hover:bg-gray-600`}>
@@ -149,7 +149,7 @@ function App() {
                 <div className='flex items-center w-10  fill-gray-950 dark:hover:bg-gray-600'>
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 19V7H16V19C16 20.1 15.1 21 14 21H6C4.9 21 4 20.1 4 19M6 9V19H14V9H6M13.5 4H17V6H3V4H6.5L7.5 3H12.5L13.5 4M19 17V15H21V17H19M19 13V7H21V13H19Z" /></svg>
                 </div>
-              </div>
+              </div> */}
               {/* <div className='bg-gray-400 w-12 overflow-hidden p-0.5 border rounded-sm dark:border-gray-600'>
                 <div className='truncate'>1234567890</div>
               </div> */}
