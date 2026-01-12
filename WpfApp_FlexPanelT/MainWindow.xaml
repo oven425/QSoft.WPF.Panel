@@ -27,6 +27,7 @@
                                 <ComboBoxItem Content="Row" Tag="{x:Static qpanel:FlexDirection.Row}"/>
                                 <ComboBoxItem Content="Column" Tag="{x:Static qpanel:FlexDirection.Column}"/>
                                 <ComboBoxItem Content="RowReverse" Tag="{x:Static qpanel:FlexDirection.RowReverse}"/>
+                                <ComboBoxItem Content="ColumnReverse" Tag="{x:Static qpanel:FlexDirection.ColumnReverse}"/>
                             </ComboBox>
                         </qpanel:FlexPanel>
                         <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">

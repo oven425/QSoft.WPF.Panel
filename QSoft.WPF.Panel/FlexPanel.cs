@@ -19,7 +19,7 @@ namespace QSoft.WPF.Panel
         Row,
         RowReverse,
         Column,
-        //ColumnReverse
+        ColumnReverse
     }
     public enum JustifyContent
     {
@@ -345,7 +345,7 @@ namespace QSoft.WPF.Panel
                     
                     var ih = Math.Max(finalSize.Height - zerogrow_h - totalgap - this.Padding.Top - this.Padding.Bottom, 0);
 
-                    ih = ih / sum;
+                    ih /= sum;
                     foreach (var oo in els.Select((x, idx) => x.Key))
                     {
                         item_h = grows[oo] * ih;
@@ -507,6 +507,21 @@ namespace QSoft.WPF.Panel
                                 }
                             }
                             break;
+                        case FlexDirection.ColumnReverse:
+                            using (var enumerator = els.GetEnumerator())
+                            {
+                                y = finalSize.Height - this.Padding.Bottom;
+                                while (enumerator.MoveNext())
+                                {
+                                    var kvp = enumerator.Current;
+                                    Rect rcc = els[kvp.Key];
+                                    y -= rcc.Height;
+                                    rcc.Y = y;
+                                    y += -this.Gap;
+                                    els[kvp.Key] = rcc;
+                                }
+                            }
+                            break;
                     }
                     break;
                 case JustifyContent.End:
@@ -542,15 +557,16 @@ namespace QSoft.WPF.Panel
                                 var child = els.ElementAt(i).Key;
                                 Rect rcc = els[child];
                                 item_h = rcc.Height;
-                                y -= item_h;
-
-                                els[child] = new Rect()
-                                {
-                                    X = 0,
-                                    Y = y,
-                                    Height = item_h,
-                                    Width = child.DesiredSize.Width,
-                                };
+                                y -= rcc.Height;
+                                rcc.Y = y;
+                                //els[child] = new Rect()
+                                //{
+                                //    X = 0,
+                                //    Y = y,
+                                //    Height = item_h,
+                                //    Width = child.DesiredSize.Width,
+                                //};
+                                els[child] = rcc;
                                 y -= this.Gap;
                             }
                             break;
@@ -588,28 +604,36 @@ namespace QSoft.WPF.Panel
                             break;
                         case FlexDirection.Column:
                             var totalh = els.Values.Sum(x => x.Height);
-                            var totalgap_h = this.Gap * (els.Count - 1);
-                            if (totalgap_h <= 0)
-                            {
-                                totalgap_h = 0;
-                            }
-                            y = (finalSize.Height - totalh - totalgap_h) / 2;
+                            totalgap = this.TotalGap();
+                            //if (totalgap_h <= 0)
+                            //{
+                            //    totalgap_h = 0;
+                            //}
+                            //y = (finalSize.Height - totalh - totalgap_h) / 2;
+                            y = Math.Max(0, (finalSize.Height - totalh - totalgap) / 2);
                             foreach (var oo in els.Select(x => x.Key))
                             {
                                 Rect rcc = els[oo];
-                                item_h = rcc.Height;
-                                els[oo] = new Rect()
-                                {
-                                    X = 0,
-                                    Y = y,
-                                    Height = item_h,
-                                    Width = finalSize.Width,
-                                };
-                                y += item_h + this.Gap;
+                                rcc.Y = y;
+                                els[oo] = rcc;
+                                y += rcc.Height + this.Gap;
+                            }
+                            break;
+                        case FlexDirection.ColumnReverse:
+                            totalh = els.Values.Sum(x => x.Height);
+                            totalgap = this.TotalGap();
+                            y = Math.Max(0, (finalSize.Height - totalh - totalgap) / 2);
+                            y = finalSize.Height - y;
+                            foreach (var oo in els.Select(x => x.Key))
+                            {
+                                Rect rcc = els[oo];
+                                y -= rcc.Height;
+                                rcc.Y = y;
+                                els[oo] = rcc;
+                                y -= this.Gap;
                             }
                             break;
                     }
-
                     break;              
                 case JustifyContent.SpaceAround:
                     switch (this.FlexDirection)
@@ -622,7 +646,7 @@ namespace QSoft.WPF.Panel
 
                             foreach (var oo in els.Select(x => x.Key))
                             {
-                                x = x + iw;
+                                x += iw;
                                 var rcc = els[oo];
                                 rcc.X = x;
                                 els[oo] = rcc;
@@ -637,9 +661,9 @@ namespace QSoft.WPF.Panel
                             x = finalSize.Width - this.Padding.Right;
                             foreach (var oo in els.Select(x => x.Key))
                             {
-                                x = x - iw;
+                                x -= iw;
                                 var rcc = els[oo];
-                                x = x - rcc.Width;
+                                x -= rcc.Width;
                                 rcc.X = x;
                                 els[oo] = rcc;
                                 x = x - iw - this.Gap;
@@ -655,11 +679,11 @@ namespace QSoft.WPF.Panel
                             }
                             else
                             {
-                                ih = ih / (InternalChildren.Count * 2);
+                                ih /= (InternalChildren.Count * 2);
                             }
                             foreach (var oo in els.Select(x => x.Key))
                             {
-                                y = y + ih;
+                                y += ih;
                                 item_h = els[oo].Height;
                                 els[oo] = new Rect()
                                 {
@@ -701,7 +725,7 @@ namespace QSoft.WPF.Panel
                                 foreach (var oo in els.Select(x => x.Key))
                                 {
                                     var rcc = els[oo];
-                                    x = x-rcc.Width;
+                                    x -= rcc.Width;
                                     rcc.X = x;
                                     els[oo] = rcc;
                                     x -= iw  - this.Gap;
@@ -717,7 +741,7 @@ namespace QSoft.WPF.Panel
                                 }
                                 else
                                 {
-                                    ih = ih / (InternalChildren.Count + 1);
+                                    ih /= (InternalChildren.Count + 1);
                                 }
                                 y = y + ih;
                                 foreach (var oo in els.Select(x => x.Key))
@@ -753,53 +777,6 @@ namespace QSoft.WPF.Panel
                                 els[oo] = rcc;
                                 x = x + iw + rcc.Width + this.Gap;
                             }
-                            //for (int i = 0; i < els.Count; i++)
-                            //{
-                            //    var child = els.ElementAt(i).Key;
-
-                            //    item_w = els[child].Width;
-                            //    if (double.IsNaN(child.Width))
-                            //    {
-                            //        //item_w = iw;
-                            //    }
-                            //    else if (item_w > iw)
-                            //    {
-                            //        item_w = iw;
-                            //    }
-                            //    Rect rc;
-                            //    if (i == 0)
-                            //    {
-                            //        rc = new Rect()
-                            //        {
-                            //            X = x,
-                            //            Y = y,
-                            //            Height = finalSize.Height,
-                            //            Width = item_w,
-                            //        };
-                            //    }
-                            //    else if (i == InternalChildren.Count - 1)
-                            //    {
-                            //        rc = new Rect()
-                            //        {
-                            //            X = x + (iw - item_w),
-                            //            Y = y,
-                            //            Height = finalSize.Height,
-                            //            Width = item_w,
-                            //        };
-                            //    }
-                            //    else
-                            //    {
-                            //        rc = new Rect()
-                            //        {
-                            //            X = x + (iw - item_w) / 2,
-                            //            Y = y,
-                            //            Height = finalSize.Height,
-                            //            Width = item_w,
-                            //        };
-                            //    }
-                            //    els[child] = rc;
-                            //    x += iw + this.Gap;
-                            //}
                             break;
                         case FlexDirection.RowReverse:
                             totalgapw = this.TotalGap();
