@@ -462,11 +462,8 @@ namespace QSoft.WPF.Panel
 
         void CalacJustifyContent(Dictionary<FrameworkElement, Rect> els, Size finalSize)
         {
-            //var item_w = 0.0;
-            var item_h = 0.0;
             double x = this.Padding.Left;
             double y = this.Padding.Top;
-
             switch (this.JustifyContent)
             {
                 case JustifyContent.Start:
@@ -679,14 +676,6 @@ namespace QSoft.WPF.Panel
                             var totalgaph = this.TotalGap();
                             var totalh = els.Values.Sum(x => x.Height);
                             var ih = (finalSize.Height - this.Padding.Top - this.Padding.Bottom - totalgaph - totalh);
-                            //if (ih < 0)
-                            //{
-                            //    ih = 0;
-                            //}
-                            //else
-                            //{
-                            //    ih /= (InternalChildren.Count * 2);
-                            //}
                             ih = ih < 0 ? 0 : ih /= (InternalChildren.Count * 2);
                             foreach (var oo in els.Select(x => x.Key))
                             {
@@ -766,14 +755,6 @@ namespace QSoft.WPF.Panel
                                     var rcc = els[oo];
                                     rcc.Y = y;
                                     els[oo] = rcc;
-                                    //item_h = els[oo].Height;
-                                    //els[oo] = new Rect()
-                                    //{
-                                    //    X = x,
-                                    //    Y = y,
-                                    //    Height = item_h,
-                                    //    Width = finalSize.Width,
-                                    //};
                                     y += ih + rcc.Height + this.Gap;
                                 }
                                 break;
@@ -851,62 +832,6 @@ namespace QSoft.WPF.Panel
                                 els[oo] = rcc;
                                 y = y + ih + rcc.Height + this.Gap;
                             }
-
-                            //if (ih < 0)
-                            //{
-                            //    ih = 0;
-                            //}
-                            //else
-                            //{
-                            //    ih = ih / InternalChildren.Count;
-                            //}
-                            //for (int i = 0; i < els.Count; i++)
-                            //{
-                            //    var child = els.ElementAt(i).Key;
-
-                            //    item_h = els[child].Height;
-                            //    if (double.IsNaN(child.Height))
-                            //    {
-                            //        //item_h = ih;
-                            //    }
-                            //    else if (item_w > ih)
-                            //    {
-                            //        item_h = ih;
-                            //    }
-                            //    Rect rc;
-                            //    if (i == 0)
-                            //    {
-                            //        rc = new Rect()
-                            //        {
-                            //            X = x,
-                            //            Y = y,
-                            //            Height = item_h,
-                            //            Width = finalSize.Width,
-                            //        };
-                            //    }
-                            //    else if (i == InternalChildren.Count - 1)
-                            //    {
-                            //        rc = new Rect()
-                            //        {
-                            //            X = x,
-                            //            Y = y + (ih - item_h),
-                            //            Height = item_h,
-                            //            Width = finalSize.Width,
-                            //        };
-                            //    }
-                            //    else
-                            //    {
-                            //        rc = new Rect()
-                            //        {
-                            //            X = x,
-                            //            Y = y + (ih - item_h) / 2,
-                            //            Height = item_h,
-                            //            Width = finalSize.Width,
-                            //        };
-                            //    }
-                            //    els[child] = rc;
-                            //    y += ih + this.Gap;
-                            //}
                             break;
                         case FlexDirection.ColumnReverse:
                             totalgaph = this.TotalGap();
@@ -924,11 +849,8 @@ namespace QSoft.WPF.Panel
                                 y = y - ih - this.Gap;
                             }
                             break;
-
                     }
-
                     break;
-
             }
         }
     }
