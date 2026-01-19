@@ -79,7 +79,7 @@ function App() {
 
   return (
     <>
-      <div className='select-none w-screen h-screen bg-white text-neutral-700 dark:bg-gray-900 dark:text-white flex flex-col'>
+      <div className='w-screen h-screen bg-white text-neutral-700 dark:bg-gray-900 dark:text-white flex flex-col'>
         <header className='flex border-b border-neutral-400 h-15 dark:border-gray-700 py-2 justify-between'>
           <h1 className='text-3xl font-semibold dark:text-white ml-4'>Flex test tool</h1>
           <div className='flex pr-4 gap-2'>
@@ -107,14 +107,17 @@ function App() {
             </div>
           </div>
         </header>
-        <div className='flex flex-row grow'>
+        <div className='flex flex-row grow min-h-0'>
           <aside className='hidden md:flex shrink-0 gap-1 w-66 pt-1 pl-1 pr-2 justify-start flex-col border-r border-neutral-400 dark:border-gray-700'>
             <button className=' text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 font-medium rounded-sm text-sm px-5 py-2.5  dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700' onClick={() => addItem()}>add item</button>
             <div className='grid grid-cols-2 '>
               <div className={`${ss === 'selectContainer' ? 'dark:bg-gray-800 bg-neutral-300' : ''} rounded-sm p-1`} onClick={() => setSS("selectContainer")}>Container</div>
               <div className={`${item === null ? "invisible" : "visible"} ${ss === 'selectItem' ? 'dark:bg-gray-800 bg-neutral-300' : ''} rounded-sm p-1`} onClick={() => setSS("selectItem")}>Item</div>
               <div className='col-span-2'>
-                <ContainerSetting className={`${ss === 'selectContainer' ? 'block' : 'hidden'}`} setContainerSetting={setContainerSetting} containerSetting={containerSetting} />
+                <div className='overflow-scroll min-h-0'>
+                  <ContainerSetting className={`${ss === 'selectContainer' ? 'block' : 'hidden'}`} setContainerSetting={setContainerSetting} containerSetting={containerSetting} />
+                </div>
+                
                 <div>
                   <ItemSetting className={`${item === null || ss === 'selectContainer' ? "hidden" : "block"}`} itemSetting={item!} setItemSetting={setItem} />
                 </div>
