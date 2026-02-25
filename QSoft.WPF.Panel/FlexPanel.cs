@@ -116,11 +116,15 @@ namespace QSoft.WPF.Panel
             {
                 MaxWidthDesciptor.AddValueChanged(addfe, OnMaxWidthChanged);
                 MaxHeightDesciptor.AddValueChanged(addfe, OnMaxHeightChanged);
+                rc.Add(addfe, new Rect());
+                grows.Add(addfe, 0);
             }
             if (visualRemoved is FrameworkElement removefe)
             {
                 MaxWidthDesciptor.RemoveValueChanged(removefe, OnMaxWidthChanged);
                 MaxHeightDesciptor.RemoveValueChanged(removefe, OnMaxHeightChanged);
+                rc.Remove(removefe);
+                grows.Remove(removefe);
             }
         }
 
@@ -232,7 +236,8 @@ namespace QSoft.WPF.Panel
 #endif
             return desiredSize;
         }
-
+        readonly Dictionary<FrameworkElement, double> grows = [];
+        readonly Dictionary<FrameworkElement, Rect> rc = [];
         protected override Size ArrangeOverride(Size finalSize)
         {
             if (InternalChildren.Count == 0)
@@ -247,7 +252,7 @@ namespace QSoft.WPF.Panel
 
             System.Diagnostics.Debug.WriteLine($"{this.Name} ArrangeOverride: {finalSize}");
 
-            Dictionary<FrameworkElement, Rect> rc = [];
+            //rc.Clear();
             foreach (FrameworkElement child in InternalChildren)
             {
                 Rect rcc = new(0, 0, child.DesiredSize.Width, child.DesiredSize.Height);
@@ -283,21 +288,30 @@ namespace QSoft.WPF.Panel
                     }
                 }
 
-                rc.Add(child, rcc);
+                //rc.Add(child, rcc);
+                rc[child] = rcc;
             }
 
-            Dictionary<FrameworkElement, double> grows = [];
+            bool isclacgrow = false;
+            //grows.Clear();
             foreach (FrameworkElement child in InternalChildren)
             {
-                grows.Add(child, Math.Max(GetGrow(child), 0));
+                //grows.Add(child, Math.Max(GetGrow(child), 0));
+                var grow = GetGrow(child);
+                if(!isclacgrow && grow > 0)
+                {
+                    isclacgrow = true;
+                }
+                grows[child] = Math.Max(grow, 0);
             }
-            if (grows.Values.Any(static x => x >0))
+            //if (grows.Values.Any(static x => x >0))
+            if(isclacgrow)
             {
-                this.CalacGrow(rc, finalSize, grows);
+                this.CalacGrow(rc, finalSize, grows, this.Gap);
             }
             else
             {
-                CalacJustifyContent(rc, finalSize);
+                CalacJustifyContent(rc, finalSize, this.JustifyContent, this.Padding, this.Gap);
             }
             CalacAlignItems(rc, finalSize);
             foreach (var oo in rc)
@@ -307,60 +321,105 @@ namespace QSoft.WPF.Panel
             }
             return finalSize;
         }
-        void CalacGrow(Dictionary<FrameworkElement, Rect> els, Size finalSize, Dictionary<FrameworkElement, double> grows)
+        void CalacGrow(Dictionary<FrameworkElement, Rect> els, Size finalSize, Dictionary<FrameworkElement, double> grows, double gap)
         {
             var item_w = 0.0;
             var item_h = 0.0;
             double x = this.Padding.Left;
             double y = this.Padding.Top;
-            var child_zerogrow = grows.Where(x => x.Value == 0);
-            var sum = grows.Values.Sum();
+            //var child_zerogrow = grows.Where(x => x.Value == 0);
+            var sum = 0.0;
+            var zerogrow_w = 0.0;
+            var zerogrow_h = 0.0;
+            foreach (var oo in grows)
+            {
+                sum = sum + oo.Value;
+                if(oo.Value == 0)
+                {
+                    zerogrow_w = zerogrow_w + oo.Key.DesiredSize.Width;
+                    zerogrow_h = zerogrow_h + oo.Key.DesiredSize.Height;
+                }
+            }
             var totalgap = TotalGap();
             switch (this.FlexDirection)
             {
                 case FlexDirection.Row:
-                    var zerogrow_w = child_zerogrow.Sum(x=>x.Key.DesiredSize.Width);
+                    //var zerogrow_w = child_zerogrow.Sum(x=>x.Key.DesiredSize.Width);
                     var iw = Math.Max(finalSize.Width - zerogrow_w - totalgap - this.Padding.Left - this.Padding.Right, 0);
-                    
                     iw = iw / sum;
-                    foreach(var oo in els.Select((x,idx) => x.Key))
+                    //foreach(var oo in els.Select((x,idx) => x.Key))
+                    //{
+                    //    item_w = grows[oo] * iw;
+                    //    if(item_w <= 0)
+                    //    {
+                    //        item_w = oo.DesiredSize.Width;
+                    //    }
+                    //    els[oo] = new Rect()
+                    //    {
+                    //        X = x,
+                    //        Y = y,
+                    //        Height = oo.DesiredSize.Height,
+                    //        Width = item_w,
+                    //    };
+                    //    x += item_w + this.Gap;
+                    //}
+
+                    foreach (var oo in els)
                     {
-                        item_w = grows[oo] * iw;
-                        if(item_w <= 0)
+                        item_w = grows[oo.Key] * iw;
+                        if (item_w <= 0)
                         {
-                            item_w = oo.DesiredSize.Width;
+                            item_w = oo.Key.DesiredSize.Width;
                         }
-                        els[oo] = new Rect()
-                        {
-                            X = x,
-                            Y = y,
-                            Height = oo.DesiredSize.Height,
-                            Width = item_w,
-                        };
-                        x += item_w + this.Gap;
+                        var rcc = oo.Value;
+                        rcc.Width = item_w;
+                        rcc.X = x;
+                        els[oo.Key] = rcc;
+                        x += item_w + gap;
                     }
                     break;
                 case FlexDirection.Column:
-                    var zerogrow_h = child_zerogrow.Sum(x => x.Key.DesiredSize.Height);
+                    //var zerogrow_h = child_zerogrow.Sum(x => x.Key.DesiredSize.Height);
                     
                     var ih = Math.Max(finalSize.Height - zerogrow_h - totalgap - this.Padding.Top - this.Padding.Bottom, 0);
 
                     ih /= sum;
-                    foreach (var oo in els.Select((x, idx) => x.Key))
+                    //foreach (var oo in els.Select((x, idx) => x.Key))
+                    //{
+                    //    item_h = grows[oo] * ih;
+                    //    if (item_h <= 0)
+                    //    {
+                    //        item_h = oo.DesiredSize.Height;
+                    //    }
+                    //    els[oo] = new Rect()
+                    //    {
+                    //        X = x,
+                    //        Y = y,
+                    //        Height = item_h,
+                    //        Width = oo.DesiredSize.Width,
+                    //    };
+                    //    y += item_h + this.Gap;
+                    //}
+
+                    foreach (var oo in els)
                     {
-                        item_h = grows[oo] * ih;
+                        item_h = grows[oo.Key] * ih;
                         if (item_h <= 0)
                         {
-                            item_h = oo.DesiredSize.Height;
+                            item_h = oo.Key.DesiredSize.Height;
                         }
-                        els[oo] = new Rect()
-                        {
-                            X = x,
-                            Y = y,
-                            Height = item_h,
-                            Width = oo.DesiredSize.Width,
-                        };
-                        y += item_h + this.Gap;
+                        //els[oo] = new Rect()
+                        //{
+                        //    X = x,
+                        //    Y = y,
+                        //    Height = item_h,
+                        //    Width = oo.DesiredSize.Width,
+                        //};
+                        var rcc = oo.Value;
+                        rcc.Height = item_h;
+                        rcc.Y = y;
+                        els[oo.Key] = rcc;
+                        y += item_h + gap;
                     }
                     break;
             }
@@ -460,71 +519,116 @@ namespace QSoft.WPF.Panel
             ? this.Gap * (InternalChildren.Count - 1)
             : 0;
 
-        void CalacJustifyContent(Dictionary<FrameworkElement, Rect> els, Size finalSize)
+        void CalacJustifyContent(Dictionary<FrameworkElement, Rect> els, Size finalSize, JustifyContent justify, Thickness padding, double gap)
         {
-            double x = this.Padding.Left;
-            double y = this.Padding.Top;
-            switch (this.JustifyContent)
+            double x = padding.Left;
+            double y = padding.Top;
+            var totalw = 0.0;
+            var totalh = 0.0;
+            var totaldsw = 0.0;
+            var totaldsh = 0.0;
+            foreach (var oo in els)
+            {
+                totalw = totalw + oo.Value.Width;
+                totalh = totalh + oo.Value.Height;
+                totaldsw = totaldsw + oo.Key.DesiredSize.Width;
+                totaldsh = totaldsh + oo.Key.DesiredSize.Height;
+            }
+            switch (justify)
             {
                 case JustifyContent.Start:
                     switch (this.FlexDirection)
                     {
                         case FlexDirection.Row:
-                            using (var enumerator = els.GetEnumerator())
+                            //using (var enumerator = els.GetEnumerator())
+                            //{
+                            //    x = this.Padding.Left;
+                            //    while (enumerator.MoveNext())
+                            //    {
+                            //        var kvp = enumerator.Current;
+                            //        Rect rcc = els[kvp.Key];
+                            //        rcc.X = x;
+                            //        x = x + rcc.Width + this.Gap;
+                            //        els[kvp.Key] = rcc;
+                            //    }
+                            //}
+                            x = padding.Left;
+                            foreach (var oo in els)
                             {
-                                x = this.Padding.Left;
-                                while (enumerator.MoveNext())
-                                {
-                                    var kvp = enumerator.Current;
-                                    Rect rcc = els[kvp.Key];
-                                    rcc.X = x;
-                                    x = x + rcc.Width + this.Gap;
-                                    els[kvp.Key] = rcc;
-                                }
+                                Rect rcc = oo.Value;
+                                rcc.X = x;
+                                els[oo.Key] = rcc;
+                                x = x + rcc.Width + gap;
                             }
                             break;
                         case FlexDirection.RowReverse:
-                            x = finalSize.Width - this.Padding.Right;
-                            using (var enumerator = els.GetEnumerator())
+                            x = finalSize.Width - padding.Right;
+                            //using (var enumerator = els.GetEnumerator())
+                            //{
+                            //    while (enumerator.MoveNext())
+                            //    {
+                            //        var kvp = enumerator.Current;
+                            //        Rect rcc = els[kvp.Key];
+                            //        x -= rcc.Width;
+                            //        rcc.X = x;
+                            //        x -= this.Gap;
+                            //        els[kvp.Key] = rcc;
+                            //    }
+                            //}
+                            foreach (var oo in els)
                             {
-                                while (enumerator.MoveNext())
-                                {
-                                    var kvp = enumerator.Current;
-                                    Rect rcc = els[kvp.Key];
-                                    x -= rcc.Width;
-                                    rcc.X = x;
-                                    x -= this.Gap;
-                                    els[kvp.Key] = rcc;
-                                }
+                                Rect rcc = oo.Value;
+                                x -= rcc.Width;
+                                rcc.X = x;
+                                x -= gap;
+                                els[oo.Key] = rcc;
                             }
                             break;
                         case FlexDirection.Column:
-                            using (var enumerator = els.GetEnumerator())
+                            //using (var enumerator = els.GetEnumerator())
+                            //{
+                            //    y = this.Padding.Top;
+                            //    while (enumerator.MoveNext())
+                            //    {
+                            //        var kvp = enumerator.Current;
+                            //        Rect rcc = els[kvp.Key];
+                            //        rcc.Y = y;
+                            //        y = y + rcc.Height + this.Gap;
+                            //        els[kvp.Key] = rcc;
+                            //    }
+                            //}
+                            y = padding.Top;
+                            foreach (var oo in els)
                             {
-                                y = this.Padding.Top;
-                                while (enumerator.MoveNext())
-                                {
-                                    var kvp = enumerator.Current;
-                                    Rect rcc = els[kvp.Key];
-                                    rcc.Y = y;
-                                    y = y + rcc.Height + this.Gap;
-                                    els[kvp.Key] = rcc;
-                                }
+                                Rect rcc = oo.Value;
+                                rcc.Y = y;
+                                y = y + rcc.Height + gap;
+                                els[oo.Key] = rcc;
                             }
                             break;
                         case FlexDirection.ColumnReverse:
-                            using (var enumerator = els.GetEnumerator())
+                            //using (var enumerator = els.GetEnumerator())
+                            //{
+                            //    y = finalSize.Height - this.Padding.Bottom;
+                            //    while (enumerator.MoveNext())
+                            //    {
+                            //        var kvp = enumerator.Current;
+                            //        Rect rcc = els[kvp.Key];
+                            //        y -= rcc.Height;
+                            //        rcc.Y = y;
+                            //        y += -this.Gap;
+                            //        els[kvp.Key] = rcc;
+                            //    }
+                            //}
+
+                            y = finalSize.Height - padding.Bottom;
+                            foreach (var oo in els)
                             {
-                                y = finalSize.Height - this.Padding.Bottom;
-                                while (enumerator.MoveNext())
-                                {
-                                    var kvp = enumerator.Current;
-                                    Rect rcc = els[kvp.Key];
-                                    y -= rcc.Height;
-                                    rcc.Y = y;
-                                    y += -this.Gap;
-                                    els[kvp.Key] = rcc;
-                                }
+                                Rect rcc = oo.Value;
+                                y -= rcc.Height;
+                                rcc.Y = y;
+                                y += -gap;
+                                els[oo.Key] = rcc;
                             }
                             break;
                     }
@@ -533,49 +637,83 @@ namespace QSoft.WPF.Panel
                     switch (this.FlexDirection)
                     {
                         case FlexDirection.Row:
-                            x = finalSize.Width - this.Padding.Right;
-                            for (int i = els.Count - 1; i >= 0; i--)
+                            x = finalSize.Width - padding.Right;
+                            //for (int i = els.Count - 1; i >= 0; i--)
+                            //{
+                            //    var child = els.ElementAt(i).Key;
+                            //    Rect rcc = els[child];
+                            //    x = x - rcc.Width;
+                            //    rcc.X = x;
+                            //    els[child] = rcc;
+                            //    x -= this.Gap;
+                            //}
+                            for (int i = InternalChildren.Count-1; i >=0; i--)
                             {
-                                var child = els.ElementAt(i).Key;
+                                var child = (FrameworkElement)InternalChildren[i];
                                 Rect rcc = els[child];
                                 x = x - rcc.Width;
                                 rcc.X = x;
                                 els[child] = rcc;
-                                x -= this.Gap;
+                                x -= gap;
                             }
                             break;
                         case FlexDirection.RowReverse:
-                            x = this.Padding.Left;
+                            x = padding.Left;
+                            //for (int i = els.Count - 1; i >= 0; i--)
+                            //{
+                            //    var child = els.ElementAt(i).Key;
+                            //    Rect rcc = els[child];
+                            //    rcc.X = x;
+                            //    els[child] = rcc;
+                            //    x += rcc.Width + this.Gap;
+                            //}
                             for (int i = els.Count - 1; i >= 0; i--)
                             {
-                                var child = els.ElementAt(i).Key;
+                                var child = (FrameworkElement)InternalChildren[i];
                                 Rect rcc = els[child];
                                 rcc.X = x;
                                 els[child] = rcc;
-                                x += rcc.Width + this.Gap;
+                                x += rcc.Width + gap;
                             }
                             break;
                         case FlexDirection.Column:
-                            y = finalSize.Height - this.Padding.Bottom;
+                            y = finalSize.Height - padding.Bottom;
+                            //for (int i = els.Count - 1; i >= 0; i--)
+                            //{
+                            //    var child = els.ElementAt(i).Key;
+                            //    Rect rcc = els[child];
+                            //    y -= rcc.Height;
+                            //    rcc.Y = y;
+                            //    els[child] = rcc;
+                            //    y -= this.Gap;
+                            //}
                             for (int i = els.Count - 1; i >= 0; i--)
                             {
-                                var child = els.ElementAt(i).Key;
+                                var child = (FrameworkElement)InternalChildren[i];
                                 Rect rcc = els[child];
                                 y -= rcc.Height;
                                 rcc.Y = y;
                                 els[child] = rcc;
-                                y -= this.Gap;
+                                y -= gap;
                             }
                             break;
                         case FlexDirection.ColumnReverse:
-                            y = this.Padding.Top;
+                            y = padding.Top;
+                            //for (int i = els.Count - 1; i >= 0; i--)
+                            //{
+                            //    var child = els.ElementAt(i).Key;
+                            //    Rect rcc = els[child];
+                            //    rcc.Y = y;
+                            //    els[child] = rcc;
+                            //    y = y + rcc.Height + this.Gap;
+                            //}
                             for (int i = els.Count - 1; i >= 0; i--)
                             {
-                                var child = els.ElementAt(i).Key;
+                                var child = (FrameworkElement)InternalChildren[i];
                                 Rect rcc = els[child];
                                 rcc.Y = y;
                                 els[child] = rcc;
-                                y = y + rcc.Height + this.Gap;
+                                y = y + rcc.Height + gap;
                             }
                             break;
                     }
@@ -585,55 +723,89 @@ namespace QSoft.WPF.Panel
                     switch (this.FlexDirection)
                     {
                         case FlexDirection.Row:
-                            var totalw = els.Values.Sum(x => x.Width);
+                            //var totalw = els.Values.Sum(x => x.Width);
                             var totalgap = this.TotalGap();
                             x = (finalSize.Width - totalw - totalgap) / 2;
-                            foreach (var oo in els.Select(x => x.Key))
+                            //foreach (var oo in els.Select(x => x.Key))
+                            //{
+                            //    Rect rcc = els[oo];
+                            //    rcc.X = x;
+                            //    els[oo] = rcc;
+                            //    x += rcc.Width + this.Gap;
+                            //}
+
+                            foreach (var oo in els)
                             {
-                                Rect rcc = els[oo];
+                                Rect rcc = oo.Value;
                                 rcc.X = x;
-                                els[oo] = rcc;
-                                x += rcc.Width + this.Gap;
+                                els[oo.Key] = rcc;
+                                x += rcc.Width + gap;
                             }
                             break;
                         case FlexDirection.RowReverse:
-                            totalw = els.Values.Sum(x => x.Width);
+                            //totalw = els.Values.Sum(x => x.Width);
                             totalgap = this.TotalGap();
                             x = (finalSize.Width - totalw - totalgap) / 2;
                             x = finalSize.Width - x;
-                            foreach (var oo in els.Select(x => x.Key))
+                            //foreach (var oo in els.Select(x => x.Key))
+                            //{
+                            //    Rect rcc = els[oo];
+                            //    x -= rcc.Width;
+                            //    rcc.X = x;
+                            //    els[oo] = rcc;
+                            //    x -= this.Gap;
+                            //}
+
+                            foreach (var oo in els)
                             {
-                                Rect rcc = els[oo];
+                                Rect rcc = oo.Value;
                                 x -= rcc.Width;
                                 rcc.X = x;
-                                els[oo] = rcc;
-                                x -= this.Gap;
+                                els[oo.Key] = rcc;
+                                x -= gap;
                             }
                             break;
                         case FlexDirection.Column:
-                            var totalh = els.Values.Sum(x => x.Height);
+                            //var totalh = els.Values.Sum(x => x.Height);
                             totalgap = this.TotalGap();
                             y = Math.Max(0, (finalSize.Height - totalh - totalgap) / 2);
-                            foreach (var oo in els.Select(x => x.Key))
+                            //foreach (var oo in els.Select(x => x.Key))
+                            //{
+                            //    Rect rcc = els[oo];
+                            //    rcc.Y = y;
+                            //    els[oo] = rcc;
+                            //    y += rcc.Height + this.Gap;
+                            //}
+
+                            foreach (var oo in els)
                             {
-                                Rect rcc = els[oo];
+                                Rect rcc = oo.Value;
                                 rcc.Y = y;
-                                els[oo] = rcc;
-                                y += rcc.Height + this.Gap;
+                                els[oo.Key] = rcc;
+                                y += rcc.Height + gap;
                             }
                             break;
                         case FlexDirection.ColumnReverse:
-                            totalh = els.Values.Sum(x => x.Height);
+                            //totalh = els.Values.Sum(x => x.Height);
                             totalgap = this.TotalGap();
                             y = Math.Max(0, (finalSize.Height - totalh - totalgap) / 2);
                             y = finalSize.Height - y;
-                            foreach (var oo in els.Select(x => x.Key))
+                            //foreach (var oo in els.Select(x => x.Key))
+                            //{
+                            //    Rect rcc = els[oo];
+                            //    y -= rcc.Height;
+                            //    rcc.Y = y;
+                            //    els[oo] = rcc;
+                            //    y -= this.Gap;
+                            //}
+
+                            foreach (var oo in els)
                             {
-                                Rect rcc = els[oo];
+                                Rect rcc = oo.Value;
                                 y -= rcc.Height;
                                 rcc.Y = y;
-                                els[oo] = rcc;
-                                y -= this.Gap;
+                                els[oo.Key] = rcc;
+                                y -= gap;
                             }
                             break;
                     }
@@ -643,62 +815,98 @@ namespace QSoft.WPF.Panel
                     {
                         case FlexDirection.Row:
                             var totalgapw = this.TotalGap();
-                            var totalw = els.Values.Sum(x => x.Width);
-                            var remainingSpace = (finalSize.Width - this.Padding.Left - this.Padding.Right - totalgapw - totalw);
+                            //var totalw = els.Values.Sum(x => x.Width);
+                            var remainingSpace = (finalSize.Width - padding.Left - padding.Right - totalgapw - totalw);
                             var iw = Math.Max(0, remainingSpace / (InternalChildren.Count * 2));
 
-                            foreach (var oo in els.Select(x => x.Key))
+                            //foreach (var oo in els.Select(x => x.Key))
+                            //{
+                            //    x += iw;
+                            //    var rcc = els[oo];
+                            //    rcc.X = x;
+                            //    els[oo] = rcc;
+                            //    x += iw + rcc.Width + this.Gap;
+                            //}
+
+                            foreach (var oo in els)
                             {
                                 x += iw;
-                                var rcc = els[oo];
+                                var rcc = oo.Value;
                                 rcc.X = x;
-                                els[oo] = rcc;
-                                x += iw + rcc.Width + this.Gap;
+                                els[oo.Key] = rcc;
+                                x += iw + rcc.Width + gap;
                             }
                             break;
                         case FlexDirection.RowReverse:
                             totalgapw = this.TotalGap();
-                            totalw = els.Values.Sum(x => x.Width);
-                            remainingSpace = (finalSize.Width - this.Padding.Left - this.Padding.Right - totalgapw - totalw);
+                            //totalw = els.Values.Sum(x => x.Width);
+                            remainingSpace = (finalSize.Width - padding.Left - padding.Right - totalgapw - totalw);
                             iw = Math.Max(0, remainingSpace / (InternalChildren.Count * 2));
-                            x = finalSize.Width - this.Padding.Right;
-                            foreach (var oo in els.Select(x => x.Key))
+                            x = finalSize.Width - padding.Right;
+                            //foreach (var oo in els.Select(x => x.Key))
+                            //{
+                            //    x -= iw;
+                            //    var rcc = els[oo];
+                            //    x -= rcc.Width;
+                            //    rcc.X = x;
+                            //    els[oo] = rcc;
+                            //    x = x - iw - this.Gap;
+                            //}
+
+                            foreach (var oo in els)
                             {
                                 x -= iw;
-                                var rcc = els[oo];
+                                var rcc = oo.Value;
                                 x -= rcc.Width;
                                 rcc.X = x;
-                                els[oo] = rcc;
-                                x = x - iw - this.Gap;
+                                els[oo.Key] = rcc;
+                                x = x - iw - gap;
                             }
                             break;
                         case FlexDirection.Column:
                             var totalgaph = this.TotalGap();
-                            var totalh = els.Values.Sum(x => x.Height);
-                            var ih = (finalSize.Height - this.Padding.Top - this.Padding.Bottom - totalgaph - totalh);
+                            //var totalh = els.Values.Sum(x => x.Height);
+                            var ih = (finalSize.Height - padding.Top - padding.Bottom - totalgaph - totalh);
                             ih = ih < 0 ? 0 : ih /= (InternalChildren.Count * 2);
-                            foreach (var oo in els.Select(x => x.Key))
+                            //foreach (var oo in els.Select(x => x.Key))
+                            //{
+                            //    y += ih;
+                            //    var rcc = els[oo];
+                            //    rcc.Y = y;
+                            //    els[oo] = rcc;
+                            //    y += ih + rcc.Height + this.Gap;
+                            //}
+
+                            foreach (var oo in els)
                             {
                                 y += ih;
-                                var rcc = els[oo];
+                                var rcc = oo.Value;
                                 rcc.Y = y;
-                                els[oo] = rcc;
-                                y += ih + rcc.Height + this.Gap;
+                                els[oo.Key] = rcc;
+                                y += ih + rcc.Height + gap;
                             }
                             break;
                         case FlexDirection.ColumnReverse:
                             totalgaph = this.TotalGap();
-                            totalh = els.Values.Sum(x => x.Height);
-                            ih = (finalSize.Height - this.Padding.Top - this.Padding.Bottom - totalgaph - totalh);
+                            //totalh = els.Values.Sum(x => x.Height);
+                            ih = (finalSize.Height - padding.Top - padding.Bottom - totalgaph - totalh);
                             ih = ih < 0 ? 0 : ih /= (InternalChildren.Count * 2);
-                            y = finalSize.Height - this.Padding.Bottom;
-                            foreach (var oo in els.Select(x => x.Key))
+                            y = finalSize.Height - padding.Bottom;
+                            //foreach (var oo in els.Select(x => x.Key))
+                            //{
+                            //    var rcc = els[oo];
+                            //    y = y - ih - rcc.Height;
+                            //    rcc.Y = y;
+                            //    els[oo] = rcc;
+                            //    y -= ih -this.Gap;
+                            //}
+                            foreach (var oo in els)
                             {
-                                var rcc = els[oo];
+                                var rcc = oo.Value;
                                 y = y - ih - rcc.Height;
                                 rcc.Y = y;
-                                els[oo] = rcc;
-                                y -= ih -this.Gap;
+                                els[oo.Key] = rcc;
+                                y -= ih - gap;
                             }
                             break;
                     }
@@ -709,38 +917,55 @@ namespace QSoft.WPF.Panel
                         {
                             case FlexDirection.Row:
                                 var totalgapw = this.TotalGap();
-                                var totalw = els.Values.Sum(x => x.Width);
-                                var iw = (finalSize.Width - this.Padding.Left - this.Padding.Right - totalgapw - totalw);
+                                //var totalw = els.Values.Sum(x => x.Width);
+                                var iw = (finalSize.Width - padding.Left - padding.Right - totalgapw - totalw);
                                 iw = Math.Max(0, iw / (InternalChildren.Count + 1));
                                 x = x + iw;
-                                foreach (var oo in els.Select(x => x.Key))
+                                //foreach (var oo in els.Select(x => x.Key))
+                                //{
+                                //    var rcc = els[oo];
+                                //    rcc.X = x;
+                                //    els[oo] = rcc;
+                                //    x += iw + rcc.Width + this.Gap;
+                                //}
+
+                                foreach (var oo in els)
                                 {
-                                    var rcc = els[oo];
+                                    var rcc = oo.Value;
                                     rcc.X = x;
-                                    els[oo] = rcc;
-                                    x += iw + rcc.Width + this.Gap;
+                                    els[oo.Key] = rcc;
+                                    x += iw + rcc.Width + gap;
                                 }
                                 break;
                             case FlexDirection.RowReverse:
                                 totalgapw = this.TotalGap();
-                                totalw = els.Values.Sum(x => x.Width);
-                                iw = (finalSize.Width - this.Padding.Left - this.Padding.Right - totalgapw - totalw);
+                                //totalw = els.Values.Sum(x => x.Width);
+                                iw = (finalSize.Width - padding.Left - padding.Right - totalgapw - totalw);
                                 iw = Math.Max(0, iw / (InternalChildren.Count + 1));
-                                x = finalSize.Width - this.Padding.Right;
+                                x = finalSize.Width - padding.Right;
                                 x = x - iw;
-                                foreach (var oo in els.Select(x => x.Key))
+                                //foreach (var oo in els.Select(x => x.Key))
+                                //{
+                                //    var rcc = els[oo];
+                                //    x -= rcc.Width;
+                                //    rcc.X = x;
+                                //    els[oo] = rcc;
+                                //    x -= iw  - this.Gap;
+                                //}
+
+                                foreach (var oo in els)
                                 {
-                                    var rcc = els[oo];
+                                    var rcc = oo.Value;
                                     x -= rcc.Width;
                                     rcc.X = x;
-                                    els[oo] = rcc;
-                                    x -= iw  - this.Gap;
+                                    els[oo.Key] = rcc;
+                                    x -= iw - gap;
                                 }
                                 break;
                             case FlexDirection.Column:
                                 var totalgaph = this.TotalGap();
-                                var totalh = els.Values.Sum(x => x.Height);
-                                var ih = (finalSize.Height - this.Padding.Top - this.Padding.Bottom - totalgaph - totalh);
+                                //var totalh = els.Values.Sum(x => x.Height);
+                                var ih = (finalSize.Height - padding.Top - padding.Bottom - totalgaph - totalh);
                                 if (ih < 0)
                                 {
                                     ih = 0;
@@ -750,18 +975,26 @@ namespace QSoft.WPF.Panel
                                     ih /= (InternalChildren.Count + 1);
                                 }
                                 y = y + ih;
-                                foreach (var oo in els.Select(x => x.Key))
+                                //foreach (var oo in els.Select(x => x.Key))
+                                //{
+                                //    var rcc = els[oo];
+                                //    rcc.Y = y;
+                                //    els[oo] = rcc;
+                                //    y += ih + rcc.Height + this.Gap;
+                                //}
+
+                                foreach (var oo in els)
                                 {
-                                    var rcc = els[oo];
+                                    var rcc = oo.Value;
                                     rcc.Y = y;
-                                    els[oo] = rcc;
-                                    y += ih + rcc.Height + this.Gap;
+                                    els[oo.Key] = rcc;
+                                    y += ih + rcc.Height + gap;
                                 }
                                 break;
                             case FlexDirection.ColumnReverse:
                                 totalgaph = this.TotalGap();
-                                totalh = els.Values.Sum(x => x.Height);
-                                ih = (finalSize.Height - this.Padding.Top - this.Padding.Bottom - totalgaph - totalh);
+                                //totalh = els.Values.Sum(x => x.Height);
+                                ih = (finalSize.Height - padding.Top - padding.Bottom - totalgaph - totalh);
                                 if (ih < 0)
                                 {
                                     ih = 0;
@@ -770,15 +1003,24 @@ namespace QSoft.WPF.Panel
                                 {
                                     ih /= (InternalChildren.Count + 1);
                                 }
-                                y = finalSize.Height - this.Padding.Bottom;
+                                y = finalSize.Height - padding.Bottom;
                                 y = y - ih;
-                                foreach (var oo in els.Select(x => x.Key))
+                                //foreach (var oo in els.Select(x => x.Key))
+                                //{
+                                //    var rcc = els[oo];
+                                //    y = y - rcc.Height;
+                                //    rcc.Y = y;
+                                //    els[oo] = rcc;
+                                //    y = y - ih - this.Gap;
+                                //}
+
+                                foreach (var oo in els)
                                 {
-                                    var rcc = els[oo];
+                                    var rcc = oo.Value;
                                     y = y - rcc.Height;
                                     rcc.Y = y;
-                                    els[oo] = rcc;
-                                    y = y - ih - this.Gap;
+                                    els[oo.Key] = rcc;
+                                    y = y - ih - gap;
                                 }
                                 break;
                         }
@@ -789,64 +1031,102 @@ namespace QSoft.WPF.Panel
                     {
                         case FlexDirection.Row:
                             var totalgapw = this.TotalGap();
-                            var iw = (finalSize.Width - this.Padding.Left - this.Padding.Right - totalgapw);
-                            iw = iw - els.Sum(x => x.Key.DesiredSize.Width);
+                            var iw = (finalSize.Width - padding.Left - padding.Right - totalgapw);
+                            //iw = iw - els.Sum(x => x.Key.DesiredSize.Width);
+                            iw = iw - totaldsw;
                             var childcount = Math.Max(1, InternalChildren.Count - 1);
                             iw = Math.Max(0, iw / childcount);
-                            x = this.Padding.Left;
-                            foreach (var oo in els.Select(x => x.Key))
+                            x = padding.Left;
+                            //foreach (var oo in els.Select(x => x.Key))
+                            //{
+                            //    var rcc = els[oo];
+                            //    rcc.X = x;
+                            //    els[oo] = rcc;
+                            //    x = x + iw + rcc.Width + this.Gap;
+                            //}
+
+                            foreach (var oo in els)
                             {
-                                var rcc = els[oo];
+                                var rcc = oo.Value;
                                 rcc.X = x;
-                                els[oo] = rcc;
-                                x = x + iw + rcc.Width + this.Gap;
+                                els[oo.Key] = rcc;
+                                x = x + iw + rcc.Width + gap;
                             }
                             break;
                         case FlexDirection.RowReverse:
                             totalgapw = this.TotalGap();
-                            iw = (finalSize.Width - this.Padding.Left - this.Padding.Right - totalgapw);
-                            iw = iw - els.Sum(x => x.Key.DesiredSize.Width);
+                            iw = (finalSize.Width - padding.Left - padding.Right - totalgapw);
+                            //iw = iw - els.Sum(x => x.Key.DesiredSize.Width);
+                            iw = iw - totaldsw;
                             childcount = Math.Max(1, InternalChildren.Count - 1);
                             iw = Math.Max(0, iw / childcount);
-                            x = finalSize.Width - this.Padding.Right;
-                            foreach (var oo in els.Select(x => x.Key))
+                            x = finalSize.Width - padding.Right;
+                            //foreach (var oo in els.Select(x => x.Key))
+                            //{
+                            //    var rcc = els[oo];
+                            //    x = x - rcc.Width;
+                            //    rcc.X = x;
+                            //    els[oo] = rcc;
+                            //    x = x -iw- this.Gap;
+                            //}
+
+                            foreach (var oo in els)
                             {
-                                var rcc = els[oo];
+                                var rcc = oo.Value;
                                 x = x - rcc.Width;
                                 rcc.X = x;
-                                els[oo] = rcc;
-                                x = x -iw- this.Gap;
+                                els[oo.Key] = rcc;
+                                x = x - iw - gap;
                             }
                             break;
                         case FlexDirection.Column:
                             var totalgaph = this.TotalGap();
-                            var ih = (finalSize.Height - this.Padding.Top - this.Padding.Bottom - totalgaph);
-                            ih = ih - els.Sum(x => x.Key.DesiredSize.Height);
+                            var ih = (finalSize.Height - padding.Top - padding.Bottom - totalgaph);
+                            //ih = ih - els.Sum(x => x.Key.DesiredSize.Height);
+                            ih = ih - totaldsh;
                             childcount = Math.Max(1, InternalChildren.Count - 1);
                             ih = ih < 0 ? 0 : ih / childcount;
-                            y = this.Padding.Top;
-                            foreach (var oo in els.Select(x => x.Key))
+                            y = padding.Top;
+                            //foreach (var oo in els.Select(x => x.Key))
+                            //{
+                            //    var rcc = els[oo];
+                            //    rcc.Y = y;
+                            //    els[oo] = rcc;
+                            //    y = y + ih + rcc.Height + this.Gap;
+                            //}
+
+                            foreach (var oo in els)
                             {
-                                var rcc = els[oo];
+                                var rcc = oo.Value;
                                 rcc.Y = y;
-                                els[oo] = rcc;
-                                y = y + ih + rcc.Height + this.Gap;
+                                els[oo.Key] = rcc;
+                                y = y + ih + rcc.Height + gap;
                             }
                             break;
                         case FlexDirection.ColumnReverse:
                             totalgaph = this.TotalGap();
-                            ih = (finalSize.Height - this.Padding.Top - this.Padding.Bottom - totalgaph);
-                            ih = ih - els.Sum(x => x.Key.DesiredSize.Height);
+                            ih = (finalSize.Height - padding.Top - padding.Bottom - totalgaph);
+                            //ih = ih - els.Sum(x => x.Key.DesiredSize.Height);
+                            ih = ih - totaldsh;
                             childcount = Math.Max(1, InternalChildren.Count - 1);
                             ih = ih < 0 ? 0 : ih / childcount;
-                            y = finalSize.Height - this.Padding.Bottom;
-                            foreach (var oo in els.Select(x => x.Key))
+                            y = finalSize.Height - padding.Bottom;
+                            //foreach (var oo in els.Select(x => x.Key))
+                            //{
+                            //    var rcc = els[oo];
+                            //    y = y - rcc.Height;
+                            //    rcc.Y = y;
+                            //    els[oo] = rcc;
+                            //    y = y - ih - this.Gap;
+                            //}
+
+                            foreach (var oo in els)
                             {
-                                var rcc = els[oo];
+                                var rcc = oo.Value;
                                 y = y - rcc.Height;
                                 rcc.Y = y;
-                                els[oo] = rcc;
-                                y = y - ih - this.Gap;
+                                els[oo.Key] = rcc;
+                                y = y - ih - gap;
                             }
                             break;
                     }
