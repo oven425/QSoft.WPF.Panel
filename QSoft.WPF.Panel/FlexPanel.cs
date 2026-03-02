@@ -154,7 +154,6 @@ namespace QSoft.WPF.Panel
             }
         }
 
-
         protected override Size MeasureOverride(Size availableSize)
         {
             var childrenCount = this.InternalChildren.Count;
@@ -231,6 +230,7 @@ namespace QSoft.WPF.Panel
             return desiredSize;
         }
 
+        FrameworkElement[] m_Childs = [];
         double[] grows = [];
         Rect[] rcs = [];
         protected override Size ArrangeOverride(Size finalSize)
@@ -259,10 +259,15 @@ namespace QSoft.WPF.Panel
             {
                 Array.Resize(ref rcs, childrenCount *2);
             }
+            if(m_Childs.Length < childrenCount)
+            {
+                m_Childs = new FrameworkElement[childrenCount * 2];
+            }
 
             for (int i = 0; i < childrenCount; i++)
             {
                 var child = (FrameworkElement)InternalChildren[i];
+                m_Childs[i] = child;
                 var desiredSize = child.DesiredSize;
                 rcs[i].X = 0;
                 rcs[i].Y = 0;
@@ -332,7 +337,7 @@ namespace QSoft.WPF.Panel
             {
                 InternalChildren[i].Arrange(rcs[i]);
             }
-
+            Array.Clear(m_Childs, 0, m_Childs.Length);
             return finalSize;
         }
         void CalacGrow(Rect[] rcs, in Size finalSize, double[] grows, FlexDirection direction,in Thickness padding , double gap)
@@ -344,7 +349,7 @@ namespace QSoft.WPF.Panel
             var sum = 0.0;
             var zerogrow_w = 0.0;
             var zerogrow_h = 0.0;
-            for(int i=0; i< InternalChildren.Count; i++)
+            for(int i=0; i< this.Children.Count; i++)
             {
                 var child = (FrameworkElement)InternalChildren[i];
                 var grow = grows[i];
@@ -362,7 +367,7 @@ namespace QSoft.WPF.Panel
                 case FlexDirection.Row:
                     var iw = Math.Max(finalSize.Width - zerogrow_w - totalgap - padding.Left - padding.Right, 0);
                     iw = iw / sum;
-                    for(int i=0; i< InternalChildren.Count; i++)
+                    for(int i=0; i< this.Children.Count; i++)
                     {
                         var child = (FrameworkElement)InternalChildren[i];
                         item_w = grows[i] * iw;
@@ -379,7 +384,7 @@ namespace QSoft.WPF.Panel
                     iw = Math.Max(finalSize.Width - zerogrow_w - totalgap - padding.Left - padding.Right, 0);
                     iw = iw / sum;
                     x = finalSize.Width - padding.Right;
-                    for (int i = 0; i < InternalChildren.Count; i++)
+                    for (int i = 0; i < this.Children.Count; i++)
                     {
                         var child = (FrameworkElement)InternalChildren[i];
                         item_w = grows[i] * iw;
@@ -396,7 +401,7 @@ namespace QSoft.WPF.Panel
                 case FlexDirection.Column:
                     var ih = Math.Max(finalSize.Height - zerogrow_h - totalgap - padding.Top - padding.Bottom, 0);
                     ih /= sum;
-                    for(int i = 0; i < InternalChildren.Count; i++)
+                    for(int i = 0; i < this.Children.Count; i++)
                     {
                         var child = (FrameworkElement)InternalChildren[i];
                         item_h = grows[i] * ih;
@@ -413,7 +418,7 @@ namespace QSoft.WPF.Panel
                     ih = Math.Max(finalSize.Height - zerogrow_h - totalgap - padding.Top - padding.Bottom, 0);
                     ih /= sum;
                     y = finalSize.Height - padding.Bottom;
-                    for (int i = 0; i < InternalChildren.Count; i++)
+                    for (int i = 0; i < this.Children.Count; i++)
                     {
                         var child = (FrameworkElement)InternalChildren[i];
                         item_h = grows[i] * ih;
@@ -433,7 +438,7 @@ namespace QSoft.WPF.Panel
 
         void CalacAlignItems(Rect[] rcs, in Size finalSize, FlexDirection direction, in Thickness padding)
         {
-            for(int i=0; i < InternalChildren.Count; i++) 
+            for(int i=0; i < this.Children.Count; i++) 
             {
                 var child = (FrameworkElement)InternalChildren[i];
                 
@@ -522,7 +527,7 @@ namespace QSoft.WPF.Panel
 
         double TotalGap()
             => this.InternalChildren.Count > 1 
-            ? this.Gap * (InternalChildren.Count - 1)
+            ? this.Gap * (this.Children.Count - 1)
             : 0;
 
         void CalacJustifyContent(Rect[] rcs, in Size finalSize, JustifyContent justify, FlexDirection direction, in Thickness padding, double gap)
@@ -533,9 +538,9 @@ namespace QSoft.WPF.Panel
             var totalh = 0.0;
             var totaldsw = 0.0;
             var totaldsh = 0.0;
-            for(int i=0; i< InternalChildren.Count; i++)
+            for(int i=0; i< this.Children.Count; i++)
             {
-                var child = (FrameworkElement)InternalChildren[i];
+                var child = this.Children[i];
                 totalw = totalw + rcs[i].Width;
                 totalh = totalh + rcs[i].Height;
                 totaldsw = totaldsw + child.DesiredSize.Width;
@@ -548,7 +553,7 @@ namespace QSoft.WPF.Panel
                     {
                         case FlexDirection.Row:
                             x = padding.Left;
-                            for(int i=0; i< InternalChildren.Count; i++)
+                            for(int i=0; i< this.Children.Count; i++)
                             {
                                 rcs[i].X = x;
                                 x = x + rcs[i].Width + gap;
@@ -556,7 +561,7 @@ namespace QSoft.WPF.Panel
                             break;
                         case FlexDirection.RowReverse:
                             x = finalSize.Width - padding.Right;
-                            for(int i=0; i< InternalChildren.Count; i++)
+                            for(int i=0; i< this.Children.Count; i++)
                             {
                                 x -= rcs[i].Width;
                                 rcs[i].X = x;
@@ -565,7 +570,7 @@ namespace QSoft.WPF.Panel
                             break;
                         case FlexDirection.Column:
                             y = padding.Top;
-                            for(int i=0; i< InternalChildren.Count; i++)
+                            for(int i=0; i< this.Children.Count; i++)
                             {
                                 rcs[i].Y = y;
                                 y = y + rcs[i].Height + gap;
@@ -573,7 +578,7 @@ namespace QSoft.WPF.Panel
                             break;
                         case FlexDirection.ColumnReverse:
                             y = finalSize.Height - padding.Bottom;
-                            for (int i = 0; i < InternalChildren.Count; i++)
+                            for (int i = 0; i < this.Children.Count; i++)
                             {
                                 y -= rcs[i].Height;
                                 rcs[i].Y = y;
@@ -587,7 +592,7 @@ namespace QSoft.WPF.Panel
                     {
                         case FlexDirection.Row:
                             x = finalSize.Width - padding.Right;
-                            for (int i = InternalChildren.Count - 1; i >= 0; i--)
+                            for (int i = this.Children.Count - 1; i >= 0; i--)
                             {
                                 x = x - rcs[i].Width;
                                 rcs[i].X = x;
@@ -596,7 +601,7 @@ namespace QSoft.WPF.Panel
                             break;
                         case FlexDirection.RowReverse:
                             x = padding.Left;
-                            for(int i= InternalChildren.Count - 1; i >= 0; i--)
+                            for(int i= this.Children.Count - 1; i >= 0; i--)
                             {
                                 rcs[i].X = x;
                                 x += rcs[i].Width + gap;
@@ -604,7 +609,7 @@ namespace QSoft.WPF.Panel
                             break;
                         case FlexDirection.Column:
                             y = finalSize.Height - padding.Bottom;
-                            for(int i = InternalChildren.Count - 1; i >= 0; i--)
+                            for(int i = this.Children.Count - 1; i >= 0; i--)
                             {
                                 y -= rcs[i].Height;
                                 rcs[i].Y = y;
@@ -613,7 +618,7 @@ namespace QSoft.WPF.Panel
                             break;
                         case FlexDirection.ColumnReverse:
                             y = padding.Top;
-                            for(int i= InternalChildren.Count - 1; i >= 0; i--)
+                            for(int i= this.Children.Count - 1; i >= 0; i--)
                             {
                                 rcs[i].Y = y;
                                 y = y + rcs[i].Height + gap;
@@ -628,7 +633,7 @@ namespace QSoft.WPF.Panel
                         case FlexDirection.Row:
                             var totalgap = this.TotalGap();
                             x = (finalSize.Width - totalw - totalgap) / 2;
-                            for(int i=0; i< InternalChildren.Count; i++)
+                            for(int i=0; i< this.Children.Count; i++)
                             {
                                 rcs[i].X = x;
                                 x += rcs[i].Width + gap;
@@ -638,7 +643,7 @@ namespace QSoft.WPF.Panel
                             totalgap = this.TotalGap();
                             x = (finalSize.Width - totalw - totalgap) / 2;
                             x = finalSize.Width - x;
-                            for(int i=0; i< InternalChildren.Count; i++)
+                            for(int i=0; i< this.Children.Count; i++)
                             {
                                 x -= rcs[i].Width;
                                 rcs[i].X = x;
@@ -648,7 +653,7 @@ namespace QSoft.WPF.Panel
                         case FlexDirection.Column:
                             totalgap = this.TotalGap();
                             y = Math.Max(0, (finalSize.Height - totalh - totalgap) / 2);
-                            for(int i=0; i< InternalChildren.Count; i++)
+                            for(int i=0; i< this.Children.Count; i++)
                             {
                                 rcs[i].Y = y;
                                 y += rcs[i].Height + gap;
@@ -658,7 +663,7 @@ namespace QSoft.WPF.Panel
                             totalgap = this.TotalGap();
                             y = Math.Max(0, (finalSize.Height - totalh - totalgap) / 2);
                             y = finalSize.Height - y;
-                            for (int i = 0; i < InternalChildren.Count; i++)
+                            for (int i = 0; i < this.Children.Count; i++)
                             {
                                 y -= rcs[i].Height;
                                 rcs[i].Y = y;
@@ -673,8 +678,8 @@ namespace QSoft.WPF.Panel
                         case FlexDirection.Row:
                             var totalgapw = this.TotalGap();
                             var remainingSpace = (finalSize.Width - padding.Left - padding.Right - totalgapw - totalw);
-                            var iw = Math.Max(0, remainingSpace / (InternalChildren.Count * 2));
-                            for(int i=0; i< InternalChildren.Count; i++)
+                            var iw = Math.Max(0, remainingSpace / (this.Children.Count * 2));
+                            for(int i=0; i< this.Children.Count; i++)
                             {
                                 x += iw;
                                 rcs[i].X = x;
@@ -684,9 +689,9 @@ namespace QSoft.WPF.Panel
                         case FlexDirection.RowReverse:
                             totalgapw = this.TotalGap();
                             remainingSpace = (finalSize.Width - padding.Left - padding.Right - totalgapw - totalw);
-                            iw = Math.Max(0, remainingSpace / (InternalChildren.Count * 2));
+                            iw = Math.Max(0, remainingSpace / (this.Children.Count * 2));
                             x = finalSize.Width - padding.Right;
-                            for(int i=0; i< InternalChildren.Count; i++)
+                            for(int i=0; i< this.Children.Count; i++)
                             {
                                 x -= iw;
                                 x -= rcs[i].Width;
@@ -697,8 +702,8 @@ namespace QSoft.WPF.Panel
                         case FlexDirection.Column:
                             var totalgaph = this.TotalGap();
                             var ih = (finalSize.Height - padding.Top - padding.Bottom - totalgaph - totalh);
-                            ih = ih < 0 ? 0 : ih /= (InternalChildren.Count * 2);
-                            for(int i=0; i< InternalChildren.Count; i++)
+                            ih = ih < 0 ? 0 : ih /= (this.Children.Count * 2);
+                            for(int i=0; i< this.Children.Count; i++)
                             {
                                 y += ih;
                                 rcs[i].Y = y;
@@ -708,9 +713,9 @@ namespace QSoft.WPF.Panel
                         case FlexDirection.ColumnReverse:
                             totalgaph = this.TotalGap();
                             ih = (finalSize.Height - padding.Top - padding.Bottom - totalgaph - totalh);
-                            ih = ih < 0 ? 0 : ih /= (InternalChildren.Count * 2);
+                            ih = ih < 0 ? 0 : ih /= (this.Children.Count * 2);
                             y = finalSize.Height - padding.Bottom;
-                            for (int i = 0; i < InternalChildren.Count; i++)
+                            for (int i = 0; i < this.Children.Count; i++)
                             {
                                 y = y - ih - rcs[i].Height;
                                 rcs[i].Y = y;
@@ -726,9 +731,9 @@ namespace QSoft.WPF.Panel
                             case FlexDirection.Row:
                                 var totalgapw = this.TotalGap();
                                 var iw = (finalSize.Width - padding.Left - padding.Right - totalgapw - totalw);
-                                iw = Math.Max(0, iw / (InternalChildren.Count + 1));
+                                iw = Math.Max(0, iw / (this.Children.Count + 1));
                                 x = x + iw;
-                                for(int i=0; i< InternalChildren.Count; i++)
+                                for(int i=0; i< this.Children.Count; i++)
                                 {
                                     rcs[i].X = x;
                                     x += iw + rcs[i].Width + gap;
@@ -737,10 +742,10 @@ namespace QSoft.WPF.Panel
                             case FlexDirection.RowReverse:
                                 totalgapw = this.TotalGap();
                                 iw = (finalSize.Width - padding.Left - padding.Right - totalgapw - totalw);
-                                iw = Math.Max(0, iw / (InternalChildren.Count + 1));
+                                iw = Math.Max(0, iw / (this.Children.Count + 1));
                                 x = finalSize.Width - padding.Right;
                                 x = x - iw;
-                                for(int i=0; i< InternalChildren.Count; i++)
+                                for(int i=0; i< this.Children.Count; i++)
                                 {
                                     x -= rcs[i].Width;
                                     rcs[i].X = x;
@@ -756,10 +761,10 @@ namespace QSoft.WPF.Panel
                                 }
                                 else
                                 {
-                                    ih /= (InternalChildren.Count + 1);
+                                    ih /= (this.Children.Count + 1);
                                 }
                                 y = y + ih;
-                                for(int i=0; i< InternalChildren.Count; i++)
+                                for(int i=0; i< this.Children.Count; i++)
                                 {
                                     rcs[i].Y = y;
                                     y += ih + rcs[i].Height + gap;
@@ -774,11 +779,11 @@ namespace QSoft.WPF.Panel
                                 }
                                 else
                                 {
-                                    ih /= (InternalChildren.Count + 1);
+                                    ih /= (this.Children.Count + 1);
                                 }
                                 y = finalSize.Height - padding.Bottom;
                                 y = y - ih;
-                                for (int i = 0; i < InternalChildren.Count; i++)
+                                for (int i = 0; i < this.Children.Count; i++)
                                 {
                                     y = y - rcs[i].Height;
                                     rcs[i].Y = y;
@@ -795,10 +800,10 @@ namespace QSoft.WPF.Panel
                             var totalgapw = this.TotalGap();
                             var iw = (finalSize.Width - padding.Left - padding.Right - totalgapw);
                             iw = iw - totaldsw;
-                            var childcount = Math.Max(1, InternalChildren.Count - 1);
+                            var childcount = Math.Max(1, this.Children.Count - 1);
                             iw = Math.Max(0, iw / childcount);
                             x = padding.Left;
-                            for(int i=0; i< InternalChildren.Count; i++)
+                            for(int i=0; i< this.Children.Count; i++)
                             {
                                 rcs[i].X = x;
                                 x = x + iw + rcs[i].Width + gap;
@@ -808,10 +813,10 @@ namespace QSoft.WPF.Panel
                             totalgapw = this.TotalGap();
                             iw = (finalSize.Width - padding.Left - padding.Right - totalgapw);
                             iw = iw - totaldsw;
-                            childcount = Math.Max(1, InternalChildren.Count - 1);
+                            childcount = Math.Max(1, this.Children.Count - 1);
                             iw = Math.Max(0, iw / childcount);
                             x = finalSize.Width - padding.Right;
-                            for(int i=0; i< InternalChildren.Count; i++)
+                            for(int i=0; i< this.Children.Count; i++)
                             {
                                 x = x - rcs[i].Width;
                                 rcs[i].X = x;
@@ -822,10 +827,10 @@ namespace QSoft.WPF.Panel
                             var totalgaph = this.TotalGap();
                             var ih = (finalSize.Height - padding.Top - padding.Bottom - totalgaph);
                             ih = ih - totaldsh;
-                            childcount = Math.Max(1, InternalChildren.Count - 1);
+                            childcount = Math.Max(1, this.Children.Count - 1);
                             ih = ih < 0 ? 0 : ih / childcount;
                             y = padding.Top;
-                            for(int i=0; i< InternalChildren.Count; i++)
+                            for(int i=0; i< this.Children.Count; i++)
                             {
                                 rcs[i].Y = y;
                                 y = y + ih + rcs[i].Height + gap;
@@ -835,10 +840,10 @@ namespace QSoft.WPF.Panel
                             totalgaph = this.TotalGap();
                             ih = (finalSize.Height - padding.Top - padding.Bottom - totalgaph);
                             ih = ih - totaldsh;
-                            childcount = Math.Max(1, InternalChildren.Count - 1);
+                            childcount = Math.Max(1, this.Children.Count - 1);
                             ih = ih < 0 ? 0 : ih / childcount;
                             y = finalSize.Height - padding.Bottom;
-                            for (int i = 0; i < InternalChildren.Count; i++)
+                            for (int i = 0; i < this.Children.Count; i++)
                             {
                                 y = y - rcs[i].Height;
                                 rcs[i].Y = y;
