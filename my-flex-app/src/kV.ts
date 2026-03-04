@@ -3,6 +3,12 @@ export type Kv<T1, T2> = {
     v: T2
 }
 
+export const wraps:Kv<string, string>[] = [
+  {k:'NoWrap', v:'flex-nowrap'},
+  {k:'Wrap', v:'flex-wrap'},
+  {k:'Wrap-Rev.', v:'flex-wrap-reverse'},
+]
+
 export const justifyContents:Kv<string, string>[] = [
   {k:'Start', v:'justify-start'},
   {k:'Center', v:'justify-center'},

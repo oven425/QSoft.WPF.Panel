@@ -1,7 +1,8 @@
 import React from 'react';
-import { justifyContents, directions, alignItems_ } from './kV'
+import {wraps, justifyContents, directions, alignItems_ } from './kV'
 
 export type ContainerSettingContext = {
+  wrap:string;
   direction: string;
   justifyContent: string;
   alignItems: string;
@@ -22,6 +23,14 @@ function ContainerSetting({ containerSetting, setContainerSetting, className }: 
   }
   return (
     <div className={`${className} flex flex-col`}>
+       <h5>Wrap</h5>
+      <div className='grid grid-cols-2 gap-0.5 rounded-sm border border-neutral-500  dark:bg-gray-950 dark:border-gray-700 p-0.5 '>
+        {
+          wraps.map((x, i) => (
+            <div key={i} onClick={() => handleContainerChange('wrap', x.v)} className={`flex justify-center ${x.v === containerSetting.wrap ? 'dark:bg-gray-800 bg-neutral-300' : ''} rounded-sm p-1`}>{x.k}</div>
+          ))
+        }
+      </div>
       <h5>Direction</h5>
       <div className='grid grid-cols-2 gap-0.5 rounded-sm border border-neutral-500  dark:bg-gray-950 dark:border-gray-700 p-0.5 '>
         {
