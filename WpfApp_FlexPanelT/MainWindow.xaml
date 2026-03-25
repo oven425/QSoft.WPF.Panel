@@ -74,11 +74,11 @@
                     <qpanel:FlexPanel Padding="1,0,3,0" x:Name="flexpanel_itemdata"  FlexDirection="Column" Gap="8" AlignItems="Stretch">
                         <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
                             <TextBlock Text="Flex-Grow"/>
-                            <TextBox x:Name="textbox_flexgrow" TextChanged="textbox_flexgrow_TextChanged" Text="{Binding ItemData.FlexGrow, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBox x:Name="textbox_flexgrow" InputMethod.IsInputMethodEnabled="False" TextChanged="textbox_flexgrow_TextChanged" Text="{Binding ItemData.FlexGrow, UpdateSourceTrigger=PropertyChanged}"/>
                         </qpanel:FlexPanel>
                         <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
                             <TextBlock Text="Flex-Shrink"/>
-                            <TextBox x:Name="textbox_flexshrink" TextChanged="textbox_flexshrink_TextChanged"  Text="{Binding ItemData.FlexShrink, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBox x:Name="textbox_flexshrink" InputMethod.IsInputMethodEnabled="False" TextChanged="textbox_flexshrink_TextChanged"  Text="{Binding ItemData.FlexShrink, UpdateSourceTrigger=PropertyChanged}"/>
                         </qpanel:FlexPanel>
                         <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
                             <TextBlock Text="Flex-Basis"/>

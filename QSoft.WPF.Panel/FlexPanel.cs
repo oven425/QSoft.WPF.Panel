@@ -98,6 +98,24 @@ namespace QSoft.WPF.Panel
         public static readonly DependencyProperty ShrinkProperty = DependencyProperty.RegisterAttached("Shrink", typeof(double), typeof(FlexPanel), new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
         public static double GetShrink(DependencyObject obj) => (double)obj.GetValue(ShrinkProperty);
         public static void SetShrink(DependencyObject obj, double value) => obj.SetValue(ShrinkProperty, value);
+
+        public FlexPanel()
+        {
+            //this.Unloaded+= OnUnloaded; 
+        }
+
+        //void OnUnloaded(object sender, RoutedEventArgs e)
+        //{
+        //    foreach (UIElement child in this.InternalChildren)
+        //    {
+        //        if (child is FrameworkElement fe)
+        //        {
+        //            MaxWidthDesciptor.RemoveValueChanged(fe, OnMaxWidthChanged);
+        //            MaxHeightDesciptor.RemoveValueChanged(fe, OnMaxHeightChanged);
+        //        }
+        //    }
+        //}
+
         static readonly DependencyPropertyDescriptor MaxWidthDesciptor = DependencyPropertyDescriptor.FromProperty(FrameworkElement.MaxWidthProperty, typeof(FrameworkElement));
         static readonly DependencyPropertyDescriptor MaxHeightDesciptor = DependencyPropertyDescriptor.FromProperty(FrameworkElement.MaxHeightProperty, typeof(FrameworkElement));
         protected override void OnVisualChildrenChanged(DependencyObject visualAdded, DependencyObject visualRemoved)
@@ -114,6 +132,8 @@ namespace QSoft.WPF.Panel
                 MaxHeightDesciptor.RemoveValueChanged(removefe, OnMaxHeightChanged);
             }
         }
+
+        
 
         void OnMaxWidthChanged(object? sender, EventArgs e)
         {
