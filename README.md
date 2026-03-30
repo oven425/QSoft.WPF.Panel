@@ -21,7 +21,7 @@
 
 </Window>
 ```
-## Direction: Row,Column
+## Direction: Row,Column,RowReverse,ColumnReverse
 ```xml
 <qpanel:FlexPanel FlexDirection="Row">
     <Button>Test1</Button>
