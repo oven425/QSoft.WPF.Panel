@@ -66,7 +66,7 @@ export const ScrollT = () => {
 
     const pixelConvert = (data: string, dfv: string): string => {
         if (data === "") return dfv
-        let num = Number(data);
+        const num = Number(data);
         if (Number.isNaN(num)) return dfv
         return data + 'px';
     }
