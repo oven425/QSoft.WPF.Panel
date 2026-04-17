@@ -43,7 +43,7 @@ namespace QSoft.WPF.Panel
 
     public class FlexPanel : System.Windows.Controls.Panel
     {
-        public readonly static DependencyProperty JustifyContentProperty = DependencyProperty.Register("JustifyContent", typeof(JustifyContent), typeof(FlexPanel), new FrameworkPropertyMetadata(JustifyContent.Start, FrameworkPropertyMetadataOptions.AffectsMeasure));
+        public readonly static DependencyProperty JustifyContentProperty = DependencyProperty.Register("JustifyContent", typeof(JustifyContent), typeof(FlexPanel), new FrameworkPropertyMetadata(JustifyContent.Start, FrameworkPropertyMetadataOptions.AffectsArrange));
         [Category("FlexPanel")]
         public JustifyContent JustifyContent
         {
@@ -51,7 +51,7 @@ namespace QSoft.WPF.Panel
             get => (JustifyContent)GetValue(JustifyContentProperty);
         }
 
-        public readonly static DependencyProperty AlignItemsProperty = DependencyProperty.Register("AlignItems", typeof(AlignItems), typeof(FlexPanel), new FrameworkPropertyMetadata(AlignItems.Start, FrameworkPropertyMetadataOptions.AffectsMeasure));
+        public readonly static DependencyProperty AlignItemsProperty = DependencyProperty.Register("AlignItems", typeof(AlignItems), typeof(FlexPanel), new FrameworkPropertyMetadata(AlignItems.Start, FrameworkPropertyMetadataOptions.AffectsArrange));
         [Category("FlexPanel")]
         public AlignItems AlignItems
         {
@@ -83,38 +83,49 @@ namespace QSoft.WPF.Panel
             get => (FlexDirection)GetValue(FlexDirectionProperty);
         }
 
-        public static readonly DependencyProperty AlignSelfProperty = DependencyProperty.RegisterAttached("AlignSelf", typeof(AlignSelf), typeof(FlexPanel), new FrameworkPropertyMetadata(AlignSelf.Auto, FrameworkPropertyMetadataOptions.AffectsParentArrange|FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+        public static readonly DependencyProperty AlignSelfProperty = DependencyProperty.RegisterAttached("AlignSelf", typeof(AlignSelf), typeof(FlexPanel), new FrameworkPropertyMetadata(AlignSelf.Auto, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
         public static AlignSelf GetAlignSelf(DependencyObject obj) => (AlignSelf)obj.GetValue(AlignSelfProperty);
         public static void SetAlignSelf(DependencyObject obj, AlignSelf value) => obj.SetValue(AlignSelfProperty, value);
 
-        public static readonly DependencyProperty GrowProperty = DependencyProperty.RegisterAttached("Grow", typeof(double), typeof(FlexPanel), new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+        public static readonly DependencyProperty GrowProperty = DependencyProperty.RegisterAttached("Grow", typeof(double), typeof(FlexPanel), new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
         public static double GetGrow(DependencyObject obj) => (double)obj.GetValue(GrowProperty);
         public static void SetGrow(DependencyObject obj, double value) => obj.SetValue(GrowProperty, value);
 
-        public static readonly DependencyProperty BasisProperty = DependencyProperty.RegisterAttached("Basis", typeof(double), typeof(FlexPanel), new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsParentArrange|FrameworkPropertyMetadataOptions.AffectsParentMeasure | FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+        public static readonly DependencyProperty BasisProperty = DependencyProperty.RegisterAttached("Basis", typeof(double), typeof(FlexPanel), new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsParentArrange|FrameworkPropertyMetadataOptions.AffectsParentMeasure | FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
         public static double GetBasis(DependencyObject obj) => (double)obj.GetValue(BasisProperty);
         public static void SetBasis(DependencyObject obj, double value) => obj.SetValue(BasisProperty, value);
 
-        public static readonly DependencyProperty ShrinkProperty = DependencyProperty.RegisterAttached("Shrink", typeof(double), typeof(FlexPanel), new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.AffectsMeasure | FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
-        public static double GetShrink(DependencyObject obj) => (double)obj.GetValue(ShrinkProperty);
-        public static void SetShrink(DependencyObject obj, double value) => obj.SetValue(ShrinkProperty, value);
-
         public FlexPanel()
         {
-            //this.Unloaded+= OnUnloaded; 
+            this.Loaded += FlexPanel_Loaded;
+            this.Unloaded += OnUnloaded;
         }
 
-        //void OnUnloaded(object sender, RoutedEventArgs e)
-        //{
-        //    foreach (UIElement child in this.InternalChildren)
-        //    {
-        //        if (child is FrameworkElement fe)
-        //        {
-        //            MaxWidthDesciptor.RemoveValueChanged(fe, OnMaxWidthChanged);
-        //            MaxHeightDesciptor.RemoveValueChanged(fe, OnMaxHeightChanged);
-        //        }
-        //    }
-        //}
+        private void FlexPanel_Loaded(object sender, RoutedEventArgs e)
+        {
+            foreach (UIElement child in this.InternalChildren)
+            {
+                if (child is FrameworkElement fe)
+                {
+                    MaxWidthDesciptor.RemoveValueChanged(fe, OnMaxWidthChanged);
+                    MaxHeightDesciptor.RemoveValueChanged(fe, OnMaxHeightChanged);
+                    MaxWidthDesciptor.AddValueChanged(fe, OnMaxWidthChanged);
+                    MaxHeightDesciptor.AddValueChanged(fe, OnMaxHeightChanged);
+                }
+            }
+        }
+
+        void OnUnloaded(object sender, RoutedEventArgs e)
+        {
+            foreach (UIElement child in this.InternalChildren)
+            {
+                if (child is FrameworkElement fe)
+                {
+                    MaxWidthDesciptor.RemoveValueChanged(fe, OnMaxWidthChanged);
+                    MaxHeightDesciptor.RemoveValueChanged(fe, OnMaxHeightChanged);
+                }
+            }
+        }
 
         static readonly DependencyPropertyDescriptor MaxWidthDesciptor = DependencyPropertyDescriptor.FromProperty(FrameworkElement.MaxWidthProperty, typeof(FrameworkElement));
         static readonly DependencyPropertyDescriptor MaxHeightDesciptor = DependencyPropertyDescriptor.FromProperty(FrameworkElement.MaxHeightProperty, typeof(FrameworkElement));
@@ -123,6 +134,8 @@ namespace QSoft.WPF.Panel
             base.OnVisualChildrenChanged(visualAdded, visualRemoved);
             if(visualAdded is FrameworkElement addfe)
             {
+                MaxWidthDesciptor.RemoveValueChanged(addfe, OnMaxWidthChanged);
+                MaxHeightDesciptor.RemoveValueChanged(addfe, OnMaxHeightChanged);
                 MaxWidthDesciptor.AddValueChanged(addfe, OnMaxWidthChanged);
                 MaxHeightDesciptor.AddValueChanged(addfe, OnMaxHeightChanged);
             }
@@ -188,26 +201,20 @@ namespace QSoft.WPF.Panel
 
                 if (isRow && basis > 0)
                 {
-                    if(basis > child.MaxWidth)
-                    {
-                        basis = child.MaxWidth;
-                    }
-                    else if(basis < child.MinWidth)
-                    {
-                        basis = child.MinWidth;
-                    }
+#if NET5_0_OR_GREATER
+                    basis = Math.Clamp(basis, child.MinWidth, child.MaxWidth);
+#else
+                    basis = Math.Max(child.MinWidth, Math.Min(basis, child.MaxWidth));
+#endif
                     childDesiredSize.Width = basis;
                 }
                 else if (!isRow && basis > 0)
                 {
-                    if (basis > child.MaxHeight)
-                    {
-                        basis = child.MaxHeight;
-                    }
-                    else if (basis < child.MinHeight)
-                    {
-                        basis = child.MinHeight;
-                    }
+#if NET5_0_OR_GREATER
+                    basis = Math.Clamp(basis, child.MinHeight, child.MaxHeight);
+#else
+                     basis = Math.Max(child.MinHeight, Math.Min(basis, child.MaxHeight));
+#endif
                     childDesiredSize.Height = basis;
                 }
                 if (isRow)
@@ -253,13 +260,6 @@ namespace QSoft.WPF.Panel
             var totalgap = TotalGap();
             var direction = this.FlexDirection;
 
-            var shrinkmode = direction switch
-            { 
-                FlexDirection.Row => this.DesiredSize.Width > finalSize.Width,
-                FlexDirection.Column => this.DesiredSize.Height > finalSize.Height,
-                _=>false
-            };
-
 
             if (grows.Length < childrenCount)
             {
@@ -269,7 +269,7 @@ namespace QSoft.WPF.Panel
             {
                 Array.Resize(ref rcs, childrenCount *2);
             }
-
+            bool isclacgrow = false;
             for (int i = 0; i < childrenCount; i++)
             {
                 var child = (FrameworkElement)InternalChildren[i];
@@ -278,7 +278,6 @@ namespace QSoft.WPF.Panel
                 rcs[i].Y = 0;
                 rcs[i].Width = desiredSize.Width;
                 rcs[i].Height = desiredSize.Height;
-                var shrink = GetShrink(child);
                 var basis = GetBasis(child);
                 if (basis != 0)
                 {
@@ -286,43 +285,27 @@ namespace QSoft.WPF.Panel
                     {
                         case FlexDirection.Row:
                         case FlexDirection.RowReverse:
-                            if (basis > child.MaxWidth)
-                            {
-                                basis = child.MaxWidth;
-                            }
-                            else if (basis < child.MinWidth)
-                            {
-                                basis = child.MinWidth;
-                            }
+#if NET5_0_OR_GREATER
+                            basis = Math.Clamp(basis, child.MinWidth, child.MaxWidth);
+#else
+                            basis = Math.Max(child.MinWidth, Math.Min(basis, child.MaxWidth));
+#endif
                             rcs[i].Width = basis;
                             break;
                         case FlexDirection.Column:
                         case FlexDirection.ColumnReverse:
-                            if (basis > child.MaxHeight)
-                            {
-                                basis = child.MaxHeight;
-                            }
-                            else if (basis < child.MinHeight)
-                            {
-                                basis = child.MinHeight;
-                            }
+#if NET5_0_OR_GREATER
+                            basis = Math.Clamp(basis, child.MinHeight, child.MaxHeight);
+#else
+                            basis = Math.Max(child.MinHeight, Math.Min(basis, child.MaxHeight));
+#endif
                             rcs[i].Height = basis;
                             break;
                     }
                 }
-            }
-            
-            
 
-            bool isclacgrow = false;
-            for (int i = 0; i < childrenCount; i++)
-            {
-                var child = (FrameworkElement)InternalChildren[i];
                 var grow = GetGrow(child);
-                if(!isclacgrow && grow > 0)
-                {
-                    isclacgrow = true;
-                }
+                isclacgrow = !isclacgrow && grow > 0;
                 grows[i] = Math.Max(grow, 0);
             }
 
@@ -334,7 +317,6 @@ namespace QSoft.WPF.Panel
             else
             {
                 CalacJustifyContent(rcs, finalSize, this.JustifyContent, direction, padding, gap, totalgap);
-                
             }
             
             CalacAlignItems(rcs, finalSize, direction, padding);
@@ -744,7 +726,7 @@ namespace QSoft.WPF.Panel
                                 {
                                     x -= rcs[i].Width;
                                     rcs[i].X = x;
-                                    x -= iw - gap;
+                                    x = x - iw- gap;
                                 }
                                 break;
                             case FlexDirection.Column:
