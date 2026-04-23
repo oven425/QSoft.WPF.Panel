@@ -28,7 +28,6 @@ namespace QSoft.WPF.Panel
         End,
         Center,
         Stretch,
-        //BaeseLine
     }
 
     public enum AlignSelf
@@ -107,9 +106,9 @@ namespace QSoft.WPF.Panel
             {
                 if (child is FrameworkElement fe)
                 {
-                    MaxWidthDesciptor.RemoveValueChanged(fe, OnMaxWidthChanged);
+                    MaxWidthDescriptor.RemoveValueChanged(fe, OnMaxWidthChanged);
                     MaxHeightDesciptor.RemoveValueChanged(fe, OnMaxHeightChanged);
-                    MaxWidthDesciptor.AddValueChanged(fe, OnMaxWidthChanged);
+                    MaxWidthDescriptor.AddValueChanged(fe, OnMaxWidthChanged);
                     MaxHeightDesciptor.AddValueChanged(fe, OnMaxHeightChanged);
                 }
             }
@@ -121,27 +120,26 @@ namespace QSoft.WPF.Panel
             {
                 if (child is FrameworkElement fe)
                 {
-                    MaxWidthDesciptor.RemoveValueChanged(fe, OnMaxWidthChanged);
+                    MaxWidthDescriptor.RemoveValueChanged(fe, OnMaxWidthChanged);
                     MaxHeightDesciptor.RemoveValueChanged(fe, OnMaxHeightChanged);
                 }
             }
         }
-
-        static readonly DependencyPropertyDescriptor MaxWidthDesciptor = DependencyPropertyDescriptor.FromProperty(FrameworkElement.MaxWidthProperty, typeof(FrameworkElement));
+        static readonly DependencyPropertyDescriptor MaxWidthDescriptor = DependencyPropertyDescriptor.FromProperty(FrameworkElement.MaxWidthProperty, typeof(FrameworkElement));
         static readonly DependencyPropertyDescriptor MaxHeightDesciptor = DependencyPropertyDescriptor.FromProperty(FrameworkElement.MaxHeightProperty, typeof(FrameworkElement));
         protected override void OnVisualChildrenChanged(DependencyObject visualAdded, DependencyObject visualRemoved)
         {
             base.OnVisualChildrenChanged(visualAdded, visualRemoved);
             if(visualAdded is FrameworkElement addfe)
             {
-                MaxWidthDesciptor.RemoveValueChanged(addfe, OnMaxWidthChanged);
+                MaxWidthDescriptor.RemoveValueChanged(addfe, OnMaxWidthChanged);
                 MaxHeightDesciptor.RemoveValueChanged(addfe, OnMaxHeightChanged);
-                MaxWidthDesciptor.AddValueChanged(addfe, OnMaxWidthChanged);
+                MaxWidthDescriptor.AddValueChanged(addfe, OnMaxWidthChanged);
                 MaxHeightDesciptor.AddValueChanged(addfe, OnMaxHeightChanged);
             }
             if (visualRemoved is FrameworkElement removefe)
             {
-                MaxWidthDesciptor.RemoveValueChanged(removefe, OnMaxWidthChanged);
+                MaxWidthDescriptor.RemoveValueChanged(removefe, OnMaxWidthChanged);
                 MaxHeightDesciptor.RemoveValueChanged(removefe, OnMaxHeightChanged);
             }
         }
@@ -305,21 +303,21 @@ namespace QSoft.WPF.Panel
                 }
 
                 var grow = GetGrow(child);
-                isclacgrow = !isclacgrow && grow > 0;
+                isclacgrow = isclacgrow || grow > 0;
                 grows[i] = Math.Max(grow, 0);
             }
 
             
             if (isclacgrow)
             {
-                this.CalacGrow(rcs, finalSize, grows, direction, padding, gap, totalgap);
+                this.CalcGrow(rcs, finalSize, grows, direction, padding, gap, totalgap);
             }
             else
             {
-                CalacJustifyContent(rcs, finalSize, this.JustifyContent, direction, padding, gap, totalgap);
+                CalcJustifyContent(rcs, finalSize, this.JustifyContent, direction, padding, gap, totalgap);
             }
             
-            CalacAlignItems(rcs, finalSize, direction, padding);
+            CalcAlignItems(rcs, finalSize, direction, padding);
 
             for (int i = 0; i < childrenCount; i++)
             {
@@ -328,7 +326,7 @@ namespace QSoft.WPF.Panel
 
             return finalSize;
         }
-        void CalacGrow(Rect[] rcs, in Size finalSize, double[] grows, FlexDirection direction,in Thickness padding , double gap, double totalgap)
+        void CalcGrow(Rect[] rcs, in Size finalSize, double[] grows, FlexDirection direction,in Thickness padding , double gap, double totalgap)
         {
             var item_w = 0.0;
             var item_h = 0.0;
@@ -423,7 +421,7 @@ namespace QSoft.WPF.Panel
             }
         }
 
-        void CalacAlignItems(Rect[] rcs, in Size finalSize, FlexDirection direction, in Thickness padding)
+        void CalcAlignItems(Rect[] rcs, in Size finalSize, FlexDirection direction, in Thickness padding)
         {
             for(int i=0; i < this.InternalChildren.Count; i++) 
             {
@@ -479,12 +477,12 @@ namespace QSoft.WPF.Panel
                             {
                                 case FlexDirection.Row:
                                 case FlexDirection.RowReverse:
-                                    rcs[i].Y = (finalSize.Height - child.DesiredSize.Height) / 2;
+                                    rcs[i].Y = (finalSize.Height - child.DesiredSize.Height - padding.Top - padding.Bottom) / 2 + padding.Top;
                                     rcs[i].Height = child.DesiredSize.Height;
                                     break;
                                 case FlexDirection.Column:
                                 case FlexDirection.ColumnReverse:
-                                    rcs[i].X = (finalSize.Width - child.DesiredSize.Width) / 2;
+                                    rcs[i].X = (finalSize.Width - child.DesiredSize.Width - padding.Left - padding.Right) / 2 + padding.Left;
                                     rcs[i].Width = child.DesiredSize.Width;
                                     break;
                             }
@@ -517,7 +515,7 @@ namespace QSoft.WPF.Panel
             ? this.Gap * (this.InternalChildren.Count - 1)
             : 0;
 
-        void CalacJustifyContent(Rect[] rcs, in Size finalSize, JustifyContent justify, FlexDirection direction, in Thickness padding, double gap, double totalgap)
+        void CalcJustifyContent(Rect[] rcs, in Size finalSize, JustifyContent justify, FlexDirection direction, in Thickness padding, double gap, double totalgap)
         {
             double x = padding.Left;
             double y = padding.Top;
@@ -618,16 +616,17 @@ namespace QSoft.WPF.Panel
                     switch (direction)
                     {
                         case FlexDirection.Row:
-                            x = (finalSize.Width - totalw - totalgap) / 2;
-                            for(int i=0; i< this.InternalChildren.Count; i++)
+                            x = (finalSize.Width - totalw - totalgap - padding.Left - padding.Right) / 2;
+                            x = x+padding.Left;
+                            for (int i=0; i< this.InternalChildren.Count; i++)
                             {
                                 rcs[i].X = x;
-                                x += rcs[i].Width + gap;
+                                x += rcs[i].Width + gap;    
                             }
                             break;
                         case FlexDirection.RowReverse:
-                            x = (finalSize.Width - totalw - totalgap) / 2;
-                            x = finalSize.Width - x;
+                            x = (finalSize.Width - totalw - totalgap - padding.Left - padding.Right) / 2;
+                            x = finalSize.Width - padding.Right - x;
                             for(int i=0; i< this.InternalChildren.Count; i++)
                             {
                                 x -= rcs[i].Width;
@@ -636,7 +635,8 @@ namespace QSoft.WPF.Panel
                             }
                             break;
                         case FlexDirection.Column:
-                            y = Math.Max(0, (finalSize.Height - totalh - totalgap) / 2);
+                            y = Math.Max(0, (finalSize.Height - totalh - totalgap - padding.Top - padding.Bottom) / 2);
+                            y = y+padding.Top;
                             for(int i=0; i< this.InternalChildren.Count; i++)
                             {
                                 rcs[i].Y = y;
@@ -644,8 +644,8 @@ namespace QSoft.WPF.Panel
                             }
                             break;
                         case FlexDirection.ColumnReverse:
-                            y = Math.Max(0, (finalSize.Height - totalh - totalgap) / 2);
-                            y = finalSize.Height - y;
+                            y = Math.Max(0, (finalSize.Height - totalh - totalgap - padding.Top - padding.Bottom) / 2);
+                            y = finalSize.Height - padding.Bottom - y;
                             for (int i = 0; i < this.InternalChildren.Count; i++)
                             {
                                 y -= rcs[i].Height;
