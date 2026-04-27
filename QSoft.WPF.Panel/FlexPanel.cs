@@ -107,9 +107,9 @@ namespace QSoft.WPF.Panel
                 if (child is FrameworkElement fe)
                 {
                     MaxWidthDescriptor.RemoveValueChanged(fe, OnMaxWidthChanged);
-                    MaxHeightDesciptor.RemoveValueChanged(fe, OnMaxHeightChanged);
+                    MaxHeightDescriptor.RemoveValueChanged(fe, OnMaxHeightChanged);
                     MaxWidthDescriptor.AddValueChanged(fe, OnMaxWidthChanged);
-                    MaxHeightDesciptor.AddValueChanged(fe, OnMaxHeightChanged);
+                    MaxHeightDescriptor.AddValueChanged(fe, OnMaxHeightChanged);
                 }
             }
         }
@@ -121,30 +121,28 @@ namespace QSoft.WPF.Panel
                 if (child is FrameworkElement fe)
                 {
                     MaxWidthDescriptor.RemoveValueChanged(fe, OnMaxWidthChanged);
-                    MaxHeightDesciptor.RemoveValueChanged(fe, OnMaxHeightChanged);
+                    MaxHeightDescriptor.RemoveValueChanged(fe, OnMaxHeightChanged);
                 }
             }
         }
         static readonly DependencyPropertyDescriptor MaxWidthDescriptor = DependencyPropertyDescriptor.FromProperty(FrameworkElement.MaxWidthProperty, typeof(FrameworkElement));
-        static readonly DependencyPropertyDescriptor MaxHeightDesciptor = DependencyPropertyDescriptor.FromProperty(FrameworkElement.MaxHeightProperty, typeof(FrameworkElement));
+        static readonly DependencyPropertyDescriptor MaxHeightDescriptor = DependencyPropertyDescriptor.FromProperty(FrameworkElement.MaxHeightProperty, typeof(FrameworkElement));
         protected override void OnVisualChildrenChanged(DependencyObject visualAdded, DependencyObject visualRemoved)
         {
             base.OnVisualChildrenChanged(visualAdded, visualRemoved);
             if(visualAdded is FrameworkElement addfe)
             {
                 MaxWidthDescriptor.RemoveValueChanged(addfe, OnMaxWidthChanged);
-                MaxHeightDesciptor.RemoveValueChanged(addfe, OnMaxHeightChanged);
+                MaxHeightDescriptor.RemoveValueChanged(addfe, OnMaxHeightChanged);
                 MaxWidthDescriptor.AddValueChanged(addfe, OnMaxWidthChanged);
-                MaxHeightDesciptor.AddValueChanged(addfe, OnMaxHeightChanged);
+                MaxHeightDescriptor.AddValueChanged(addfe, OnMaxHeightChanged);
             }
             if (visualRemoved is FrameworkElement removefe)
             {
                 MaxWidthDescriptor.RemoveValueChanged(removefe, OnMaxWidthChanged);
-                MaxHeightDesciptor.RemoveValueChanged(removefe, OnMaxHeightChanged);
+                MaxHeightDescriptor.RemoveValueChanged(removefe, OnMaxHeightChanged);
             }
         }
-
-        
 
         void OnMaxWidthChanged(object? sender, EventArgs e)
         {
