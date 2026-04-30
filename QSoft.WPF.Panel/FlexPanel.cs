@@ -174,13 +174,13 @@ namespace QSoft.WPF.Panel
             }
         }
 
-        protected override Size MeasureOverride(Size availableSize)
+        protected override System.Windows.Size MeasureOverride(System.Windows.Size availableSize)
         {
             var childrenCount = this.InternalChildren.Count;
-            if (childrenCount == 0) return new Size(0, 0);
+            if (childrenCount == 0) return new System.Windows.Size(0, 0);
 
             var totalGap = TotalGap();
-            var desiredSize = new Size(0, 0);
+            var desiredSize = new System.Windows.Size(0, 0);
             bool isRow = this.FlexDirection switch
             { 
                 FlexDirection.Row => true,
@@ -245,7 +245,7 @@ namespace QSoft.WPF.Panel
 
         double[] grows = [];
         Rect[] rcs = [];
-        protected override Size ArrangeOverride(Size finalSize)
+        protected override System.Windows.Size ArrangeOverride(System.Windows.Size finalSize)
         {
             var childrenCount = this.InternalChildren.Count;
             if (childrenCount == 0)
@@ -324,7 +324,7 @@ namespace QSoft.WPF.Panel
 
             return finalSize;
         }
-        void CalcGrow(Rect[] rcs, in Size finalSize, double[] grows, FlexDirection direction,in Thickness padding , double gap, double totalgap)
+        void CalcGrow(Rect[] rcs, in System.Windows.Size finalSize, double[] grows, FlexDirection direction,in Thickness padding , double gap, double totalgap)
         {
             var item_w = 0.0;
             var item_h = 0.0;
@@ -419,7 +419,7 @@ namespace QSoft.WPF.Panel
             }
         }
 
-        void CalcAlignItems(Rect[] rcs, in Size finalSize, FlexDirection direction, in Thickness padding)
+        void CalcAlignItems(Rect[] rcs, in System.Windows.Size finalSize, FlexDirection direction, in Thickness padding)
         {
             for(int i=0; i < this.InternalChildren.Count; i++) 
             {
@@ -513,7 +513,7 @@ namespace QSoft.WPF.Panel
             ? this.Gap * (this.InternalChildren.Count - 1)
             : 0;
 
-        void CalcJustifyContent(Rect[] rcs, in Size finalSize, JustifyContent justify, FlexDirection direction, in Thickness padding, double gap, double totalgap)
+        void CalcJustifyContent(Rect[] rcs, in System.Windows.Size finalSize, JustifyContent justify, FlexDirection direction, in Thickness padding, double gap, double totalgap)
         {
             double x = padding.Left;
             double y = padding.Top;
