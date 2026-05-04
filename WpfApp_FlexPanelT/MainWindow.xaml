@@ -22,6 +22,13 @@
                 <TabItem Header="Container">
                     <qpanel:FlexPanel FlexDirection="Column" Gap="8" AlignItems="Stretch">
                         <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
+                            <TextBlock Text="Flex-wrap"/>
+                            <ComboBox SelectedValuePath="Tag" SelectedValue="{Binding FlexWrap, ElementName=flexpanel}">
+                                <ComboBoxItem Content="NoWrap" Tag="{x:Static qpanel:FlexWrap.NoWrap}"/>
+                                <ComboBoxItem Content="Wrap" Tag="{x:Static qpanel:FlexWrap.Wrap}"/>
+                            </ComboBox>
+                        </qpanel:FlexPanel>
+                        <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
                             <TextBlock Text="Flex-direction"/>
                             <ComboBox SelectedValuePath="Tag" SelectedValue="{Binding FlexDirection, ElementName=flexpanel}">
                                 <ComboBoxItem Content="Row" Tag="{x:Static qpanel:FlexDirection.Row}"/>

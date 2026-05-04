@@ -5,6 +5,12 @@ using System.Windows;
 //https://w3c.hexschool.com/flexbox/4a029043
 namespace QSoft.WPF.Panel
 {
+    public enum FlexWrap
+    {
+        NoWrap,
+        Wrap,
+        //WrapReverse
+    }
     public enum FlexDirection
     {
         Row,
@@ -42,6 +48,14 @@ namespace QSoft.WPF.Panel
 
     public class FlexPanel : System.Windows.Controls.Panel
     {
+        public readonly static DependencyProperty FlexWrapProperty = DependencyProperty.Register("FlexWrap", typeof(FlexWrap), typeof(FlexPanel), new FrameworkPropertyMetadata(FlexWrap.NoWrap, FrameworkPropertyMetadataOptions.AffectsArrange));
+        [Category("FlexPanel")]
+        public FlexWrap FlexWrap
+        {
+            set => this.SetValue(FlexWrapProperty, value);
+            get => (FlexWrap)GetValue(FlexWrapProperty);
+        }
+
         public readonly static DependencyProperty JustifyContentProperty = DependencyProperty.Register("JustifyContent", typeof(JustifyContent), typeof(FlexPanel), new FrameworkPropertyMetadata(JustifyContent.Start, FrameworkPropertyMetadataOptions.AffectsArrange));
         [Category("FlexPanel")]
         public JustifyContent JustifyContent
