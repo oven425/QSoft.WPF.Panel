@@ -10,7 +10,7 @@ import type { ItemSettingContext } from './ItemSetting'
 import useThemeMode from './useThemeMode'
 
 function App() {
-  const [containerSetting, setContainerSetting] = useState<ContainerSettingContext>({ gap: '0', alignItems: 'items-start', justifyContent: 'justify-start', direction: 'flex-row', isShowScrollbar: false });
+  const [containerSetting, setContainerSetting] = useState<ContainerSettingContext>({ wrap: 'nowrap', gap: '0', alignItems: 'items-start', justifyContent: 'justify-start', direction: 'flex-row', isShowScrollbar: false });
   const [items, setItems] = useState<ItemSettingContext[]>([]);
   const [item, setItem] = useState<ItemSettingContext | null>(null);
   const id = useRef(0);

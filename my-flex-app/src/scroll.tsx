@@ -9,7 +9,7 @@ import useThemeMode from './useThemeMode'
 
 export const ScrollT = () => {
     const [containerOpen, setContainerOpen] = useState(false);
-    const [containerSetting, setContainerSetting] = useState<ContainerSettingContext>({ gap: '0', alignItems: 'items-start', justifyContent: 'justify-start', direction: 'flex-row', wrap: 'flex-nowrap', isShowScrollbar: false });
+    const [containerSetting, setContainerSetting] = useState<ContainerSettingContext>({ wrap: 'nowrap', gap: '0', alignItems: 'items-start', justifyContent: 'justify-start', direction: 'flex-row', isShowScrollbar: false });
     const [items, setItems] = useState<ItemSettingContext[]>([]);
     const [item, setItem] = useState<ItemSettingContext | null>(null);
     const id = useRef(0);
@@ -113,15 +113,9 @@ export const ScrollT = () => {
                 </div>
             </aside>
             <main className="overflow-auto min-h-0 min-w-0 bg-neutral-200 dark:bg-gray-950">
-
-                {/* 2. Wrapper 負責撐開內容與 Padding */}
-                <div className="min-w-full min-h-full p-8 flex flex-col">
-
-                    {/* 3. Box 負責渲染背景與排列內部 */}
-                    <div id="box"
-                        style={{ gap: `${containerSetting.gap}px` }}
-                        className={`flex-1 flex ${containerSetting.wrap} ${containerSetting.direction} ${containerSetting.alignItems} ${containerSetting.justifyContent} dark:bg-gray-900 bg-neutral-200 rounded-sm`}
-                    >
+                <div className="min-w-full min-h-full p-3 flex flex-col">
+                    <div id="box" style={{ gap: `${containerSetting.gap}px` }}
+                        className={`flex-1 flex ${containerSetting.wrap} ${containerSetting.direction} ${containerSetting.alignItems} ${containerSetting.justifyContent} dark:bg-gray-900 bg-neutral-200 rounded-sm`}>
                         {
                             items.map((x, i) => (
                                 <div key={i} style={{ width: pixelConvert(x.width, 'auto'), minWidth: pixelConvert(x.minWidth, '0'), maxWidth: pixelConvert(x.maxWidth, 'none'), height: pixelConvert(x.height, 'auto'), flexGrow: `${x.grow}`, flexShrink: `${x.shrink}`, flexBasis: pixelConvert(x.basis, 'auto') }} className={`dark:bg-gray-800 overflow-hidden bg-white border-neutral-400 flex ${x.alignSelf} p-0.5 border rounded-sm dark:border-gray-600`} >
