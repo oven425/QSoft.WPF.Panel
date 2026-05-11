@@ -195,6 +195,8 @@ namespace QSoft.WPF.Panel
 
             var totalGap = TotalGap();
             var desiredSize = new System.Windows.Size(0, 0);
+
+
             bool isRow = this.FlexDirection switch
             { 
                 FlexDirection.Row => true,
@@ -269,7 +271,7 @@ namespace QSoft.WPF.Panel
             var gap = this.Gap;
             var totalgap = TotalGap();
             var direction = this.FlexDirection;
-
+            var wrap = this.FlexWrap;
 
             if (grows.Length < childrenCount)
             {
@@ -535,6 +537,7 @@ namespace QSoft.WPF.Panel
             var totalh = 0.0;
             var totaldsw = 0.0;
             var totaldsh = 0.0;
+            
             for(int i=0; i< this.InternalChildren.Count; i++)
             {
                 var child = this.InternalChildren[i];

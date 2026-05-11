@@ -65,7 +65,7 @@
                             <TextBlock Text="Padding"/>
                             <TextBox Text="{Binding Padding, ElementName=flexpanel, UpdateSourceTrigger=PropertyChanged}"/>
                         </qpanel:FlexPanel>
-                        <CheckBox x:Name="checkbox_ishowscrollbar" IsChecked="True" Click="checkbox_ishowscrollbar_Click">Scrollbar</CheckBox>
+                        <CheckBox x:Name="checkbox_ishowscrollbar" IsChecked="False" Click="checkbox_ishowscrollbar_Click">Scrollbar</CheckBox>
                     </qpanel:FlexPanel>
                 </TabItem>
                 <TabItem Header="Item">
