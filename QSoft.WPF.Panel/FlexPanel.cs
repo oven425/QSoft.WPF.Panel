@@ -5,12 +5,12 @@ using System.Windows;
 //https://w3c.hexschool.com/flexbox/4a029043
 namespace QSoft.WPF.Panel
 {
-    public enum FlexWrap
-    {
-        NoWrap,
-        Wrap,
-        //WrapReverse
-    }
+    //public enum FlexWrap
+    //{
+    //    NoWrap,
+    //    Wrap,
+    //    //WrapReverse
+    //}
     public enum FlexDirection
     {
         Row,
@@ -48,13 +48,13 @@ namespace QSoft.WPF.Panel
 
     public class FlexPanel : System.Windows.Controls.Panel
     {
-        public readonly static DependencyProperty FlexWrapProperty = DependencyProperty.Register("FlexWrap", typeof(FlexWrap), typeof(FlexPanel), new FrameworkPropertyMetadata(FlexWrap.NoWrap, FrameworkPropertyMetadataOptions.AffectsArrange));
-        [Category("FlexPanel")]
-        public FlexWrap FlexWrap
-        {
-            set => this.SetValue(FlexWrapProperty, value);
-            get => (FlexWrap)GetValue(FlexWrapProperty);
-        }
+        //public readonly static DependencyProperty FlexWrapProperty = DependencyProperty.Register("FlexWrap", typeof(FlexWrap), typeof(FlexPanel), new FrameworkPropertyMetadata(FlexWrap.NoWrap, FrameworkPropertyMetadataOptions.AffectsMeasure));
+        //[Category("FlexPanel")]
+        //public FlexWrap FlexWrap
+        //{
+        //    set => this.SetValue(FlexWrapProperty, value);
+        //    get => (FlexWrap)GetValue(FlexWrapProperty);
+        //}
 
         public readonly static DependencyProperty JustifyContentProperty = DependencyProperty.Register("JustifyContent", typeof(JustifyContent), typeof(FlexPanel), new FrameworkPropertyMetadata(JustifyContent.Start, FrameworkPropertyMetadataOptions.AffectsArrange));
         [Category("FlexPanel")]
@@ -103,6 +103,10 @@ namespace QSoft.WPF.Panel
         public static readonly DependencyProperty GrowProperty = DependencyProperty.RegisterAttached("Grow", typeof(double), typeof(FlexPanel), new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
         public static double GetGrow(DependencyObject obj) => (double)obj.GetValue(GrowProperty);
         public static void SetGrow(DependencyObject obj, double value) => obj.SetValue(GrowProperty, value);
+
+        public static readonly DependencyProperty ShrinkProperty = DependencyProperty.RegisterAttached("Shrink", typeof(double), typeof(FlexPanel), new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+        public static double GetShrink(DependencyObject obj) => (double)obj.GetValue(ShrinkProperty);
+        public static void SetShrink(DependencyObject obj, double value) => obj.SetValue(ShrinkProperty, value);
 
         public static readonly DependencyProperty BasisProperty = DependencyProperty.RegisterAttached("Basis", typeof(double), typeof(FlexPanel), new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsParentArrange|FrameworkPropertyMetadataOptions.AffectsParentMeasure | FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
         public static double GetBasis(DependencyObject obj) => (double)obj.GetValue(BasisProperty);
@@ -255,6 +259,7 @@ namespace QSoft.WPF.Panel
 
             desiredSize.Width = Math.Min(desiredSize.Width, availableSize.Width);
             desiredSize.Height = Math.Min(desiredSize.Height, availableSize.Height);
+            
 
             return desiredSize;
         }
@@ -271,7 +276,6 @@ namespace QSoft.WPF.Panel
             var gap = this.Gap;
             var totalgap = TotalGap();
             var direction = this.FlexDirection;
-            var wrap = this.FlexWrap;
 
             if (grows.Length < childrenCount)
             {

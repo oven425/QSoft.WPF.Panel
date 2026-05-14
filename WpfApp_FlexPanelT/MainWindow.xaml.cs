@@ -26,12 +26,12 @@ namespace WpfApp_FlexPanelT
         {
             InitializeComponent();
             this.DataContext = this.m_MainUI = new MainUI();
+
         }
 
         private void button_addflex_Click(object sender, RoutedEventArgs e)
         {
-            var item = new FlexItem(new FlexItemVM()
-            { Name = $"Index:{this.flexpanel.Children.Count}" });
+            var item = new FlexItem(new FlexItemVM() { Name = $"Index:{this.flexpanel.Children.Count}" });
             //item.Width = 100;
             //FlexPanel.SetBasis(item, 100);
             item.Delete += Item_Delete;
@@ -124,6 +124,16 @@ namespace WpfApp_FlexPanelT
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             this.ShowScrollbar(checkbox_ishowscrollbar.IsChecked == true);
+            for(int i = 0; i < 10; i++)
+            {
+                var item = new FlexItem(new FlexItemVM() { Name = $"Index:{this.flexpanel.Children.Count}" });
+                //item.Width = 100;
+                //FlexPanel.SetBasis(item, 100);
+                item.Delete += Item_Delete;
+                item.Edit += Item_Edit;
+                this.flexpanel.Children.Add(item);
+            }
+            
         }
 
         private void textbox_minwidth_TextChanged(object sender, TextChangedEventArgs e)
@@ -206,7 +216,6 @@ namespace WpfApp_FlexPanelT
 
     public  class MainUI: INotifyPropertyChanged
     {
-        //public ObservableCollection<FlexItemVM> Items { get; set; } = [];
         FlexItemVM? m_ItemData;
         public FlexItemVM? ItemData
         {
@@ -216,12 +225,4 @@ namespace WpfApp_FlexPanelT
         public event PropertyChangedEventHandler? PropertyChanged;
         void Update([CallerMemberName]string name="")=>this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
-
-    //public class ItemData
-    //{
-    //    public AlignSelf AlignSelf { get; set; }
-    //    public double FlexGrow { set; get; }
-    //    public double FlexBasis { set; get; }
-    //}
-
 }
