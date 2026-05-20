@@ -9,7 +9,7 @@ import useThemeMode from './useThemeMode'
 
 export const ScrollT = () => {
     const [containerOpen, setContainerOpen] = useState(false);
-    const [containerSetting, setContainerSetting] = useState<ContainerSettingContext>({ wrap: 'nowrap', gap: '0', alignItems: 'items-start', justifyContent: 'justify-start', direction: 'flex-row', isShowScrollbar: false });
+    const [containerSetting, setContainerSetting] = useState<ContainerSettingContext>({ wrap: 'flex-nowrap', gap: '0', alignItems: 'items-start', justifyContent: 'justify-start', direction: 'flex-row', isShowScrollbar: false });
     const [items, setItems] = useState<ItemSettingContext[]>([]);
     const [item, setItem] = useState<ItemSettingContext | null>(null);
     const id = useRef(0);
