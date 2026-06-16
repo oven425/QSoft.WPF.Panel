@@ -124,15 +124,15 @@ namespace WpfApp_FlexPanelT
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             this.ShowScrollbar(checkbox_ishowscrollbar.IsChecked == true);
-            for(int i = 0; i < 10; i++)
-            {
-                var item = new FlexItem(new FlexItemVM() { Name = $"Index:{this.flexpanel.Children.Count}" });
-                //item.Width = 100;
-                //FlexPanel.SetBasis(item, 100);
-                item.Delete += Item_Delete;
-                item.Edit += Item_Edit;
-                this.flexpanel.Children.Add(item);
-            }
+            //for(int i = 0; i < 10; i++)
+            //{
+            //    var item = new FlexItem(new FlexItemVM() { Name = $"Index:{this.flexpanel.Children.Count}" });
+            //    //item.Width = 100;
+            //    //FlexPanel.SetBasis(item, 100);
+            //    item.Delete += Item_Delete;
+            //    item.Edit += Item_Edit;
+            //    this.flexpanel.Children.Add(item);
+            //}
             
         }
 

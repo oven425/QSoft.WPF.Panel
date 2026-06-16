@@ -15,7 +15,7 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <TextBlock Text="{Binding Name}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            <TextBlock Margin="3,0" Text="{Binding Name}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
             <Button Grid.Column="1" x:Name="button_edit" Click="button_edit_Click">
                 <Path Fill="#000000" Data="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z" />
             </Button>

@@ -265,6 +265,7 @@ namespace QSoft.WPF.Panel
         }
 
         double[] grows = [];
+        double[] shrinks = [];
         Rect[] rcs = [];
         protected override System.Windows.Size ArrangeOverride(System.Windows.Size finalSize)
         {
@@ -285,7 +286,13 @@ namespace QSoft.WPF.Panel
             {
                 Array.Resize(ref rcs, childrenCount *2);
             }
+            if (shrinks.Length < childrenCount)
+            {
+                Array.Resize(ref  shrinks, childrenCount * 2);
+            }
             bool isclacgrow = false;
+            bool isshrink = false;
+            var allw = 0.0;
             for (int i = 0; i < childrenCount; i++)
             {
                 var child = (FrameworkElement)InternalChildren[i];
@@ -319,16 +326,75 @@ namespace QSoft.WPF.Panel
                             break;
                     }
                 }
-
+                allw = allw + rcs[i].Width;
                 var grow = GetGrow(child);
-                isclacgrow = isclacgrow || grow > 0;
+                //isclacgrow = isclacgrow || grow > 0;
                 grows[i] = Math.Max(grow, 0);
+                shrinks[i] = GetShrink(child);
+            }
+            switch(direction)
+            {
+                case FlexDirection.Row:
+                case FlexDirection.RowReverse:
+                    if(allw > finalSize.Width)
+                    {
+                        for(var i= 0; i<shrinks.Length; i++)
+                        {
+                            if (shrinks[i] > 0)
+                            {
+                                isshrink = true;
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for (var i = 0; i < grows.Length; i++)
+                        {
+                            if (grows[i] > 0)
+                            {
+                                isclacgrow = true;
+                                break;
+                            }
+                        }
+                    }
+                    break;
+                case FlexDirection.Column:
+                case FlexDirection.ColumnReverse:
+                    if (this.DesiredSize.Height > finalSize.Height)
+                    {
+                        isclacgrow = false;
+                        for (var i = 0; i < shrinks.Length; i++)
+                        {
+                            if (shrinks[i] > 0)
+                            {
+                                isshrink = true;
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for (var i = 0; i < grows.Length; i++)
+                        {
+                            if (grows[i] > 0)
+                            {
+                                isclacgrow = true;
+                                break;
+                            }
+                        }
+                    }
+                    break;
             }
 
-            
+
             if (isclacgrow)
             {
                 this.CalcGrow(rcs, finalSize, grows, direction, padding, gap, totalgap);
+            }
+            else if(isshrink)
+            {
+
             }
             else
             {
@@ -358,7 +424,7 @@ namespace QSoft.WPF.Panel
                 var child = (FrameworkElement)InternalChildren[i];
                 var grow = grows[i];
                 sum += grow;
-                if (grow == 0)
+                //if (grow == 0)
                 {
                     zerogrow_w += child.DesiredSize.Width;
                     zerogrow_h += child.DesiredSize.Height;
@@ -373,10 +439,15 @@ namespace QSoft.WPF.Panel
                     for(int i=0; i< this.InternalChildren.Count; i++)
                     {
                         var child = (FrameworkElement)InternalChildren[i];
-                        item_w = grows[i] * iw;
-                        if (item_w <= 0)
+                        //item_w = grows[i] * iw;
+                        //if (item_w <= 0)
+                        //{
+                        //    item_w = child.DesiredSize.Width;
+                        //}
+                        item_w = child.DesiredSize.Width;
+                        if (grows[i] > 0)
                         {
-                            item_w = child.DesiredSize.Width;
+                            item_w = item_w + grows[i] * iw;
                         }
                         rcs[i].Width = item_w;
                         rcs[i].X = x;
@@ -390,10 +461,15 @@ namespace QSoft.WPF.Panel
                     for (int i = 0; i < this.InternalChildren.Count; i++)
                     {
                         var child = (FrameworkElement)InternalChildren[i];
-                        item_w = grows[i] * iw;
-                        if (item_w <= 0)
+                        //item_w = grows[i] * iw;
+                        //if (item_w <= 0)
+                        //{
+                        //    item_w = child.DesiredSize.Width;
+                        //}
+                        item_w = child.DesiredSize.Width;
+                        if (grows[i] > 0)
                         {
-                            item_w = child.DesiredSize.Width;
+                            item_w = item_w + grows[i] * iw;
                         }
                         x -= item_w;
                         rcs[i].X = x;
@@ -407,10 +483,15 @@ namespace QSoft.WPF.Panel
                     for(int i = 0; i < this.InternalChildren.Count; i++)
                     {
                         var child = (FrameworkElement)InternalChildren[i];
-                        item_h = grows[i] * ih;
-                        if (item_h <= 0)
+                        //item_h = grows[i] * ih;
+                        //if (item_h <= 0)
+                        //{
+                        //    item_h = child.DesiredSize.Height;
+                        //}
+                        item_h = child.DesiredSize.Height;
+                        if (grows[i] > 0)
                         {
-                            item_h = child.DesiredSize.Height;
+                            item_h = item_h + grows[i] * ih;
                         }
                         rcs[i].Height = item_h;
                         rcs[i].Y = y;
@@ -424,10 +505,15 @@ namespace QSoft.WPF.Panel
                     for (int i = 0; i < this.InternalChildren.Count; i++)
                     {
                         var child = (FrameworkElement)InternalChildren[i];
-                        item_h = grows[i] * ih;
-                        if (item_h <= 0)
+                        //item_h = grows[i] * ih;
+                        //if (item_h <= 0)
+                        //{
+                        //    item_h = child.DesiredSize.Height;
+                        //}
+                        item_h = child.DesiredSize.Height;
+                        if (grows[i] > 0)
                         {
-                            item_h = child.DesiredSize.Height;
+                            item_h = item_h + grows[i] * ih;
                         }
                         y -= item_h;
                         rcs[i].Height = item_h;
