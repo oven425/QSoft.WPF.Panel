@@ -328,9 +328,9 @@ namespace QSoft.WPF.Panel
                 }
                 allw = allw + rcs[i].Width;
                 var grow = GetGrow(child);
-                //isclacgrow = isclacgrow || grow > 0;
                 grows[i] = Math.Max(grow, 0);
-                shrinks[i] = GetShrink(child);
+                var shrink = GetShrink(child);
+                shrinks[i] = Math.Max(shrink, 0);
             }
             switch(direction)
             {
@@ -394,7 +394,7 @@ namespace QSoft.WPF.Panel
             }
             else if(isshrink)
             {
-
+                this.CalcShrink(rcs, finalSize, shrinks, direction, padding, gap, totalgap);
             }
             else
             {
@@ -410,6 +410,44 @@ namespace QSoft.WPF.Panel
 
             return finalSize;
         }
+
+        void CalcShrink(Rect[] rcs, in System.Windows.Size finalSize, double[] shrinks, FlexDirection direction, in Thickness padding, double gap, double totalgap)
+        {
+            var item_w = 0.0;
+            var item_h = 0.0;
+            double x = padding.Left;
+            double y = padding.Top;
+            var sum = 0.0;
+            var all_w = 0.0;
+            var all_h = 0.0;
+            for (int i = 0; i < this.InternalChildren.Count; i++)
+            {
+                var child = (FrameworkElement)InternalChildren[i];
+                sum += shrinks[i];
+                all_w += rcs[i].Width;
+                all_h += rcs[i].Height;
+            }
+            switch(direction)
+            {
+                case FlexDirection.Row:
+                    var iw = finalSize.Width - (all_w + totalgap + padding.Left + padding.Right);
+                    iw = iw / sum;
+                    for (int i = 0; i < this.InternalChildren.Count; i++)
+                    {
+                        var child = (FrameworkElement)InternalChildren[i];
+                        item_w = child.DesiredSize.Width;
+                        if (shrinks[i] > 0)
+                        {
+                            item_w = item_w + shrinks[i] * iw;
+                        }
+                        rcs[i].Width = item_w;
+                        rcs[i].X = x;
+                        x += item_w + gap;
+                    }
+                    break;
+            }
+        }
+
         void CalcGrow(Rect[] rcs, in System.Windows.Size finalSize, double[] grows, FlexDirection direction,in Thickness padding , double gap, double totalgap)
         {
             var item_w = 0.0;
@@ -417,33 +455,24 @@ namespace QSoft.WPF.Panel
             double x = padding.Left;
             double y = padding.Top;
             var sum = 0.0;
-            var zerogrow_w = 0.0;
-            var zerogrow_h = 0.0;
+            var all_w = 0.0;
+            var all_h = 0.0;
             for(int i=0; i< this.InternalChildren.Count; i++)
             {
                 var child = (FrameworkElement)InternalChildren[i];
-                var grow = grows[i];
-                sum += grow;
-                //if (grow == 0)
-                {
-                    zerogrow_w += child.DesiredSize.Width;
-                    zerogrow_h += child.DesiredSize.Height;
-                }
+                sum += grows[i];
+                all_w += child.DesiredSize.Width;
+                all_h += child.DesiredSize.Height;
             }
 
             switch (direction)
             {
                 case FlexDirection.Row:
-                    var iw = Math.Max(finalSize.Width - zerogrow_w - totalgap - padding.Left - padding.Right, 0);
+                    var iw = Math.Max(finalSize.Width - all_w - totalgap - padding.Left - padding.Right, 0);
                     iw = iw / sum;
                     for(int i=0; i< this.InternalChildren.Count; i++)
                     {
                         var child = (FrameworkElement)InternalChildren[i];
-                        //item_w = grows[i] * iw;
-                        //if (item_w <= 0)
-                        //{
-                        //    item_w = child.DesiredSize.Width;
-                        //}
                         item_w = child.DesiredSize.Width;
                         if (grows[i] > 0)
                         {
@@ -455,17 +484,12 @@ namespace QSoft.WPF.Panel
                     }
                     break;
                 case FlexDirection.RowReverse:
-                    iw = Math.Max(finalSize.Width - zerogrow_w - totalgap - padding.Left - padding.Right, 0);
+                    iw = Math.Max(finalSize.Width - all_w - totalgap - padding.Left - padding.Right, 0);
                     iw = iw / sum;
                     x = finalSize.Width - padding.Right;
                     for (int i = 0; i < this.InternalChildren.Count; i++)
                     {
                         var child = (FrameworkElement)InternalChildren[i];
-                        //item_w = grows[i] * iw;
-                        //if (item_w <= 0)
-                        //{
-                        //    item_w = child.DesiredSize.Width;
-                        //}
                         item_w = child.DesiredSize.Width;
                         if (grows[i] > 0)
                         {
@@ -478,16 +502,11 @@ namespace QSoft.WPF.Panel
                     }
                     break;
                 case FlexDirection.Column:
-                    var ih = Math.Max(finalSize.Height - zerogrow_h - totalgap - padding.Top - padding.Bottom, 0);
+                    var ih = Math.Max(finalSize.Height - all_h - totalgap - padding.Top - padding.Bottom, 0);
                     ih /= sum;
                     for(int i = 0; i < this.InternalChildren.Count; i++)
                     {
                         var child = (FrameworkElement)InternalChildren[i];
-                        //item_h = grows[i] * ih;
-                        //if (item_h <= 0)
-                        //{
-                        //    item_h = child.DesiredSize.Height;
-                        //}
                         item_h = child.DesiredSize.Height;
                         if (grows[i] > 0)
                         {
@@ -499,17 +518,12 @@ namespace QSoft.WPF.Panel
                     }
                     break;
                 case FlexDirection.ColumnReverse:
-                    ih = Math.Max(finalSize.Height - zerogrow_h - totalgap - padding.Top - padding.Bottom, 0);
+                    ih = Math.Max(finalSize.Height - all_h - totalgap - padding.Top - padding.Bottom, 0);
                     ih /= sum;
                     y = finalSize.Height - padding.Bottom;
                     for (int i = 0; i < this.InternalChildren.Count; i++)
                     {
                         var child = (FrameworkElement)InternalChildren[i];
-                        //item_h = grows[i] * ih;
-                        //if (item_h <= 0)
-                        //{
-                        //    item_h = child.DesiredSize.Height;
-                        //}
                         item_h = child.DesiredSize.Height;
                         if (grows[i] > 0)
                         {

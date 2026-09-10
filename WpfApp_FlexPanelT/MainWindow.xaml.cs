@@ -209,7 +209,7 @@ namespace WpfApp_FlexPanelT
         {
             if (this.m_EditSelfObj is not null && this.m_MainUI.ItemData is not null)
             {
-                //FlexPanel.SetShrink(this.m_EditSelfObj, this.m_MainUI.ItemData.FlexShrink);
+                FlexPanel.SetShrink(this.m_EditSelfObj, this.m_MainUI.ItemData.FlexShrink);
             }
         }
     }
