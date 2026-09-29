@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.5.11709.299 stable
+VisualStudioVersion = 18.5.11709.299
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QSoft.WPF.Panel", "QSoft.WPF.Panel\QSoft.WPF.Panel.csproj", "{8D3AAD74-BF98-49C4-8FEB-6BC3118AB595}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp_FlexPanelT", "WpfApp_FlexPanelT\WpfApp_FlexPanelT.csproj", "{B0081822-EBFF-4C4B-8B56-E94C9DC89585}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp_FlexT", "WpfApp_FlexT\WpfApp_FlexT.csproj", "{702F6A15-DF43-450B-9D67-58CD4341BF84}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,22 @@ Global
 		{B0081822-EBFF-4C4B-8B56-E94C9DC89585}.Release|x64.Build.0 = Release|Any CPU
 		{B0081822-EBFF-4C4B-8B56-E94C9DC89585}.Release|x86.ActiveCfg = Release|Any CPU
 		{B0081822-EBFF-4C4B-8B56-E94C9DC89585}.Release|x86.Build.0 = Release|Any CPU
+		{702F6A15-DF43-450B-9D67-58CD4341BF84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{702F6A15-DF43-450B-9D67-58CD4341BF84}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{702F6A15-DF43-450B-9D67-58CD4341BF84}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{702F6A15-DF43-450B-9D67-58CD4341BF84}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{702F6A15-DF43-450B-9D67-58CD4341BF84}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{702F6A15-DF43-450B-9D67-58CD4341BF84}.Debug|x64.Build.0 = Debug|Any CPU
+		{702F6A15-DF43-450B-9D67-58CD4341BF84}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{702F6A15-DF43-450B-9D67-58CD4341BF84}.Debug|x86.Build.0 = Debug|Any CPU
+		{702F6A15-DF43-450B-9D67-58CD4341BF84}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{702F6A15-DF43-450B-9D67-58CD4341BF84}.Release|Any CPU.Build.0 = Release|Any CPU
+		{702F6A15-DF43-450B-9D67-58CD4341BF84}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{702F6A15-DF43-450B-9D67-58CD4341BF84}.Release|ARM64.Build.0 = Release|Any CPU
+		{702F6A15-DF43-450B-9D67-58CD4341BF84}.Release|x64.ActiveCfg = Release|Any CPU
+		{702F6A15-DF43-450B-9D67-58CD4341BF84}.Release|x64.Build.0 = Release|Any CPU
+		{702F6A15-DF43-450B-9D67-58CD4341BF84}.Release|x86.ActiveCfg = Release|Any CPU
+		{702F6A15-DF43-450B-9D67-58CD4341BF84}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

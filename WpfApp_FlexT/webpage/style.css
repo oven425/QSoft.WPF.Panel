@@ -1,0 +1,76 @@
+/*
+  Flex canvas - plain CSS, no framework.
+  #box is laid out from the FlexPanelTestData posted by WPF (see app.js).
+  Colors follow the Tailwind CSS palette used by the original React version (my-flex-app).
+*/
+
+:root {
+  --white: #fff;
+  --gray-600: oklch(44.6% .03 256.802);
+  --gray-800: oklch(27.8% .033 256.848);
+  --gray-900: oklch(21% .034 264.665);
+  --neutral-200: oklch(92.2% 0 0);
+  --neutral-400: oklch(70.8% 0 0);
+  --neutral-700: oklch(37.1% 0 0);
+
+  --page-fg: var(--neutral-700);
+  --box-bg: var(--neutral-200);
+  --item-bg: var(--white);
+  --item-border: var(--neutral-400);
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page-fg: var(--white);
+    --box-bg: var(--gray-900);
+    --item-bg: var(--gray-800);
+    --item-border: var(--gray-600);
+
+    color-scheme: dark;
+  }
+}
+
+*,
+::before,
+::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 0 solid;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  line-height: 1.5;
+  background: var(--box-bg);
+  color: var(--page-fg);
+}
+
+/* Fills the whole page; the page scrolls when the items overflow. */
+.box {
+  display: flex;
+  min-height: 100%;
+}
+
+.item {
+  display: flex;
+  overflow: hidden;
+  padding: .125rem;
+  border: 1px solid var(--item-border);
+  border-radius: .25rem;
+  background: var(--item-bg);
+}
+
+.item-label {
+  flex-grow: 1;
+  flex-shrink: 0;
+  align-self: center;
+  padding: .25rem .75rem;
+}
