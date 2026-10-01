@@ -104,7 +104,7 @@ namespace QSoft.WPF.Panel
         public static double GetGrow(DependencyObject obj) => (double)obj.GetValue(GrowProperty);
         public static void SetGrow(DependencyObject obj, double value) => obj.SetValue(GrowProperty, value);
 
-        public static readonly DependencyProperty ShrinkProperty = DependencyProperty.RegisterAttached("Shrink", typeof(double), typeof(FlexPanel), new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+        public static readonly DependencyProperty ShrinkProperty = DependencyProperty.RegisterAttached("Shrink", typeof(double), typeof(FlexPanel), new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsParentArrange | FrameworkPropertyMetadataOptions.AffectsParentMeasure | FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
         public static double GetShrink(DependencyObject obj) => (double)obj.GetValue(ShrinkProperty);
         public static void SetShrink(DependencyObject obj, double value) => obj.SetValue(ShrinkProperty, value);
 
@@ -192,757 +192,405 @@ namespace QSoft.WPF.Panel
             }
         }
 
-        protected override System.Windows.Size MeasureOverride(System.Windows.Size availableSize)
+        // Flex data of one child, gathered by MeasureOverride and reused by ArrangeOverride.
+        struct FlexItem
         {
-            var childrenCount = this.InternalChildren.Count;
-            if (childrenCount == 0) return new System.Windows.Size(0, 0);
+            public bool HasBasis;
+            public double Base;     // flex base size (main axis, margin included): Basis, or the desired size when Basis is not set
+            public double Min;      // main-axis size limits, see GetSizeLimits
+            public double Max;
+            public double Chrome;   // margin, border and padding on the main axis, see GetChrome
+            public double Grow;
+            public double Shrink;
+            public double Size;     // resolved main-axis size
+            public bool Frozen;
+            public double Violation;
 
-            var totalGap = TotalGap();
-            var desiredSize = new System.Windows.Size(0, 0);
+            // CSS weights Shrink by the size of the content, so larger items shrink more than smaller ones.
+            public double ShrinkWeight => Shrink * Math.Max(Base - Chrome, 0);
+        }
 
+        FlexItem[] flexItems = [];
+        int measuredCount;
 
-            bool isRow = this.FlexDirection switch
-            { 
-                FlexDirection.Row => true,
-                FlexDirection.RowReverse => true,
-                _=>false
-            };
+        static bool IsRow(FlexDirection direction)
+            => direction == FlexDirection.Row || direction == FlexDirection.RowReverse;
 
-            for (int i = 0; i < childrenCount; i++)
+        static Size MakeSize(bool isRow, double main, double cross)
+            => isRow ? new Size(main, cross) : new Size(cross, main);
+
+        static double Deflate(double size, double padding)
+            => double.IsInfinity(size) ? size : Math.Max(size - padding, 0);
+
+        static double Clamp(double value, double min, double max)
+            => Math.Max(min, Math.Min(value, max));
+
+        static double ToFactor(double value)
+            => value > 0 && !double.IsInfinity(value) ? value : 0;
+
+        // Same rule FrameworkElement applies to itself: an explicit Width/Height pins the size (within Min/Max).
+        // The limits are for the child's slot, so they include its margin like DesiredSize does.
+        static void GetSizeLimits(UIElement child, bool horizontal, out double min, out double max)
+        {
+            min = 0;
+            max = double.PositiveInfinity;
+            if (child is not FrameworkElement fe) return;
+
+            var size = horizontal ? fe.Width : fe.Height;
+            min = horizontal ? fe.MinWidth : fe.MinHeight;
+            max = horizontal ? fe.MaxWidth : fe.MaxHeight;
+            max = Math.Max(Math.Min(double.IsNaN(size) ? double.PositiveInfinity : size, max), min);
+            min = Math.Max(Math.Min(max, double.IsNaN(size) ? 0 : size), min);
+
+            var margin = Sum(fe.Margin, horizontal);
+            min = Math.Max(min + margin, 0);
+            max = Math.Max(max + margin, min);
+        }
+
+        static double Sum(Thickness thickness, bool horizontal)
+            => horizontal ? thickness.Left + thickness.Right : thickness.Top + thickness.Bottom;
+
+        static double GetMargin(UIElement child, bool horizontal)
+            => child is FrameworkElement fe ? Sum(fe.Margin, horizontal) : 0;
+
+        // The part of the child's size on one axis that is not content: margin, and border and padding of the
+        // elements that have them. A box can't get smaller than that, and it doesn't take part in shrinking.
+        static double GetChrome(UIElement child, bool horizontal)
+        {
+            if (child is not FrameworkElement fe) return 0;
+
+            var chrome = Sum(fe.Margin, horizontal);
+            switch (fe)
             {
-                var child = (FrameworkElement)InternalChildren[i];
-                var basis = GetBasis(child);
-                child.Measure(availableSize);
-                var childDesiredSize = child.DesiredSize;
+                case System.Windows.Controls.Border border:
+                    chrome += Sum(border.BorderThickness, horizontal) + Sum(border.Padding, horizontal);
+                    break;
+                case System.Windows.Controls.Control control:
+                    chrome += Sum(control.BorderThickness, horizontal) + Sum(control.Padding, horizontal);
+                    break;
+                case System.Windows.Controls.TextBlock textBlock:
+                    chrome += Sum(textBlock.Padding, horizontal);
+                    break;
+            }
+            return Math.Max(chrome, 0);
+        }
 
-                if (isRow && basis > 0)
+        static void ReadFlexProperties(UIElement child, bool isRow, ref FlexItem item)
+        {
+            GetSizeLimits(child, isRow, out var min, out var max);
+            item.Chrome = GetChrome(child, isRow);
+            item.Max = max;
+            item.Min = Math.Min(Math.Max(min, item.Chrome), max);
+            item.Grow = ToFactor(GetGrow(child));
+            item.Shrink = ToFactor(GetShrink(child));
+        }
+
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            var children = this.InternalChildren;
+            var count = children.Count;
+            var padding = this.Padding;
+            var isRow = IsRow(this.FlexDirection);
+            var padMain = isRow ? padding.Left + padding.Right : padding.Top + padding.Bottom;
+            var padCross = isRow ? padding.Top + padding.Bottom : padding.Left + padding.Right;
+            var availMain = isRow ? availableSize.Width : availableSize.Height;
+            var availCross = isRow ? availableSize.Height : availableSize.Width;
+            var innerMain = Deflate(availMain, padMain);
+            var innerCross = Deflate(availCross, padCross);
+            var childConstraint = MakeSize(isRow, innerMain, innerCross);
+
+            if (flexItems.Length < count)
+            {
+                Array.Resize(ref flexItems, count * 2);
+            }
+            measuredCount = count;
+
+            var gapTotal = TotalGap();
+            var sumHypothetical = 0.0;
+            for (int i = 0; i < count; i++)
+            {
+                var child = children[i];
+                ref var item = ref flexItems[i];
+                ReadFlexProperties(child, isRow, ref item);
+
+                // Like Width (and CSS flex-basis), Basis is the size of the element without its margin.
+                var basis = GetBasis(child);
+                var margin = GetMargin(child, isRow);
+                if (double.IsPositiveInfinity(basis) && !double.IsInfinity(item.Max))
                 {
-#if NET5_0_OR_GREATER
-                    basis = Math.Clamp(basis, child.MinWidth, child.MaxWidth);
-#else
-                    basis = Math.Max(child.MinWidth, Math.Min(basis, child.MaxWidth));
-#endif
-                    childDesiredSize.Width = basis;
+                    basis = item.Max - margin;
                 }
-                else if (!isRow && basis > 0)
+                item.HasBasis = basis > 0 && !double.IsInfinity(basis);
+                if (item.HasBasis)
                 {
-#if NET5_0_OR_GREATER
-                    basis = Math.Clamp(basis, child.MinHeight, child.MaxHeight);
-#else
-                     basis = Math.Max(child.MinHeight, Math.Min(basis, child.MaxHeight));
-#endif
-                    childDesiredSize.Height = basis;
-                }
-                if (isRow)
-                {
-                    desiredSize.Width += childDesiredSize.Width;
-                    desiredSize.Height = Math.Max(desiredSize.Height, childDesiredSize.Height);
+                    item.Base = basis + margin;
                 }
                 else
                 {
-                    desiredSize.Width = Math.Max(desiredSize.Width, childDesiredSize.Width);
-                    desiredSize.Height += childDesiredSize.Height;
+                    child.Measure(childConstraint);
+                    item.Base = isRow ? child.DesiredSize.Width : child.DesiredSize.Height;
                 }
+                sumHypothetical += Clamp(item.Base, item.Min, item.Max);
             }
-            
-            if (isRow)
+
+            // Only shrinking is settled here, because a shrunk child has to be measured at its final size.
+            // Growing depends on the size the parent finally arranges the panel with, see ArrangeOverride.
+            if (sumHypothetical + gapTotal > innerMain)
             {
-                desiredSize.Width += totalGap;
+                ResolveFlexibleLengths(count, innerMain, gapTotal);
             }
             else
             {
-                desiredSize.Height += totalGap;
+                for (int i = 0; i < count; i++)
+                {
+                    flexItems[i].Size = Clamp(flexItems[i].Base, flexItems[i].Min, flexItems[i].Max);
+                }
             }
 
-            desiredSize.Width += this.Padding.Left + this.Padding.Right;
-            desiredSize.Height += this.Padding.Top + this.Padding.Bottom;
+            var sumSize = 0.0;
+            var maxCross = 0.0;
+            for (int i = 0; i < count; i++)
+            {
+                var child = children[i];
+                ref var item = ref flexItems[i];
+                // FrameworkElement arranges a child at least as large as its unclipped desired size, so a child that
+                // gets less room than it asked for must be measured again at that size to report the smaller size.
+                if (item.HasBasis || item.Size < item.Base)
+                {
+                    child.Measure(MakeSize(isRow, item.Size, innerCross));
+                }
+                var desired = child.DesiredSize;
+                sumSize += item.Size;
+                maxCross = Math.Max(maxCross, isRow ? desired.Height : desired.Width);
+            }
 
-            desiredSize.Width = Math.Min(desiredSize.Width, availableSize.Width);
-            desiredSize.Height = Math.Min(desiredSize.Height, availableSize.Height);
-            
-
-            return desiredSize;
+            var desiredMain = Math.Min(sumSize + gapTotal + padMain, availMain);
+            var desiredCross = Math.Min(maxCross + padCross, availCross);
+            return MakeSize(isRow, desiredMain, desiredCross);
         }
 
-        double[] grows = [];
-        double[] shrinks = [];
-        Rect[] rcs = [];
-        protected override System.Windows.Size ArrangeOverride(System.Windows.Size finalSize)
+        protected override Size ArrangeOverride(Size finalSize)
         {
-            var childrenCount = this.InternalChildren.Count;
-            if (childrenCount == 0)
-                return base.ArrangeOverride(finalSize);
+            var children = this.InternalChildren;
+            var count = children.Count;
+            if (count == 0) return finalSize;
+            if (count != measuredCount)
+            {
+                InvalidateMeasure();
+                return finalSize;
+            }
 
             var padding = this.Padding;
-            var gap = this.Gap;
-            var totalgap = TotalGap();
             var direction = this.FlexDirection;
+            var isRow = IsRow(direction);
+            var isReverse = direction == FlexDirection.RowReverse || direction == FlexDirection.ColumnReverse;
+            var padStart = isRow ? padding.Left : padding.Top;
+            var padEnd = isRow ? padding.Right : padding.Bottom;
+            var crossPadStart = isRow ? padding.Top : padding.Left;
+            var crossPadEnd = isRow ? padding.Bottom : padding.Right;
+            var innerMain = Math.Max((isRow ? finalSize.Width : finalSize.Height) - padStart - padEnd, 0);
+            var innerCross = Math.Max((isRow ? finalSize.Height : finalSize.Width) - crossPadStart - crossPadEnd, 0);
+            var gap = this.Gap;
+            var gapTotal = TotalGap();
+            var alignItems = this.AlignItems;
 
-            if (grows.Length < childrenCount)
+            for (int i = 0; i < count; i++)
             {
-                Array.Resize(ref grows, childrenCount * 2);
+                ReadFlexProperties(children[i], isRow, ref flexItems[i]);
             }
-            if(rcs.Length < childrenCount)
+            ResolveFlexibleLengths(count, innerMain, gapTotal);
+
+            var freeSpace = innerMain - gapTotal;
+            for (int i = 0; i < count; i++)
             {
-                Array.Resize(ref rcs, childrenCount *2);
+                freeSpace -= flexItems[i].Size;
             }
-            if (shrinks.Length < childrenCount)
+            GetJustifyOffsets(freeSpace, count, isReverse, out var offset, out var spacing);
+
+            // Distance from the content box's start edge on the main axis. The start edge is the left/top side,
+            // or the right/bottom side for the reversed directions.
+            var position = offset;
+            for (int i = 0; i < count; i++)
             {
-                Array.Resize(ref  shrinks, childrenCount * 2);
-            }
-            bool isclacgrow = false;
-            bool isshrink = false;
-            var allw = 0.0;
-            for (int i = 0; i < childrenCount; i++)
-            {
-                var child = (FrameworkElement)InternalChildren[i];
-                var desiredSize = child.DesiredSize;
-                rcs[i].X = 0;
-                rcs[i].Y = 0;
-                rcs[i].Width = desiredSize.Width;
-                rcs[i].Height = desiredSize.Height;
-                var basis = GetBasis(child);
-                if (basis != 0)
+                var child = children[i];
+                var main = flexItems[i].Size;
+                var mainPos = isReverse ? padStart + innerMain - position - main : padStart + position;
+
+                var align = GetAlignSelf(child) switch
                 {
-                    switch(direction)
-                    {
-                        case FlexDirection.Row:
-                        case FlexDirection.RowReverse:
-#if NET5_0_OR_GREATER
-                            basis = Math.Clamp(basis, child.MinWidth, child.MaxWidth);
-#else
-                            basis = Math.Max(child.MinWidth, Math.Min(basis, child.MaxWidth));
-#endif
-                            rcs[i].Width = basis;
-                            break;
-                        case FlexDirection.Column:
-                        case FlexDirection.ColumnReverse:
-#if NET5_0_OR_GREATER
-                            basis = Math.Clamp(basis, child.MinHeight, child.MaxHeight);
-#else
-                            basis = Math.Max(child.MinHeight, Math.Min(basis, child.MaxHeight));
-#endif
-                            rcs[i].Height = basis;
-                            break;
-                    }
+                    AlignSelf.Start => AlignItems.Start,
+                    AlignSelf.End => AlignItems.End,
+                    AlignSelf.Center => AlignItems.Center,
+                    AlignSelf.Stretch => AlignItems.Stretch,
+                    _ => alignItems
+                };
+                double crossSize;
+                if (align == AlignItems.Stretch)
+                {
+                    GetSizeLimits(child, !isRow, out var minCross, out var maxCross);
+                    crossSize = Clamp(innerCross, minCross, maxCross);
                 }
-                allw = allw + rcs[i].Width;
-                var grow = GetGrow(child);
-                grows[i] = Math.Max(grow, 0);
-                var shrink = GetShrink(child);
-                shrinks[i] = Math.Max(shrink, 0);
-            }
-            switch(direction)
-            {
-                case FlexDirection.Row:
-                case FlexDirection.RowReverse:
-                    if(allw > finalSize.Width)
-                    {
-                        for(var i= 0; i<shrinks.Length; i++)
-                        {
-                            if (shrinks[i] > 0)
-                            {
-                                isshrink = true;
-                                break;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        for (var i = 0; i < grows.Length; i++)
-                        {
-                            if (grows[i] > 0)
-                            {
-                                isclacgrow = true;
-                                break;
-                            }
-                        }
-                    }
-                    break;
-                case FlexDirection.Column:
-                case FlexDirection.ColumnReverse:
-                    if (this.DesiredSize.Height > finalSize.Height)
-                    {
-                        isclacgrow = false;
-                        for (var i = 0; i < shrinks.Length; i++)
-                        {
-                            if (shrinks[i] > 0)
-                            {
-                                isshrink = true;
-                                break;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        for (var i = 0; i < grows.Length; i++)
-                        {
-                            if (grows[i] > 0)
-                            {
-                                isclacgrow = true;
-                                break;
-                            }
-                        }
-                    }
-                    break;
-            }
+                else
+                {
+                    crossSize = isRow ? child.DesiredSize.Height : child.DesiredSize.Width;
+                }
+                var crossOffset = align switch
+                {
+                    AlignItems.End => innerCross - crossSize,
+                    AlignItems.Center => (innerCross - crossSize) / 2,
+                    _ => 0
+                };
+                var crossPos = crossPadStart + crossOffset;
 
-
-            if (isclacgrow)
-            {
-                this.CalcGrow(rcs, finalSize, grows, direction, padding, gap, totalgap);
-            }
-            else if(isshrink)
-            {
-                this.CalcShrink(rcs, finalSize, shrinks, direction, padding, gap, totalgap);
-            }
-            else
-            {
-                CalcJustifyContent(rcs, finalSize, this.JustifyContent, direction, padding, gap, totalgap);
-            }
-            
-            CalcAlignItems(rcs, finalSize, direction, padding);
-
-            for (int i = 0; i < childrenCount; i++)
-            {
-                InternalChildren[i].Arrange(rcs[i]);
+                child.Arrange(isRow
+                    ? new Rect(mainPos, crossPos, main, crossSize)
+                    : new Rect(crossPos, mainPos, crossSize, main));
+                position += main + gap + spacing;
             }
 
             return finalSize;
         }
 
-        void CalcShrink(Rect[] rcs, in System.Windows.Size finalSize, double[] shrinks, FlexDirection direction, in Thickness padding, double gap, double totalgap)
+        // CSS Flexbox "Resolving Flexible Lengths" for a single line: shares the free space of the main axis
+        // between the items (Grow when there is room left, Shrink when the items don't fit) while honouring
+        // their min/max sizes. The resulting main sizes are stored in FlexItem.Size.
+        void ResolveFlexibleLengths(int count, double innerMain, double gapTotal)
         {
-            var item_w = 0.0;
-            var item_h = 0.0;
-            double x = padding.Left;
-            double y = padding.Top;
-            var sum = 0.0;
-            var all_w = 0.0;
-            var all_h = 0.0;
-            for (int i = 0; i < this.InternalChildren.Count; i++)
+            var sumHypothetical = 0.0;
+            for (int i = 0; i < count; i++)
             {
-                var child = (FrameworkElement)InternalChildren[i];
-                sum += shrinks[i];
-                all_w += rcs[i].Width;
-                all_h += rcs[i].Height;
+                sumHypothetical += Clamp(flexItems[i].Base, flexItems[i].Min, flexItems[i].Max);
             }
-            switch(direction)
-            {
-                case FlexDirection.Row:
-                    var iw = finalSize.Width - (all_w + totalgap + padding.Left + padding.Right);
-                    iw = iw / sum;
-                    for (int i = 0; i < this.InternalChildren.Count; i++)
-                    {
-                        var child = (FrameworkElement)InternalChildren[i];
-                        item_w = child.DesiredSize.Width;
-                        if (shrinks[i] > 0)
-                        {
-                            item_w = item_w + shrinks[i] * iw;
-                        }
-                        rcs[i].Width = item_w;
-                        rcs[i].X = x;
-                        x += item_w + gap;
-                    }
-                    break;
-            }
-        }
+            var useGrow = sumHypothetical + gapTotal < innerMain;
 
-        void CalcGrow(Rect[] rcs, in System.Windows.Size finalSize, double[] grows, FlexDirection direction,in Thickness padding , double gap, double totalgap)
-        {
-            var item_w = 0.0;
-            var item_h = 0.0;
-            double x = padding.Left;
-            double y = padding.Top;
-            var sum = 0.0;
-            var all_w = 0.0;
-            var all_h = 0.0;
-            for(int i=0; i< this.InternalChildren.Count; i++)
+            // Items that can't flex in the current direction are frozen at their hypothetical size.
+            var initialFreeSpace = innerMain - gapTotal;
+            for (int i = 0; i < count; i++)
             {
-                var child = (FrameworkElement)InternalChildren[i];
-                sum += grows[i];
-                all_w += child.DesiredSize.Width;
-                all_h += child.DesiredSize.Height;
+                ref var item = ref flexItems[i];
+                var hypothetical = Clamp(item.Base, item.Min, item.Max);
+                var factor = useGrow ? item.Grow : item.Shrink;
+                item.Frozen = factor == 0 || (useGrow ? item.Base > hypothetical : item.Base < hypothetical);
+                item.Size = item.Frozen ? hypothetical : item.Base;
+                initialFreeSpace -= item.Size;
             }
 
-            switch (direction)
+            while (true)
             {
-                case FlexDirection.Row:
-                    var iw = Math.Max(finalSize.Width - all_w - totalgap - padding.Left - padding.Right, 0);
-                    iw = iw / sum;
-                    for(int i=0; i< this.InternalChildren.Count; i++)
-                    {
-                        var child = (FrameworkElement)InternalChildren[i];
-                        item_w = child.DesiredSize.Width;
-                        if (grows[i] > 0)
-                        {
-                            item_w = item_w + grows[i] * iw;
-                        }
-                        rcs[i].Width = item_w;
-                        rcs[i].X = x;
-                        x += item_w + gap;
-                    }
-                    break;
-                case FlexDirection.RowReverse:
-                    iw = Math.Max(finalSize.Width - all_w - totalgap - padding.Left - padding.Right, 0);
-                    iw = iw / sum;
-                    x = finalSize.Width - padding.Right;
-                    for (int i = 0; i < this.InternalChildren.Count; i++)
-                    {
-                        var child = (FrameworkElement)InternalChildren[i];
-                        item_w = child.DesiredSize.Width;
-                        if (grows[i] > 0)
-                        {
-                            item_w = item_w + grows[i] * iw;
-                        }
-                        x -= item_w;
-                        rcs[i].X = x;
-                        rcs[i].Width = item_w;
-                        x -= gap;
-                    }
-                    break;
-                case FlexDirection.Column:
-                    var ih = Math.Max(finalSize.Height - all_h - totalgap - padding.Top - padding.Bottom, 0);
-                    ih /= sum;
-                    for(int i = 0; i < this.InternalChildren.Count; i++)
-                    {
-                        var child = (FrameworkElement)InternalChildren[i];
-                        item_h = child.DesiredSize.Height;
-                        if (grows[i] > 0)
-                        {
-                            item_h = item_h + grows[i] * ih;
-                        }
-                        rcs[i].Height = item_h;
-                        rcs[i].Y = y;
-                        y += item_h + gap;
-                    }
-                    break;
-                case FlexDirection.ColumnReverse:
-                    ih = Math.Max(finalSize.Height - all_h - totalgap - padding.Top - padding.Bottom, 0);
-                    ih /= sum;
-                    y = finalSize.Height - padding.Bottom;
-                    for (int i = 0; i < this.InternalChildren.Count; i++)
-                    {
-                        var child = (FrameworkElement)InternalChildren[i];
-                        item_h = child.DesiredSize.Height;
-                        if (grows[i] > 0)
-                        {
-                            item_h = item_h + grows[i] * ih;
-                        }
-                        y -= item_h;
-                        rcs[i].Height = item_h;
-                        rcs[i].Y = y;
-                        y -= gap;
-                    }
-
-                    break;
-            }
-        }
-
-        void CalcAlignItems(Rect[] rcs, in System.Windows.Size finalSize, FlexDirection direction, in Thickness padding)
-        {
-            for(int i=0; i < this.InternalChildren.Count; i++) 
-            {
-                var child = (FrameworkElement)InternalChildren[i];
-                
-                var alignitem = GetAlignSelf(child) switch
+                var remainingFreeSpace = innerMain - gapTotal;
+                var sumFactors = 0.0;
+                var sumScaledShrink = 0.0;
+                var hasUnfrozen = false;
+                for (int i = 0; i < count; i++)
                 {
-                    AlignSelf.Stretch => AlignItems.Stretch,
-                    AlignSelf.Center => AlignItems.Center,
-                    AlignSelf.Start => AlignItems.Start,
-                    AlignSelf.End => AlignItems.End,
-                    _ => this.AlignItems
-                };
-                switch (alignitem)
-                {
-                    case AlignItems.Start:
-                        {
-                            switch (direction)
-                            {
-                                case FlexDirection.Row:
-                                case FlexDirection.RowReverse:
-                                    rcs[i].Y = padding.Top;
-                                    rcs[i].Height = child.DesiredSize.Height;
-                                    break;
-                                case FlexDirection.Column:
-                                case FlexDirection.ColumnReverse:
-                                    rcs[i].X = padding.Left;
-                                    rcs[i].Width = child.DesiredSize.Width;
-                                    break;
-                            }
-                        }
-                        break;
-                    case AlignItems.End:
-                        {
-                            switch (direction)
-                            {
-                                case FlexDirection.Row:
-                                case FlexDirection.RowReverse:
-                                    rcs[i].Y = finalSize.Height - child.DesiredSize.Height - padding.Bottom;
-                                    rcs[i].Height = child.DesiredSize.Height;
-                                    break;
-                                case FlexDirection.Column:
-                                case FlexDirection.ColumnReverse:
-                                    rcs[i].X = finalSize.Width - child.DesiredSize.Width - padding.Right;
-                                    rcs[i].Width = child.DesiredSize.Width;
-                                    break;
-                            }
-                        }
-                        break;
-                    case AlignItems.Center:
-                        {
-                            switch (direction)
-                            {
-                                case FlexDirection.Row:
-                                case FlexDirection.RowReverse:
-                                    rcs[i].Y = (finalSize.Height - child.DesiredSize.Height - padding.Top - padding.Bottom) / 2 + padding.Top;
-                                    rcs[i].Height = child.DesiredSize.Height;
-                                    break;
-                                case FlexDirection.Column:
-                                case FlexDirection.ColumnReverse:
-                                    rcs[i].X = (finalSize.Width - child.DesiredSize.Width - padding.Left - padding.Right) / 2 + padding.Left;
-                                    rcs[i].Width = child.DesiredSize.Width;
-                                    break;
-                            }
-                        }
-                        break;
-                    case AlignItems.Stretch:
-                        {
-                            switch (direction)
-                            {
-                                case FlexDirection.Row:
-                                case FlexDirection.RowReverse:
-                                    rcs[i].Y = padding.Top;
-                                    rcs[i].Height = Math.Max(finalSize.Height - padding.Top - padding.Bottom, 0);
-                                    break;
-                                case FlexDirection.Column:
-                                case FlexDirection.ColumnReverse:
-                                    rcs[i].X = padding.Left;
-                                    rcs[i].Width = Math.Max(finalSize.Width - padding.Left - padding.Right, 0);
-                                    break;
-                            }
+                    ref var item = ref flexItems[i];
+                    if (item.Frozen)
+                    {
+                        remainingFreeSpace -= item.Size;
+                    }
+                    else
+                    {
+                        hasUnfrozen = true;
+                        remainingFreeSpace -= item.Base;
+                        sumFactors += useGrow ? item.Grow : item.Shrink;
+                        sumScaledShrink += item.ShrinkWeight;
+                    }
+                }
+                if (!hasUnfrozen) break;
 
-                        }
-                        break;
+                if (sumFactors < 1)
+                {
+                    var scaled = initialFreeSpace * sumFactors;
+                    if (Math.Abs(scaled) < Math.Abs(remainingFreeSpace))
+                    {
+                        remainingFreeSpace = scaled;
+                    }
+                }
+
+                // Larger items shrink more: the share is weighted by Shrink * content size, not by Shrink alone.
+                var totalViolation = 0.0;
+                for (int i = 0; i < count; i++)
+                {
+                    ref var item = ref flexItems[i];
+                    if (item.Frozen) continue;
+
+                    var size = item.Base;
+                    if (useGrow && remainingFreeSpace > 0)
+                    {
+                        size += remainingFreeSpace * item.Grow / sumFactors;
+                    }
+                    else if (!useGrow && remainingFreeSpace < 0 && sumScaledShrink > 0)
+                    {
+                        size += remainingFreeSpace * item.ShrinkWeight / sumScaledShrink;
+                    }
+                    item.Size = Clamp(size, item.Min, item.Max);
+                    item.Violation = item.Size - size;
+                    totalViolation += item.Violation;
+                }
+
+                // Items that hit their min/max are fixed at that size and the rest is distributed again.
+                for (int i = 0; i < count; i++)
+                {
+                    ref var item = ref flexItems[i];
+                    if (!item.Frozen
+                        && (totalViolation == 0 || (totalViolation > 0 ? item.Violation > 0 : item.Violation < 0)))
+                    {
+                        item.Frozen = true;
+                    }
                 }
             }
         }
 
-        double TotalGap()
-            => this.InternalChildren.Count > 1 
-            ? this.Gap * (this.InternalChildren.Count - 1)
-            : 0;
-
-        void CalcJustifyContent(Rect[] rcs, in System.Windows.Size finalSize, JustifyContent justify, FlexDirection direction, in Thickness padding, double gap, double totalgap)
+        // Where the first item starts (measured from the main-start edge of the content box) and the extra
+        // space between two items. Like CSS, SpaceBetween falls back to start when nothing is left over, while
+        // SpaceAround/SpaceEvenly fall back to "safe center": the content is pinned to the left/top edge, which
+        // is the main-end side of the reversed directions, and overflows on the other side.
+        void GetJustifyOffsets(double freeSpace, int count, bool isReverse, out double offset, out double spacing)
         {
-            double x = padding.Left;
-            double y = padding.Top;
-            var totalw = 0.0;
-            var totalh = 0.0;
-            var totaldsw = 0.0;
-            var totaldsh = 0.0;
-            
-            for(int i=0; i< this.InternalChildren.Count; i++)
+            offset = 0;
+            spacing = 0;
+            switch (this.JustifyContent)
             {
-                var child = this.InternalChildren[i];
-                totalw += rcs[i].Width;
-                totalh += rcs[i].Height;
-                totaldsw += child.DesiredSize.Width;
-                totaldsh += child.DesiredSize.Height;
-            }
-            switch (justify)
-            {
-                case JustifyContent.Start:
-                    switch (direction)
-                    {
-                        case FlexDirection.Row:
-                            x = padding.Left;
-                            for(int i=0; i< this.InternalChildren.Count; i++)
-                            {
-                                rcs[i].X = x;
-                                x = x + rcs[i].Width + gap;
-                            }
-                            break;
-                        case FlexDirection.RowReverse:
-                            x = finalSize.Width - padding.Right;
-                            for(int i=0; i< this.InternalChildren.Count; i++)
-                            {
-                                x -= rcs[i].Width;
-                                rcs[i].X = x;
-                                x -= gap;
-                            }
-                            break;
-                        case FlexDirection.Column:
-                            y = padding.Top;
-                            for(int i=0; i< this.InternalChildren.Count; i++)
-                            {
-                                rcs[i].Y = y;
-                                y = y + rcs[i].Height + gap;
-                            }
-                            break;
-                        case FlexDirection.ColumnReverse:
-                            y = finalSize.Height - padding.Bottom;
-                            for (int i = 0; i < this.InternalChildren.Count; i++)
-                            {
-                                y -= rcs[i].Height;
-                                rcs[i].Y = y;
-                                y -= gap;
-                            }
-                            break;
-                    }
-                    break;
                 case JustifyContent.End:
-                    switch (direction)
-                    {
-                        case FlexDirection.Row:
-                            x = finalSize.Width - padding.Right;
-                            for (int i = this.InternalChildren.Count - 1; i >= 0; i--)
-                            {
-                                x = x - rcs[i].Width;
-                                rcs[i].X = x;
-                                x -= gap;
-                            }
-                            break;
-                        case FlexDirection.RowReverse:
-                            x = padding.Left;
-                            for(int i= this.InternalChildren.Count - 1; i >= 0; i--)
-                            {
-                                rcs[i].X = x;
-                                x += rcs[i].Width + gap;
-                            }
-                            break;
-                        case FlexDirection.Column:
-                            y = finalSize.Height - padding.Bottom;
-                            for(int i = this.InternalChildren.Count - 1; i >= 0; i--)
-                            {
-                                y -= rcs[i].Height;
-                                rcs[i].Y = y;
-                                y -= gap;
-                            }
-                            break;
-                        case FlexDirection.ColumnReverse:
-                            y = padding.Top;
-                            for(int i= this.InternalChildren.Count - 1; i >= 0; i--)
-                            {
-                                rcs[i].Y = y;
-                                y = y + rcs[i].Height + gap;
-                            }
-                            break;
-                    }
-
+                    offset = freeSpace;
                     break;
                 case JustifyContent.Center:
-                    switch (direction)
+                    offset = freeSpace / 2;
+                    break;
+                case JustifyContent.SpaceBetween:
+                    if (freeSpace > 0 && count > 1)
                     {
-                        case FlexDirection.Row:
-                            x = (finalSize.Width - totalw - totalgap - padding.Left - padding.Right) / 2;
-                            x = x+padding.Left;
-                            for (int i=0; i< this.InternalChildren.Count; i++)
-                            {
-                                rcs[i].X = x;
-                                x += rcs[i].Width + gap;    
-                            }
-                            break;
-                        case FlexDirection.RowReverse:
-                            x = (finalSize.Width - totalw - totalgap - padding.Left - padding.Right) / 2;
-                            x = finalSize.Width - padding.Right - x;
-                            for(int i=0; i< this.InternalChildren.Count; i++)
-                            {
-                                x -= rcs[i].Width;
-                                rcs[i].X = x;
-                                x -= gap;
-                            }
-                            break;
-                        case FlexDirection.Column:
-                            y = Math.Max(0, (finalSize.Height - totalh - totalgap - padding.Top - padding.Bottom) / 2);
-                            y = y+padding.Top;
-                            for(int i=0; i< this.InternalChildren.Count; i++)
-                            {
-                                rcs[i].Y = y;
-                                y += rcs[i].Height + gap;
-                            }
-                            break;
-                        case FlexDirection.ColumnReverse:
-                            y = Math.Max(0, (finalSize.Height - totalh - totalgap - padding.Top - padding.Bottom) / 2);
-                            y = finalSize.Height - padding.Bottom - y;
-                            for (int i = 0; i < this.InternalChildren.Count; i++)
-                            {
-                                y -= rcs[i].Height;
-                                rcs[i].Y = y;
-                                y -= gap;
-                            }
-                            break;
+                        spacing = freeSpace / (count - 1);
                     }
-                    break;              
+                    break;
                 case JustifyContent.SpaceAround:
-                    switch (direction)
+                    if (freeSpace > 0)
                     {
-                        case FlexDirection.Row:
-                            var remainingSpace = (finalSize.Width - padding.Left - padding.Right - totalgap - totalw);
-                            var iw = Math.Max(0, remainingSpace / (this.InternalChildren.Count * 2));
-                            for(int i=0; i< this.InternalChildren.Count; i++)
-                            {
-                                x += iw;
-                                rcs[i].X = x;
-                                x += iw + rcs[i].Width + gap;
-                            }
-                            break;
-                        case FlexDirection.RowReverse:
-                            remainingSpace = (finalSize.Width - padding.Left - padding.Right - totalgap - totalw);
-                            iw = Math.Max(0, remainingSpace / (this.InternalChildren.Count * 2));
-                            x = finalSize.Width - padding.Right;
-                            for(int i=0; i< this.InternalChildren.Count; i++)
-                            {
-                                x -= iw;
-                                x -= rcs[i].Width;
-                                rcs[i].X = x;
-                                x = x - iw - gap;
-                            }
-                            break;
-                        case FlexDirection.Column:
-                            var ih = (finalSize.Height - padding.Top - padding.Bottom - totalgap - totalh);
-                            ih = ih < 0 ? 0 : ih /= (this.InternalChildren.Count * 2);
-                            for(int i=0; i< this.InternalChildren.Count; i++)
-                            {
-                                y += ih;
-                                rcs[i].Y = y;
-                                y += ih + rcs[i].Height + gap;
-                            }
-                            break;
-                        case FlexDirection.ColumnReverse:
-                            ih = (finalSize.Height - padding.Top - padding.Bottom - totalgap - totalh);
-                            ih = ih < 0 ? 0 : ih /= (this.InternalChildren.Count * 2);
-                            y = finalSize.Height - padding.Bottom;
-                            for (int i = 0; i < this.InternalChildren.Count; i++)
-                            {
-                                y = y - ih - rcs[i].Height;
-                                rcs[i].Y = y;
-                                y -= ih - gap;
-                            }
-                            break;
+                        spacing = freeSpace / count;
+                        offset = spacing / 2;
+                    }
+                    else if (isReverse)
+                    {
+                        offset = freeSpace;
                     }
                     break;
                 case JustifyContent.SpaceEvenly:
+                    if (freeSpace > 0)
                     {
-                        switch(direction)
-                        {
-                            case FlexDirection.Row:
-                                var iw = (finalSize.Width - padding.Left - padding.Right - totalgap - totalw);
-                                iw = Math.Max(0, iw / (this.InternalChildren.Count + 1));
-                                x = x + iw;
-                                for(int i=0; i< this.InternalChildren.Count; i++)
-                                {
-                                    rcs[i].X = x;
-                                    x += iw + rcs[i].Width + gap;
-                                }
-                                break;
-                            case FlexDirection.RowReverse:
-                                iw = (finalSize.Width - padding.Left - padding.Right - totalgap - totalw);
-                                iw = Math.Max(0, iw / (this.InternalChildren.Count + 1));
-                                x = finalSize.Width - padding.Right;
-                                x = x - iw;
-                                for(int i=0; i< this.InternalChildren.Count; i++)
-                                {
-                                    x -= rcs[i].Width;
-                                    rcs[i].X = x;
-                                    x = x - iw- gap;
-                                }
-                                break;
-                            case FlexDirection.Column:
-                                var ih = (finalSize.Height - padding.Top - padding.Bottom - totalgap - totalh);
-                                if (ih < 0)
-                                {
-                                    ih = 0;
-                                }
-                                else
-                                {
-                                    ih /= (this.InternalChildren.Count + 1);
-                                }
-                                y = y + ih;
-                                for(int i=0; i< this.InternalChildren.Count; i++)
-                                {
-                                    rcs[i].Y = y;
-                                    y += ih + rcs[i].Height + gap;
-                                }
-                                break;
-                            case FlexDirection.ColumnReverse:
-                                ih = (finalSize.Height - padding.Top - padding.Bottom - totalgap - totalh);
-                                if (ih < 0)
-                                {
-                                    ih = 0;
-                                }
-                                else
-                                {
-                                    ih /= (this.InternalChildren.Count + 1);
-                                }
-                                y = finalSize.Height - padding.Bottom;
-                                y = y - ih;
-                                for (int i = 0; i < this.InternalChildren.Count; i++)
-                                {
-                                    y = y - rcs[i].Height;
-                                    rcs[i].Y = y;
-                                    y = y - ih - gap;
-                                }
-                                break;
-                        }
+                        spacing = freeSpace / (count + 1);
+                        offset = spacing;
                     }
-                    break;
-                case JustifyContent.SpaceBetween:
-                    switch (direction)
+                    else if (isReverse)
                     {
-                        case FlexDirection.Row:
-                            var iw = (finalSize.Width - padding.Left - padding.Right - totalgap);
-                            iw = iw - totaldsw;
-                            var childcount = Math.Max(1, this.InternalChildren.Count - 1);
-                            iw = Math.Max(0, iw / childcount);
-                            x = padding.Left;
-                            for(int i=0; i< this.InternalChildren.Count; i++)
-                            {
-                                rcs[i].X = x;
-                                x = x + iw + rcs[i].Width + gap;
-                            }
-                            break;
-                        case FlexDirection.RowReverse:
-                            iw = (finalSize.Width - padding.Left - padding.Right - totalgap);
-                            iw = iw - totaldsw;
-                            childcount = Math.Max(1, this.InternalChildren.Count - 1);
-                            iw = Math.Max(0, iw / childcount);
-                            x = finalSize.Width - padding.Right;
-                            for(int i=0; i< this.InternalChildren.Count; i++)
-                            {
-                                x = x - rcs[i].Width;
-                                rcs[i].X = x;
-                                x = x - iw - gap;
-                            }
-                            break;
-                        case FlexDirection.Column:
-                            var ih = (finalSize.Height - padding.Top - padding.Bottom - totalgap);
-                            ih = ih - totaldsh;
-                            childcount = Math.Max(1, this.InternalChildren.Count - 1);
-                            ih = ih < 0 ? 0 : ih / childcount;
-                            y = padding.Top;
-                            for(int i=0; i< this.InternalChildren.Count; i++)
-                            {
-                                rcs[i].Y = y;
-                                y = y + ih + rcs[i].Height + gap;
-                            }
-                            break;
-                        case FlexDirection.ColumnReverse:
-                            ih = (finalSize.Height - padding.Top - padding.Bottom - totalgap);
-                            ih = ih - totaldsh;
-                            childcount = Math.Max(1, this.InternalChildren.Count - 1);
-                            ih = ih < 0 ? 0 : ih / childcount;
-                            y = finalSize.Height - padding.Bottom;
-                            for (int i = 0; i < this.InternalChildren.Count; i++)
-                            {
-                                y = y - rcs[i].Height;
-                                rcs[i].Y = y;
-                                y = y - ih - gap;
-                            }
-                            break;
+                        offset = freeSpace;
                     }
                     break;
             }
         }
+
+        double TotalGap()
+            => this.InternalChildren.Count > 1
+            ? this.Gap * (this.InternalChildren.Count - 1)
+            : 0;
     }
 }

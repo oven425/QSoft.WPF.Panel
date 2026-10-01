@@ -11,8 +11,11 @@
 </head>
 
 <body>
-  <!-- Laid out from the FlexPanelTestData posted by WPF (see app.js). -->
-  <div id="box" class="box"></div>
+  <!-- #viewport is the scrollable layer outside the flex box, controlled by FlexPanelTestData.Parent. -->
+  <div id="viewport" class="viewport">
+    <!-- Laid out from the FlexPanelTestData posted by WPF (see app.js). -->
+    <div id="box" class="box"></div>
+  </div>
 
   <template id="item-template">
     <div class="item">

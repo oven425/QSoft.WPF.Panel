@@ -53,7 +53,15 @@ body {
   color: var(--page-fg);
 }
 
-/* Fills the whole page; the page scrolls when the items overflow. */
+/* The scrollable layer outside the flex box; mirrors the WPF ScrollViewer wrapping FlexPanel. */
+.viewport {
+  height: 100%;
+  overflow: hidden;
+  /* WPF already reports the viewport without its scrollbars, so none may take room away from #box here. */
+  scrollbar-width: none;
+}
+
+/* Fills the viewport; the viewport scrolls (or clips) when the items overflow. */
 .box {
   display: flex;
   min-height: 100%;

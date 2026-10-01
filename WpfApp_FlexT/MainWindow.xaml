@@ -7,23 +7,77 @@
         mc:Ignorable="d"
         xmlns:qpanel="clr-namespace:QSoft.WPF.Panel;assembly=QSoft.WPF.Panel"
         xmlns:webview="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="620" Width="900">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Button x:Name="button_set" Click="button_set_Click">Set</Button>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <ComboBox x:Name="combobox_testcase" DisplayMemberPath="DisplayName"
+                      VerticalAlignment="Center" Margin="4" Padding="4"
+                      SelectionChanged="combobox_testcase_SelectionChanged"/>
+            <Button x:Name="button_recompare" Grid.Column="1" Content="重新比對" VerticalAlignment="Center"
+                    Margin="4" Padding="10,4" Click="button_recompare_Click"/>
+        </Grid>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+            <ScrollViewer x:Name="scrollviewer_flexpanel" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Disabled">
                 <qpanel:FlexPanel x:Name="flexpanel"/>
             </ScrollViewer>
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <TextBlock TextAlignment="Center" VerticalAlignment="Center">
+                    <Run Text="WPF"/><LineBreak/>
+                    <Run Text="←"/>
+                </TextBlock>
+                <TextBlock Grid.Row="1" TextAlignment="Center" VerticalAlignment="Center">
+                    <Run Text="Web"/><LineBreak/>
+                    <Run Text="→"/>
+                </TextBlock>
+            </Grid>
             
-            <webview:WebView2 x:Name="web" Grid.Column="1"/>
+            <webview:WebView2 x:Name="web" Grid.Column="2"/>
         </Grid>
+        <!-- Reports each flex item's WPF vs. web-rendered (X, Y, Width, Height), populated by
+             MainWindow.xaml.cs's ApplyTestCase/CompareAndShow after every test-case render. -->
+        <StackPanel Grid.Row="2" Margin="4">
+            <TextBlock x:Name="textblock_summary" FontWeight="Bold" Margin="0,2"/>
+            <ListView x:Name="listview_comparison" MaxHeight="180">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="#" Width="30" DisplayMemberBinding="{Binding Index}"/>
+                        <GridViewColumn Header="WPF (X, Y, W, H)" Width="200" DisplayMemberBinding="{Binding WpfRect}"/>
+                        <GridViewColumn Header="Web (X, Y, W, H)" Width="200" DisplayMemberBinding="{Binding WebRect}"/>
+                        <GridViewColumn Header="Diff (X, Y, W, H)" Width="180" DisplayMemberBinding="{Binding DeltaRect}"/>
+                        <GridViewColumn Header="結果" Width="80" DisplayMemberBinding="{Binding StatusText}"/>
+                    </GridView>
+                </ListView.View>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsMatch}" Value="False">
+                                <Setter Property="Background" Value="#FBD9D9"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsMatch}" Value="True">
+                                <Setter Property="Background" Value="#DCF3DC"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListView.ItemContainerStyle>
+            </ListView>
+        </StackPanel>
     </Grid>
 </Window>

@@ -1,0 +1,44 @@
+{
+  "Description": "Direction=RowReverse, JustifyContent=SpaceAround, AlignItems=End",
+  "Parent": {
+    "EnableHorizontalScrollbar": false,
+    "EnableVerticalScrollbar": false
+  },
+  "Padding": {
+    "Left": 8,
+    "Top": 8,
+    "Right": 8,
+    "Bottom": 8
+  },
+  "Gap": 8,
+  "JustifyContent": "SpaceAround",
+  "Direction": "RowReverse",
+  "AlignItems": "End",
+  "Childs": [
+    {
+      "Basis": 0,
+      "Shrink": 1,
+      "Grow": 0
+    },
+    {
+      "Basis": 80,
+      "Shrink": 1,
+      "Grow": 0
+    },
+    {
+      "Basis": 0,
+      "Shrink": 1,
+      "Grow": 0
+    },
+    {
+      "Basis": 120,
+      "Shrink": 0,
+      "Grow": 0
+    },
+    {
+      "Basis": 0,
+      "Shrink": 1,
+      "Grow": 0
+    }
+  ]
+}
