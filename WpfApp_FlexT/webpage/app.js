@@ -30,6 +30,7 @@
   const box = document.getElementById('box');
   const viewport = document.getElementById('viewport');
   const itemTemplate = document.getElementById('item-template');
+  const tip = document.getElementById('tip');
 
   // Reads a property by its C# name; the camelCase name is accepted too.
   function read(source, name) {
@@ -55,15 +56,48 @@
   function createItem(child, index) {
     const element = itemTemplate.content.firstElementChild.cloneNode(true);
     element.querySelector('.item-label').textContent = `index: ${index}`;
+    const grow = toNumber(read(child, 'Grow'));
+    const shrink = toNumber(read(child, 'Shrink'));
     const basis = toNumber(read(child, 'Basis'));
     Object.assign(element.style, {
-      flexGrow: String(toNumber(read(child, 'Grow'))),
-      flexShrink: String(toNumber(read(child, 'Shrink'))),
+      flexGrow: String(grow),
+      flexShrink: String(shrink),
       // FlexPanel keeps the child's desired size when Basis is 0.
       flexBasis: basis > 0 ? `${basis}px` : 'auto',
     });
+    // The same three lines as the tooltip of the WPF items (MainWindow.xaml.cs).
+    element.dataset.tip = `Grow: ${grow}\nShrink: ${shrink}\nBasis: ${basis > 0 ? basis : 'auto'}`;
     return element;
   }
+
+  // Tooltip of the items. The browser's own one (the title attribute) only appears after a delay, so this plain element
+  // is shown and hidden the moment the pointer enters and leaves an item. The events are delegated to #box because
+  // render() replaces all of its items.
+  const tipOffsetY = 17; // just below the mouse cursor, where WPF puts its ToolTip
+
+  function showTip(item, x, y) {
+    tip.textContent = item.dataset.tip;
+    tip.hidden = false;
+    const { width, height } = tip.getBoundingClientRect();
+    const page = document.documentElement;
+    // Below and to the right of the pointer; kept inside the page, and above the pointer when there is no room below.
+    tip.style.left = `${Math.max(0, Math.min(x, page.clientWidth - width))}px`;
+    tip.style.top = `${y + tipOffsetY + height <= page.clientHeight ? y + tipOffsetY : Math.max(0, y - height)}px`;
+  }
+
+  function hideTip() {
+    tip.hidden = true;
+  }
+
+  // mouseover/mouseout also fire when the pointer moves between an item and its label, which is not entering or leaving it.
+  box.addEventListener('mouseover', event => {
+    const item = event.target.closest('.item');
+    if (item && !item.contains(event.relatedTarget)) showTip(item, event.clientX, event.clientY);
+  });
+  box.addEventListener('mouseout', event => {
+    const item = event.target.closest('.item');
+    if (item && !item.contains(event.relatedTarget)) hideTip();
+  });
 
   // ScrollViewer measures its content without a limit along a scrollable axis. FlexPanel answers with the total of
   // its items' flex base sizes plus gaps and padding, whereas CSS max-content (which Chromium computes without looking
@@ -126,6 +160,8 @@
     });
 
     const childs = read(data, 'Childs');
+    // No mouseout is sent for an item that gets removed while it is hovered.
+    hideTip();
     box.replaceChildren(...(Array.isArray(childs) ? childs : []).map(createItem));
 
     if (isRow ? scrollX : scrollY) {

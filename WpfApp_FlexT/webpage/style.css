@@ -82,3 +82,18 @@ body {
   align-self: center;
   padding: .25rem .75rem;
 }
+
+/* Tooltip of the items (see app.js). Styled like the default WPF ToolTip shown on the WPF side. */
+.tip {
+  position: fixed;
+  z-index: 1;
+  padding: 3px 5px;
+  border: 1px solid #767676;
+  background: #f1f2f7;
+  color: #575757;
+  font-size: 12px;
+  line-height: 16px;
+  white-space: pre;
+  /* Never catches the pointer, so showing it under the cursor cannot make the item lose the hover. */
+  pointer-events: none;
+}

@@ -52,10 +52,12 @@
             <webview:WebView2 x:Name="web" Grid.Column="2"/>
         </Grid>
         <!-- Reports each flex item's WPF vs. web-rendered (X, Y, Width, Height), populated by
-             MainWindow.xaml.cs's ApplyTestCase/CompareAndShow after every test-case render. -->
+             MainWindow.xaml.cs's ApplyTestCase/CompareAndShow after every test-case render.
+             The list height is fixed so that emptying/refilling it never resizes the two panes above,
+             which would leave the web page laid out in a viewport that no longer matches the WPF one. -->
         <StackPanel Grid.Row="2" Margin="4">
             <TextBlock x:Name="textblock_summary" FontWeight="Bold" Margin="0,2"/>
-            <ListView x:Name="listview_comparison" MaxHeight="180">
+            <ListView x:Name="listview_comparison" Height="180">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Header="#" Width="30" DisplayMemberBinding="{Binding Index}"/>

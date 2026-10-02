@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -13,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace WpfApp_FlexT
 {
@@ -39,11 +41,25 @@ namespace WpfApp_FlexT
         int currentRequestId = -1;
         List<ItemRect>? lastWpfItemRects;
         FlexPanelTestData? currentTestData;
+        // Opened and closed by hand from MouseEnter/MouseLeave instead of through ToolTipService, which waits out a show
+        // delay and keeps the tip open while the mouse crosses the "safe area" between the item and the tip. Driving it
+        // directly shows the tip the moment the mouse enters an item and hides it the moment the mouse leaves.
+        readonly ToolTip flexItemToolTip = new();
+        // The web page keeps the viewport size it was last sent, so it has to be sent the new one when the window is
+        // resized. A drag raises SizeChanged for every mouse move; the timer folds them into one update per tick, and
+        // moves the update out of the layout pass that raises SizeChanged, where nothing can be measured yet.
+        readonly DispatcherTimer resizeTimer = new() { Interval = TimeSpan.FromMilliseconds(50) };
 
         public MainWindow()
         {
             InitializeComponent();
+            // The tip's popup looks this key up through its PlacementTarget (a flex item), so setting it on the panel
+            // removes the ~150 ms fade in/out (applied when the OS animates tooltips) for the item tips only.
+            flexpanel.Resources[SystemParameters.ToolTipPopupAnimationKey] = PopupAnimation.None;
             InitializeWebViewAsync();
+            resizeTimer.Tick += ResizeTimer_Tick;
+            SizeChanged += MainWindow_SizeChanged;
+            Closed += (_, _) => resizeTimer.Stop();
             // Deferred to Loaded: before the window has an HWND/real size, UpdateLayout() inside
             // ApplyTestCase can't measure real WPF item rects (they'd all come back as 0,0,0,0).
             Loaded += (_, _) => LoadTestCases();
@@ -60,9 +76,14 @@ namespace WpfApp_FlexT
         // renders and measures #box's children (see webpage/app.js).
         sealed record MeasurementMessage(string? Type, int RequestId, List<ItemRect>? Items);
 
-        // What WPF sends to the web page: the test data plus a RequestId so the measurements the page
-        // echoes back can be matched to the WPF-side snapshot taken for that same render.
-        sealed record WebPageEnvelope(int RequestId, FlexPanelTestData TestData);
+        // The size WPF's ScrollViewer gave the FlexPanel. The web page lays #box out inside a viewport of exactly
+        // this size rather than the WebView2 control's own bounds, which are resized asynchronously (for example when
+        // the result list below changes height) and would otherwise race with the web page's measurement.
+        sealed record ViewportSize(double Width, double Height);
+
+        // What WPF sends to the web page: the test data and the viewport it was laid out in, plus a RequestId so the
+        // measurements the page echoes back can be matched to the WPF-side snapshot taken for that same render.
+        sealed record WebPageEnvelope(int RequestId, ViewportSize Viewport, FlexPanelTestData TestData);
 
         sealed class ComparisonRow
         {
@@ -123,8 +144,8 @@ namespace WpfApp_FlexT
 
         private void button_recompare_Click(object sender, RoutedEventArgs e)
         {
-            // Useful after resizing the window: re-renders and re-measures both sides at the
-            // window's current size instead of waiting for another test-case selection.
+            // Renders both sides again from scratch, for example after the OS theme changed. Resizing the window
+            // needs no click: MainWindow_SizeChanged brings the web page up to date by itself.
             if (currentTestData is not null)
             {
                 ApplyTestCase(currentTestData);
@@ -134,18 +155,38 @@ namespace WpfApp_FlexT
         void ApplyTestCase(FlexPanelTestData data)
         {
             currentTestData = data;
-            currentRequestId = ++requestSequence;
 
             ShowInFlexPanel(data);
+            MeasureAndShowInWebView(data);
+
+            listview_comparison.ItemsSource = null;
+            textblock_summary.Text = "\u6bd4\u5c0d\u4e2d... (\u7b49\u5f85\u7db2\u9801\u91cf\u6e2c\u7d50\u679c)";
+        }
+
+        // Takes the WPF snapshot of the FlexPanel as it is laid out now and has the web page lay the same test case out in
+        // the same viewport. The comparison follows when the page's measurements come back (OnWebMessageReceived).
+        void MeasureAndShowInWebView(FlexPanelTestData data)
+        {
+            currentRequestId = ++requestSequence;
             // Forces a synchronous layout pass so ActualWidth/ActualHeight/TranslatePoint below are
             // accurate immediately, instead of waiting for WPF's next async layout pass.
             flexpanel.UpdateLayout();
             lastWpfItemRects = MeasureFlexPanelItems();
 
             ShowInWebView(data, currentRequestId);
+        }
 
-            listview_comparison.ItemsSource = null;
-            textblock_summary.Text = "\u6bd4\u5c0d\u4e2d... (\u7b49\u5f85\u7db2\u9801\u91cf\u6e2c\u7d50\u679c)";
+        void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (currentTestData is not null && !resizeTimer.IsEnabled) resizeTimer.Start();
+        }
+
+        // WPF lays the FlexPanel out again for the new size by itself, but the web page only knows the viewport it was
+        // sent. The table is not emptied meanwhile (unlike for a new test case) so it does not flicker while dragging.
+        void ResizeTimer_Tick(object? sender, EventArgs e)
+        {
+            resizeTimer.Stop();
+            if (currentTestData is not null) MeasureAndShowInWebView(currentTestData);
         }
 
         List<ItemRect> MeasureFlexPanelItems()
@@ -234,7 +275,8 @@ namespace WpfApp_FlexT
 
         public void ShowInWebView(FlexPanelTestData data, int requestId)
         {
-            webPageDataJson = JsonSerializer.Serialize(new WebPageEnvelope(requestId, data), WebMessageJsonOptions);
+            var viewport = new ViewportSize(scrollviewer_flexpanel.ViewportWidth, scrollviewer_flexpanel.ViewportHeight);
+            webPageDataJson = JsonSerializer.Serialize(new WebPageEnvelope(requestId, viewport, data), WebMessageJsonOptions);
             PostWebPageData();
         }
 
@@ -268,9 +310,24 @@ namespace WpfApp_FlexT
             flexpanel.Children.Clear();
             for (int i = 0; i < data.Childs.Count; i++)
             {
-                flexpanel.Children.Add(CreateFlexChild(data.Childs[i], i, isDark));
+                var item = CreateFlexChild(data.Childs[i], i, isDark);
+                item.MouseEnter += FlexItem_MouseEnter;
+                item.MouseLeave += FlexItem_MouseLeave;
+                flexpanel.Children.Add(item);
             }
         }
+
+        void FlexItem_MouseEnter(object sender, MouseEventArgs e)
+        {
+            var item = (UIElement)sender;
+            double basis = FlexPanel.GetBasis(item);
+            // FlexPanel only honours a positive Basis; otherwise the item keeps its own size ("auto").
+            flexItemToolTip.Content = $"Grow: {FlexPanel.GetGrow(item)}\nShrink: {FlexPanel.GetShrink(item)}\nBasis: {(basis > 0 ? basis.ToString() : "auto")}";
+            flexItemToolTip.PlacementTarget = item;
+            flexItemToolTip.IsOpen = true;
+        }
+
+        void FlexItem_MouseLeave(object sender, MouseEventArgs e) => flexItemToolTip.IsOpen = false;
 
         static UIElement CreateFlexChild(FlexPanelTestDataChild child, int index, bool isDark)
         {
