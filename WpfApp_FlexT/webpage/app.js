@@ -26,6 +26,27 @@
     Center: 'center',
     Stretch: 'stretch',
   };
+  const cssFlexWrap = {
+    NoWrap: 'nowrap',
+    Wrap: 'wrap',
+    WrapReverse: 'wrap-reverse',
+  };
+  const cssAlignContent = {
+    Stretch: 'stretch',
+    Start: 'flex-start',
+    End: 'flex-end',
+    Center: 'center',
+    SpaceBetween: 'space-between',
+    SpaceAround: 'space-around',
+    SpaceEvenly: 'space-evenly',
+  };
+  const cssAlignSelf = {
+    Auto: 'auto',
+    Start: 'flex-start',
+    End: 'flex-end',
+    Center: 'center',
+    Stretch: 'stretch',
+  };
 
   const box = document.getElementById('box');
   const viewport = document.getElementById('viewport');
@@ -53,17 +74,32 @@
     return Number.isFinite(number) ? Math.max(number, 0) : 0;
   }
 
-  function createItem(child, index) {
+  // An unset (null) optional size leaves the CSS property alone.
+  function optionalPx(value) {
+    return value === null || value === undefined ? '' : `${toNumber(value)}px`;
+  }
+
+  function createItem(child, index, isRow) {
     const element = itemTemplate.content.firstElementChild.cloneNode(true);
     element.querySelector('.item-label').textContent = `index: ${index}`;
     const grow = toNumber(read(child, 'Grow'));
     const shrink = toNumber(read(child, 'Shrink'));
     const basis = toNumber(read(child, 'Basis'));
+    const margin = read(child, 'Margin');
     Object.assign(element.style, {
       flexGrow: String(grow),
       flexShrink: String(shrink),
       // FlexPanel keeps the child's desired size when Basis is 0.
       flexBasis: basis > 0 ? `${basis}px` : 'auto',
+      alignSelf: toCss(cssAlignSelf, read(child, 'AlignSelf')),
+      // CrossSize is the height of a row and the width of a column; MinMain/MaxMain limit the main-axis size.
+      [isRow ? 'height' : 'width']: optionalPx(read(child, 'CrossSize')),
+      [isRow ? 'minWidth' : 'minHeight']: optionalPx(read(child, 'MinMain')),
+      [isRow ? 'maxWidth' : 'maxHeight']: optionalPx(read(child, 'MaxMain')),
+      marginLeft: `${toNumber(read(margin, 'Left'))}px`,
+      marginTop: `${toNumber(read(margin, 'Top'))}px`,
+      marginRight: `${toNumber(read(margin, 'Right'))}px`,
+      marginBottom: `${toNumber(read(margin, 'Bottom'))}px`,
     });
     // The same three lines as the tooltip of the WPF items (MainWindow.xaml.cs).
     element.dataset.tip = `Grow: ${grow}\nShrink: ${shrink}\nBasis: ${basis > 0 ? basis : 'auto'}`;
@@ -113,7 +149,14 @@
       el.style.flexShrink = '0';
     }
     let total = paddingBefore + paddingAfter + gap * Math.max(items.length - 1, 0);
-    for (const el of items) total += el.getBoundingClientRect()[size];
+    for (const el of items) {
+      // The margins are part of the room an item takes, whereas the rect of the item itself leaves them out.
+      const style = getComputedStyle(el);
+      const margin = isRow
+        ? parseFloat(style.marginLeft) + parseFloat(style.marginRight)
+        : parseFloat(style.marginTop) + parseFloat(style.marginBottom);
+      total += el.getBoundingClientRect()[size] + margin;
+    }
     items.forEach((el, i) => {
       [el.style.flexGrow, el.style.flexShrink] = flex[i];
     });
@@ -150,8 +193,10 @@
       height: scrollY ? 'auto' : '100%',
       minHeight: '100%',
       flexDirection: direction,
+      flexWrap: toCss(cssFlexWrap, read(data, 'Wrap')),
       justifyContent: toCss(cssJustifyContent, read(data, 'JustifyContent')),
       alignItems: toCss(cssAlignItems, read(data, 'AlignItems')),
+      alignContent: toCss(cssAlignContent, read(data, 'AlignContent')),
       gap: `${gap}px`,
       paddingLeft: `${paddingLeft}px`,
       paddingTop: `${paddingTop}px`,
@@ -162,7 +207,7 @@
     const childs = read(data, 'Childs');
     // No mouseout is sent for an item that gets removed while it is hovered.
     hideTip();
-    box.replaceChildren(...(Array.isArray(childs) ? childs : []).map(createItem));
+    box.replaceChildren(...(Array.isArray(childs) ? childs : []).map((child, index) => createItem(child, index, isRow)));
 
     if (isRow ? scrollX : scrollY) {
       fitMainAxisToItems(

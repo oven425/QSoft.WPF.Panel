@@ -1,0 +1,49 @@
+{
+  "Description": "Edge=CrossOverflow, Wrap=NoWrap, Direction=Column, AlignItems=Start",
+  "Parent": {
+    "EnableHorizontalScrollbar": false,
+    "EnableVerticalScrollbar": false
+  },
+  "Padding": {
+    "Left": 8,
+    "Top": 8,
+    "Right": 8,
+    "Bottom": 8
+  },
+  "Gap": 8,
+  "Wrap": "NoWrap",
+  "JustifyContent": "Start",
+  "Direction": "Column",
+  "AlignItems": "Start",
+  "AlignContent": "Stretch",
+  "Childs": [
+    {
+      "Basis": 90,
+      "Shrink": 1,
+      "Grow": 0
+    },
+    {
+      "Basis": 110,
+      "Shrink": 1,
+      "Grow": 0,
+      "CrossSize": 600
+    },
+    {
+      "Basis": 100,
+      "Shrink": 1,
+      "Grow": 0
+    },
+    {
+      "Basis": 120,
+      "Shrink": 1,
+      "Grow": 0,
+      "CrossSize": 300
+    },
+    {
+      "Basis": 90,
+      "Shrink": 1,
+      "Grow": 0,
+      "CrossSize": 50
+    }
+  ]
+}

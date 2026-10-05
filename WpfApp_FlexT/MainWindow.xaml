@@ -7,23 +7,130 @@
         mc:Ignorable="d"
         xmlns:qpanel="clr-namespace:QSoft.WPF.Panel;assembly=QSoft.WPF.Panel"
         xmlns:webview="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
-        Title="MainWindow" Height="620" Width="900">
+        Title="MainWindow" Height="770" Width="900">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
+        <!-- Selection area. There are too many test cases for one list, so they are narrowed down first: by category (the
+             part of the file name before its first "_") and by search keywords, which the search box suggests while they
+             are typed. The ComboBox lists what is left, and the content of the chosen test case is shown below it.
+             The content box has a fixed height (longer text scrolls) for the same reason as the result list below: a
+             change of height would resize the two panes, which would leave the web page laid out in a viewport that no
+             longer matches the WPF one. The window Height includes this area, so when the box gets another height the
+             window needs the same change to leave the panes the size they have now (429 x 326). -->
+        <Grid Grid.Row="0" Margin="4,2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <ComboBox x:Name="combobox_testcase" DisplayMemberPath="DisplayName"
-                      VerticalAlignment="Center" Margin="4" Padding="4"
-                      SelectionChanged="combobox_testcase_SelectionChanged"/>
-            <Button x:Name="button_recompare" Grid.Column="1" Content="重新比對" VerticalAlignment="Center"
-                    Margin="4" Padding="10,4" Click="button_recompare_Click"/>
+            <Grid.Resources>
+                <Style x:Key="FieldLabel" TargetType="TextBlock">
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="Margin" Value="2,0,8,0"/>
+                </Style>
+                <!-- A suggestion under the search box. It cannot take the keyboard focus, so a click leaves the focus in the box,
+                     and the picked one is highlighted although the list never has the focus. -->
+                <Style x:Key="SuggestionItemStyle" TargetType="ListBoxItem">
+                    <Setter Property="Focusable" Value="False"/>
+                    <Setter Property="Padding" Value="6,2"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <Border x:Name="Bd" Padding="{TemplateBinding Padding}" Background="Transparent">
+                                    <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="Bd" Property="Background" Value="#E5F3FF"/>
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter TargetName="Bd" Property="Background" Value="#CCE8FF"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Grid.Resources>
+
+            <TextBlock Text="分類" Style="{StaticResource FieldLabel}"/>
+            <ComboBox x:Name="combobox_category" Grid.Column="1" DisplayMemberPath="DisplayName"
+                      Margin="2" Padding="4,3" SelectionChanged="combobox_category_SelectionChanged"/>
+            <TextBlock Grid.Column="2" Text="搜尋" Style="{StaticResource FieldLabel}" Margin="10,0,8,0"/>
+            <Grid Grid.Column="3" Margin="2">
+                <TextBox x:Name="textbox_search" Padding="2,3" VerticalContentAlignment="Center"
+                         GotKeyboardFocus="textbox_search_GotKeyboardFocus" LostKeyboardFocus="textbox_search_LostKeyboardFocus"
+                         PreviewKeyDown="textbox_search_PreviewKeyDown" SelectionChanged="textbox_search_SelectionChanged"
+                         AutomationProperties.Name="搜尋" TextChanged="textbox_search_TextChanged"/>
+                <TextBlock Text="輸入關鍵字篩選 (例: Column SpaceAround)" Foreground="Gray" Margin="6,0"
+                           VerticalAlignment="Center" IsHitTestVisible="False">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Text, ElementName=textbox_search}" Value="">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <!-- The suggestions for the word being typed. A popup, so that the list can cover the web view (a window of its
+                     own, which hides any element drawn over it) and does not change the size of the selection area. The list
+                     is some dozens of rows at most, so none of them is virtualized: every row exists for UI Automation. -->
+                <Popup x:Name="popup_suggestions" PlacementTarget="{Binding ElementName=textbox_search}" Placement="Bottom"
+                       StaysOpen="True">
+                    <Border Width="{Binding ActualWidth, ElementName=textbox_search}" BorderThickness="1"
+                            Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"
+                            BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}">
+                        <ListBox x:Name="listbox_suggestions" MaxHeight="240" BorderThickness="0" Focusable="False"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled" VirtualizingPanel.IsVirtualizing="False"
+                                 AutomationProperties.Name="搜尋建議"
+                                 ItemContainerStyle="{StaticResource SuggestionItemStyle}"
+                                 PreviewMouseLeftButtonDown="listbox_suggestions_PreviewMouseLeftButtonDown">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding Text}"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding Count, StringFormat={}{0} 筆}" Foreground="Gray" Margin="12,0,0,0"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Border>
+                </Popup>
+            </Grid>
+            <TextBlock x:Name="textblock_count" Grid.Column="4" Style="{StaticResource FieldLabel}" Margin="8,0,2,0"/>
+
+            <TextBlock Grid.Row="1" Text="測試案例" Style="{StaticResource FieldLabel}"/>
+            <ComboBox x:Name="combobox_testcase" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" DisplayMemberPath="DisplayName"
+                      Margin="2" Padding="4,3" SelectionChanged="combobox_testcase_SelectionChanged"/>
+            <StackPanel Grid.Row="1" Grid.Column="4" Orientation="Horizontal">
+                <Button x:Name="button_prev" Content="上一個" Margin="2" Padding="10,3" Click="button_prev_Click"/>
+                <Button x:Name="button_next" Content="下一個" Margin="2" Padding="10,3" Click="button_next_Click"/>
+                <Button x:Name="button_recompare" Content="重新比對" Margin="2" Padding="10,3" Click="button_recompare_Click"/>
+            </StackPanel>
+
+            <TextBlock Grid.Row="2" Text="內容" Style="{StaticResource FieldLabel}" VerticalAlignment="Top" Margin="2,6,8,0"/>
+            <TextBox x:Name="textbox_content" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="4" Height="136" Margin="2" Padding="4,2"
+                     IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
+                     FontFamily="Consolas" FontSize="12" Background="#FAFAFA" AutomationProperties.Name="測試案例內容"/>
         </Grid>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>

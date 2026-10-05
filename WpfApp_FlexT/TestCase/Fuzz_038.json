@@ -1,0 +1,116 @@
+{
+  "Description": "Fuzz=038, Wrap=Wrap, Direction=RowReverse, JustifyContent=SpaceAround, AlignItems=Center, AlignContent=SpaceBetween, Items=13",
+  "Parent": {
+    "EnableHorizontalScrollbar": false,
+    "EnableVerticalScrollbar": false
+  },
+  "Padding": {
+    "Left": 8,
+    "Top": 24,
+    "Right": 4,
+    "Bottom": 0
+  },
+  "Gap": 24,
+  "Wrap": "Wrap",
+  "JustifyContent": "SpaceAround",
+  "Direction": "RowReverse",
+  "AlignItems": "Center",
+  "AlignContent": "SpaceBetween",
+  "Childs": [
+    {
+      "Basis": 140,
+      "Shrink": 2,
+      "Grow": 1,
+      "AlignSelf": "Stretch",
+      "CrossSize": 30
+    },
+    {
+      "Basis": 0,
+      "Shrink": 2,
+      "Grow": 0,
+      "CrossSize": 50
+    },
+    {
+      "Basis": 140,
+      "Shrink": 1,
+      "Grow": 0,
+      "Margin": {
+        "Left": 1,
+        "Top": 12,
+        "Right": 9,
+        "Bottom": 0
+      }
+    },
+    {
+      "Basis": 70,
+      "Shrink": 1,
+      "Grow": 0
+    },
+    {
+      "Basis": 220,
+      "Shrink": 1,
+      "Grow": 0,
+      "CrossSize": 40
+    },
+    {
+      "Basis": 170,
+      "Shrink": 1,
+      "Grow": 0
+    },
+    {
+      "Basis": 0,
+      "Shrink": 2,
+      "Grow": 2,
+      "AlignSelf": "End",
+      "CrossSize": 60
+    },
+    {
+      "Basis": 180,
+      "Shrink": 1,
+      "Grow": 1,
+      "MinMain": 40
+    },
+    {
+      "Basis": 0,
+      "Shrink": 2,
+      "Grow": 2,
+      "CrossSize": 80
+    },
+    {
+      "Basis": 190,
+      "Shrink": 0,
+      "Grow": 1,
+      "CrossSize": 40,
+      "MinMain": 120
+    },
+    {
+      "Basis": 170,
+      "Shrink": 1,
+      "Grow": 0,
+      "Margin": {
+        "Left": 4,
+        "Top": 12,
+        "Right": 12,
+        "Bottom": 8
+      }
+    },
+    {
+      "Basis": 90,
+      "Shrink": 1,
+      "Grow": 0,
+      "AlignSelf": "Stretch",
+      "CrossSize": 40
+    },
+    {
+      "Basis": 140,
+      "Shrink": 0,
+      "Grow": 0,
+      "Margin": {
+        "Left": 1,
+        "Top": 4,
+        "Right": 10,
+        "Bottom": 11
+      }
+    }
+  ]
+}

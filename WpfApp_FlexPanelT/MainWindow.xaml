@@ -21,13 +21,14 @@
             <TabControl x:Name="tabcontrol" qpanel:FlexPanel.Grow="1" Grid.Row="1">
                 <TabItem Header="Container">
                     <qpanel:FlexPanel FlexDirection="Column" Gap="8" AlignItems="Stretch">
-                        <!--<qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
+                        <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
                             <TextBlock Text="Flex-wrap"/>
                             <ComboBox SelectedValuePath="Tag" SelectedValue="{Binding FlexWrap, ElementName=flexpanel}">
                                 <ComboBoxItem Content="NoWrap" Tag="{x:Static qpanel:FlexWrap.NoWrap}"/>
                                 <ComboBoxItem Content="Wrap" Tag="{x:Static qpanel:FlexWrap.Wrap}"/>
+                                <ComboBoxItem Content="WrapReverse" Tag="{x:Static qpanel:FlexWrap.WrapReverse}"/>
                             </ComboBox>
-                        </qpanel:FlexPanel>-->
+                        </qpanel:FlexPanel>
                         <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
                             <TextBlock Text="Flex-direction"/>
                             <ComboBox SelectedValuePath="Tag" SelectedValue="{Binding FlexDirection, ElementName=flexpanel}">
@@ -55,6 +56,18 @@
                                 <ComboBoxItem Content="Center" Tag="{x:Static qpanel:AlignItems.Center}"/>
                                 <ComboBoxItem Content="End" Tag="{x:Static qpanel:AlignItems.End}"/>
                                 <ComboBoxItem Content="Stretch" Tag="{x:Static qpanel:AlignItems.Stretch}"/>
+                            </ComboBox>
+                        </qpanel:FlexPanel>
+                        <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">
+                            <TextBlock Text="Align-content"/>
+                            <ComboBox SelectedValuePath="Tag" SelectedValue="{Binding AlignContent, ElementName=flexpanel}">
+                                <ComboBoxItem Content="Stretch" Tag="{x:Static qpanel:AlignContent.Stretch}"/>
+                                <ComboBoxItem Content="Start" Tag="{x:Static qpanel:AlignContent.Start}"/>
+                                <ComboBoxItem Content="Center" Tag="{x:Static qpanel:AlignContent.Center}"/>
+                                <ComboBoxItem Content="End" Tag="{x:Static qpanel:AlignContent.End}"/>
+                                <ComboBoxItem Content="SpaceAround" Tag="{x:Static qpanel:AlignContent.SpaceAround}"/>
+                                <ComboBoxItem Content="SpaceBetween" Tag="{x:Static qpanel:AlignContent.SpaceBetween}"/>
+                                <ComboBoxItem Content="SpaceEvenly" Tag="{x:Static qpanel:AlignContent.SpaceEvenly}"/>
                             </ComboBox>
                         </qpanel:FlexPanel>
                         <qpanel:FlexPanel Gap="3" FlexDirection="Column" AlignItems="Stretch">

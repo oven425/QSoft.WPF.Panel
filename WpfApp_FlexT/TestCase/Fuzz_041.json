@@ -1,0 +1,125 @@
+{
+  "Description": "Fuzz=041, Wrap=WrapReverse, Direction=RowReverse, JustifyContent=End, AlignItems=Start, AlignContent=Start, Items=15",
+  "Parent": {
+    "EnableHorizontalScrollbar": false,
+    "EnableVerticalScrollbar": true
+  },
+  "Padding": {
+    "Left": 12,
+    "Top": 12,
+    "Right": 16,
+    "Bottom": 12
+  },
+  "Gap": 4,
+  "Wrap": "WrapReverse",
+  "JustifyContent": "End",
+  "Direction": "RowReverse",
+  "AlignItems": "Start",
+  "AlignContent": "Start",
+  "Childs": [
+    {
+      "Basis": 150,
+      "Shrink": 0,
+      "Grow": 1
+    },
+    {
+      "Basis": 60,
+      "Shrink": 1,
+      "Grow": 0
+    },
+    {
+      "Basis": 120,
+      "Shrink": 0,
+      "Grow": 2,
+      "AlignSelf": "End",
+      "MinMain": 70
+    },
+    {
+      "Basis": 140,
+      "Shrink": 2,
+      "Grow": 1,
+      "AlignSelf": "Start",
+      "CrossSize": 60,
+      "MinMain": 100
+    },
+    {
+      "Basis": 0,
+      "Shrink": 1,
+      "Grow": 1,
+      "Margin": {
+        "Left": 0,
+        "Top": 5,
+        "Right": 11,
+        "Bottom": 4
+      }
+    },
+    {
+      "Basis": 0,
+      "Shrink": 1,
+      "Grow": 2,
+      "CrossSize": 70
+    },
+    {
+      "Basis": 210,
+      "Shrink": 2,
+      "Grow": 2
+    },
+    {
+      "Basis": 0,
+      "Shrink": 1,
+      "Grow": 2
+    },
+    {
+      "Basis": 140,
+      "Shrink": 1,
+      "Grow": 1
+    },
+    {
+      "Basis": 90,
+      "Shrink": 0,
+      "Grow": 2,
+      "AlignSelf": "Stretch",
+      "MinMain": 60,
+      "MaxMain": 160
+    },
+    {
+      "Basis": 190,
+      "Shrink": 1,
+      "Grow": 2,
+      "CrossSize": 100,
+      "Margin": {
+        "Left": 3,
+        "Top": 3,
+        "Right": 10,
+        "Bottom": 3
+      }
+    },
+    {
+      "Basis": 0,
+      "Shrink": 2,
+      "Grow": 0
+    },
+    {
+      "Basis": 180,
+      "Shrink": 2,
+      "Grow": 2,
+      "CrossSize": 40,
+      "Margin": {
+        "Left": 8,
+        "Top": 2,
+        "Right": 3,
+        "Bottom": 8
+      }
+    },
+    {
+      "Basis": 0,
+      "Shrink": 2,
+      "Grow": 0
+    },
+    {
+      "Basis": 0,
+      "Shrink": 1,
+      "Grow": 0
+    }
+  ]
+}

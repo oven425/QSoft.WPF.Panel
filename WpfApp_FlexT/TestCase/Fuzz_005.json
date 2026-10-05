@@ -1,0 +1,104 @@
+{
+  "Description": "Fuzz=005, Wrap=Wrap, Direction=Row, JustifyContent=SpaceBetween, AlignItems=Center, AlignContent=End, Items=13",
+  "Parent": {
+    "EnableHorizontalScrollbar": false,
+    "EnableVerticalScrollbar": false
+  },
+  "Padding": {
+    "Left": 16,
+    "Top": 16,
+    "Right": 8,
+    "Bottom": 12
+  },
+  "Gap": 8,
+  "Wrap": "Wrap",
+  "JustifyContent": "SpaceBetween",
+  "Direction": "Row",
+  "AlignItems": "Center",
+  "AlignContent": "End",
+  "Childs": [
+    {
+      "Basis": 190,
+      "Shrink": 0,
+      "Grow": 0,
+      "CrossSize": 60
+    },
+    {
+      "Basis": 90,
+      "Shrink": 1,
+      "Grow": 0,
+      "CrossSize": 30
+    },
+    {
+      "Basis": 50,
+      "Shrink": 0,
+      "Grow": 0,
+      "CrossSize": 30
+    },
+    {
+      "Basis": 0,
+      "Shrink": 0,
+      "Grow": 1
+    },
+    {
+      "Basis": 40,
+      "Shrink": 1,
+      "Grow": 2,
+      "AlignSelf": "Center",
+      "CrossSize": 100
+    },
+    {
+      "Basis": 140,
+      "Shrink": 1,
+      "Grow": 0
+    },
+    {
+      "Basis": 160,
+      "Shrink": 0,
+      "Grow": 0,
+      "AlignSelf": "Stretch",
+      "CrossSize": 80
+    },
+    {
+      "Basis": 150,
+      "Shrink": 1,
+      "Grow": 0,
+      "CrossSize": 100
+    },
+    {
+      "Basis": 190,
+      "Shrink": 1,
+      "Grow": 2,
+      "CrossSize": 80
+    },
+    {
+      "Basis": 80,
+      "Shrink": 2,
+      "Grow": 1,
+      "Margin": {
+        "Left": 9,
+        "Top": 8,
+        "Right": 6,
+        "Bottom": 3
+      }
+    },
+    {
+      "Basis": 220,
+      "Shrink": 1,
+      "Grow": 0,
+      "CrossSize": 110
+    },
+    {
+      "Basis": 0,
+      "Shrink": 1,
+      "Grow": 2
+    },
+    {
+      "Basis": 190,
+      "Shrink": 1,
+      "Grow": 0,
+      "AlignSelf": "Start",
+      "CrossSize": 40
+    }
+  ]
+}

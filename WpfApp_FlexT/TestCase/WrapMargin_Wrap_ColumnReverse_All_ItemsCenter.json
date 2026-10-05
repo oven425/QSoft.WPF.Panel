@@ -1,0 +1,127 @@
+{
+  "Description": "Wrap=Wrap, Direction=ColumnReverse, Margin=All, AlignItems=Center",
+  "Parent": {
+    "EnableHorizontalScrollbar": false,
+    "EnableVerticalScrollbar": false
+  },
+  "Padding": {
+    "Left": 8,
+    "Top": 8,
+    "Right": 8,
+    "Bottom": 8
+  },
+  "Gap": 8,
+  "Wrap": "Wrap",
+  "JustifyContent": "Start",
+  "Direction": "ColumnReverse",
+  "AlignItems": "Center",
+  "AlignContent": "Stretch",
+  "Childs": [
+    {
+      "Basis": 90,
+      "Shrink": 1,
+      "Grow": 0,
+      "Margin": {
+        "Left": 6,
+        "Top": 6,
+        "Right": 6,
+        "Bottom": 6
+      }
+    },
+    {
+      "Basis": 110,
+      "Shrink": 1,
+      "Grow": 0,
+      "CrossSize": 130,
+      "Margin": {
+        "Left": 6,
+        "Top": 6,
+        "Right": 6,
+        "Bottom": 6
+      }
+    },
+    {
+      "Basis": 100,
+      "Shrink": 1,
+      "Grow": 0,
+      "CrossSize": 60,
+      "Margin": {
+        "Left": 6,
+        "Top": 6,
+        "Right": 6,
+        "Bottom": 6
+      }
+    },
+    {
+      "Basis": 120,
+      "Shrink": 1,
+      "Grow": 0,
+      "CrossSize": 60,
+      "Margin": {
+        "Left": 6,
+        "Top": 6,
+        "Right": 6,
+        "Bottom": 6
+      }
+    },
+    {
+      "Basis": 90,
+      "Shrink": 1,
+      "Grow": 0,
+      "CrossSize": 50,
+      "Margin": {
+        "Left": 6,
+        "Top": 6,
+        "Right": 6,
+        "Bottom": 6
+      }
+    },
+    {
+      "Basis": 70,
+      "Shrink": 1,
+      "Grow": 0,
+      "CrossSize": 40,
+      "Margin": {
+        "Left": 6,
+        "Top": 6,
+        "Right": 6,
+        "Bottom": 6
+      }
+    },
+    {
+      "Basis": 100,
+      "Shrink": 1,
+      "Grow": 0,
+      "Margin": {
+        "Left": 6,
+        "Top": 6,
+        "Right": 6,
+        "Bottom": 6
+      }
+    },
+    {
+      "Basis": 60,
+      "Shrink": 1,
+      "Grow": 0,
+      "CrossSize": 70,
+      "Margin": {
+        "Left": 6,
+        "Top": 6,
+        "Right": 6,
+        "Bottom": 6
+      }
+    },
+    {
+      "Basis": 120,
+      "Shrink": 1,
+      "Grow": 0,
+      "CrossSize": 40,
+      "Margin": {
+        "Left": 6,
+        "Top": 6,
+        "Right": 6,
+        "Bottom": 6
+      }
+    }
+  ]
+}

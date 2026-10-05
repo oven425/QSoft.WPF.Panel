@@ -1,0 +1,62 @@
+{
+  "Description": "Fuzz=033, Wrap=Wrap, Direction=ColumnReverse, JustifyContent=SpaceEvenly, AlignItems=Stretch, AlignContent=Stretch, Items=5",
+  "Parent": {
+    "EnableHorizontalScrollbar": false,
+    "EnableVerticalScrollbar": false
+  },
+  "Padding": {
+    "Left": 8,
+    "Top": 16,
+    "Right": 12,
+    "Bottom": 0
+  },
+  "Gap": 4,
+  "Wrap": "Wrap",
+  "JustifyContent": "SpaceEvenly",
+  "Direction": "ColumnReverse",
+  "AlignItems": "Stretch",
+  "AlignContent": "Stretch",
+  "Childs": [
+    {
+      "Basis": 200,
+      "Shrink": 1,
+      "Grow": 1,
+      "MaxMain": 180,
+      "Margin": {
+        "Left": 4,
+        "Top": 4,
+        "Right": 7,
+        "Bottom": 8
+      }
+    },
+    {
+      "Basis": 50,
+      "Shrink": 1,
+      "Grow": 0
+    },
+    {
+      "Basis": 210,
+      "Shrink": 1,
+      "Grow": 0,
+      "CrossSize": 70
+    },
+    {
+      "Basis": 0,
+      "Shrink": 1,
+      "Grow": 0,
+      "CrossSize": 100,
+      "Margin": {
+        "Left": 2,
+        "Top": 0,
+        "Right": 9,
+        "Bottom": 4
+      }
+    },
+    {
+      "Basis": 190,
+      "Shrink": 2,
+      "Grow": 2,
+      "CrossSize": 70
+    }
+  ]
+}
