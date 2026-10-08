@@ -107,6 +107,26 @@ namespace QSoft.WPF.Panel
             get => (double)GetValue(GapProperty);
         }
 
+        // Like CSS's row-gap/column-gap: NaN (the default) falls back to Gap, so setting only Gap keeps
+        // behaving exactly as before. row-gap is always the physical *vertical* gap and column-gap the
+        // physical *horizontal* one, regardless of FlexDirection - see GetAxisGaps for how that maps to
+        // the main/cross axis the layout actually uses.
+        public readonly static DependencyProperty RowGapProperty = DependencyProperty.Register("RowGap", typeof(double), typeof(FlexPanel), new FrameworkPropertyMetadata(double.NaN, FrameworkPropertyMetadataOptions.AffectsMeasure));
+        [Category("FlexPanel")]
+        public double RowGap
+        {
+            set => this.SetValue(RowGapProperty, value);
+            get => (double)GetValue(RowGapProperty);
+        }
+
+        public readonly static DependencyProperty ColumnGapProperty = DependencyProperty.Register("ColumnGap", typeof(double), typeof(FlexPanel), new FrameworkPropertyMetadata(double.NaN, FrameworkPropertyMetadataOptions.AffectsMeasure));
+        [Category("FlexPanel")]
+        public double ColumnGap
+        {
+            set => this.SetValue(ColumnGapProperty, value);
+            get => (double)GetValue(ColumnGapProperty);
+        }
+
         public readonly static DependencyProperty FlexDirectionProperty = DependencyProperty.Register("FlexDirection", typeof(FlexDirection), typeof(FlexPanel), new FrameworkPropertyMetadata(FlexDirection.Row, FrameworkPropertyMetadataOptions.AffectsMeasure));
         [Category("FlexPanel")]
         public FlexDirection FlexDirection
@@ -255,6 +275,17 @@ namespace QSoft.WPF.Panel
         static bool IsRow(FlexDirection direction)
             => direction == FlexDirection.Row || direction == FlexDirection.RowReverse;
 
+        // CSS's row-gap is always the vertical gap and column-gap the horizontal one, no matter which way
+        // FlexDirection runs - so which of the two lands on the main axis (between items) versus the cross
+        // axis (between wrapped lines) flips with isRow, the same way CSS flexbox resolves them.
+        void GetAxisGaps(bool isRow, out double mainGap, out double crossGap)
+        {
+            var rowGap = double.IsNaN(this.RowGap) ? this.Gap : this.RowGap;
+            var columnGap = double.IsNaN(this.ColumnGap) ? this.Gap : this.ColumnGap;
+            mainGap = isRow ? columnGap : rowGap;
+            crossGap = isRow ? rowGap : columnGap;
+        }
+
         static Size MakeSize(bool isRow, double main, double cross)
             => isRow ? new Size(main, cross) : new Size(cross, main);
 
@@ -349,7 +380,7 @@ namespace QSoft.WPF.Panel
             var innerMain = Deflate(availMain, padMain);
             var innerCross = Deflate(availCross, padCross);
             var childConstraint = MakeSize(isRow, innerMain, innerCross);
-            var gap = this.Gap;
+            GetAxisGaps(isRow, out var mainGap, out var crossGap);
 
             if (flexItems.Length < count)
             {
@@ -383,13 +414,13 @@ namespace QSoft.WPF.Panel
             }
 
             // An unlimited main size (a ScrollViewer along that axis) never needs a line break.
-            var lineCount = CollectLines(count, this.FlexWrap != FlexWrap.NoWrap, innerMain, gap);
+            var lineCount = CollectLines(count, this.FlexWrap != FlexWrap.NoWrap, innerMain, mainGap);
             var maxLineMain = 0.0;
             var sumLineCross = 0.0;
             for (int l = 0; l < lineCount; l++)
             {
                 var line = flexLines[l];
-                var lineGap = GetLineGap(line, gap);
+                var lineGap = GetLineGap(line, mainGap);
 
                 var sumHypothetical = 0.0;
                 for (int i = line.Start; i < line.End; i++)
@@ -431,7 +462,7 @@ namespace QSoft.WPF.Panel
             }
             if (lineCount > 1)
             {
-                sumLineCross += gap * (lineCount - 1);
+                sumLineCross += crossGap * (lineCount - 1);
             }
 
             var desiredMain = Math.Min(maxLineMain + padMain, availMain);
@@ -462,7 +493,7 @@ namespace QSoft.WPF.Panel
             var crossPadEnd = isRow ? padding.Bottom : padding.Right;
             var innerMain = Math.Max((isRow ? finalSize.Width : finalSize.Height) - padStart - padEnd, 0);
             var innerCross = Math.Max((isRow ? finalSize.Height : finalSize.Width) - crossPadStart - crossPadEnd, 0);
-            var gap = this.Gap;
+            GetAxisGaps(isRow, out var mainGap, out var crossGap);
             var alignItems = this.AlignItems;
 
             for (int i = 0; i < count; i++)
@@ -470,12 +501,12 @@ namespace QSoft.WPF.Panel
                 ReadFlexProperties(children[i], isRow, ref flexItems[i]);
             }
 
-            var lineCount = CollectLines(count, isMultiLine, innerMain, gap);
+            var lineCount = CollectLines(count, isMultiLine, innerMain, mainGap);
             var sumLineCross = 0.0;
             for (int l = 0; l < lineCount; l++)
             {
                 ref var line = ref flexLines[l];
-                ResolveFlexibleLengths(line.Start, line.End, innerMain, GetLineGap(line, gap));
+                ResolveFlexibleLengths(line.Start, line.End, innerMain, GetLineGap(line, mainGap));
 
                 line.Cross = 0;
                 for (int i = line.Start; i < line.End; i++)
@@ -491,7 +522,7 @@ namespace QSoft.WPF.Panel
             var lineSpacing = 0.0;
             if (isMultiLine)
             {
-                var freeCross = innerCross - sumLineCross - gap * (lineCount - 1);
+                var freeCross = innerCross - sumLineCross - crossGap * (lineCount - 1);
                 var alignContent = this.AlignContent;
                 if (alignContent == AlignContent.Stretch)
                 {
@@ -520,7 +551,7 @@ namespace QSoft.WPF.Panel
             for (int l = 0; l < lineCount; l++)
             {
                 var line = flexLines[l];
-                var freeSpace = innerMain - GetLineGap(line, gap);
+                var freeSpace = innerMain - GetLineGap(line, mainGap);
                 for (int i = line.Start; i < line.End; i++)
                 {
                     freeSpace -= flexItems[i].Size;
@@ -565,9 +596,9 @@ namespace QSoft.WPF.Panel
                     child.Arrange(isRow
                         ? new Rect(mainPos, crossPos, main, crossSize)
                         : new Rect(crossPos, mainPos, crossSize, main));
-                    position += main + gap + spacing;
+                    position += main + mainGap + spacing;
                 }
-                linePosition += line.Cross + gap + lineSpacing;
+                linePosition += line.Cross + crossGap + lineSpacing;
             }
 
             return finalSize;

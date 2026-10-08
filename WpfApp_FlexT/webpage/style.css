@@ -44,6 +44,10 @@
 html,
 body {
   height: 100%;
+  /* #viewport is the only element meant to scroll (or clip); without this, a sub-pixel gap between
+     the WPF-reported viewport size and WebView2's actual render size can make the page itself
+     overflow by a hair, showing a native browser scrollbar that has no counterpart on the WPF side. */
+  overflow: hidden;
 }
 
 body {

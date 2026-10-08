@@ -79,6 +79,14 @@
     <Button>Test3</Button>
 </qpanel:FlexPanel>
 ```
+`RowGap`/`ColumnGap` override `Gap` on one axis only, like CSS's separate `row-gap`/`column-gap` properties: `RowGap` is always the vertical gap and `ColumnGap` the horizontal one, no matter which way `FlexDirection` runs. Leaving either unset (the default) keeps using `Gap` on that axis.
+```xml
+<qpanel:FlexPanel FlexDirection="Row" FlexWrap="Wrap" RowGap="4" ColumnGap="16">
+    <Button qpanel:FlexPanel.Basis="150">Test1</Button>
+    <Button qpanel:FlexPanel.Basis="150">Test2</Button>
+    <Button qpanel:FlexPanel.Basis="150">Test3</Button>
+</qpanel:FlexPanel>
+```
 
 ## AlignSelf: Auto, Start, End, Center, Stretch
 ```xml

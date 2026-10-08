@@ -16,7 +16,10 @@
         </Grid.RowDefinitions>
         <!-- Selection area. There are too many test cases for one list, so they are narrowed down first: by category (the
              part of the file name before its first "_") and by search keywords, which the search box suggests while they
-             are typed. The ComboBox lists what is left, and the content of the chosen test case is shown below it.
+             are typed. The ComboBox lists what is left, and the content of the chosen test case is shown below it as
+             editable JSON (the same shape as the TestCase\*.json files): typing valid FlexPanelTestData JSON re-renders
+             both sides live (see MainWindow.xaml.cs's ContentEditTimer_Tick), but it is never written back to the file,
+             so switching test cases (or reloading) always reverts to what is on disk.
              The content box has a fixed height (longer text scrolls) for the same reason as the result list below: a
              change of height would resize the two panes, which would leave the web page laid out in a viewport that no
              longer matches the WPF one. The window Height includes this area, so when the box gets another height the
@@ -129,8 +132,10 @@
 
             <TextBlock Grid.Row="2" Text="內容" Style="{StaticResource FieldLabel}" VerticalAlignment="Top" Margin="2,6,8,0"/>
             <TextBox x:Name="textbox_content" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="4" Height="136" Margin="2" Padding="4,2"
-                     IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
-                     FontFamily="Consolas" FontSize="12" Background="#FAFAFA" AutomationProperties.Name="測試案例內容"/>
+                     TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"
+                     FontFamily="Consolas" FontSize="12" Background="White"
+                     AutomationProperties.Name="測試案例內容 (JSON，可編輯，不會寫回檔案)"
+                     TextChanged="textbox_content_TextChanged"/>
         </Grid>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>

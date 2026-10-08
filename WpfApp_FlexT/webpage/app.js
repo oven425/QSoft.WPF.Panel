@@ -171,6 +171,12 @@
     const direction = toCss(cssFlexDirection, read(data, 'Direction'));
     const isRow = direction.startsWith('row');
     const gap = toNumber(read(data, 'Gap'));
+    // RowGap/ColumnGap override Gap on one axis only, like CSS's separate row-gap/column-gap properties: row-gap
+    // is always the physical vertical gap and column-gap the physical horizontal one, regardless of direction.
+    const rowGapRaw = read(data, 'RowGap');
+    const columnGapRaw = read(data, 'ColumnGap');
+    const rowGap = rowGapRaw === null || rowGapRaw === undefined ? gap : toNumber(rowGapRaw);
+    const columnGap = columnGapRaw === null || columnGapRaw === undefined ? gap : toNumber(columnGapRaw);
     const paddingLeft = toNumber(read(padding, 'Left'));
     const paddingTop = toNumber(read(padding, 'Top'));
     const paddingRight = toNumber(read(padding, 'Right'));
@@ -197,7 +203,8 @@
       justifyContent: toCss(cssJustifyContent, read(data, 'JustifyContent')),
       alignItems: toCss(cssAlignItems, read(data, 'AlignItems')),
       alignContent: toCss(cssAlignContent, read(data, 'AlignContent')),
-      gap: `${gap}px`,
+      rowGap: `${rowGap}px`,
+      columnGap: `${columnGap}px`,
       paddingLeft: `${paddingLeft}px`,
       paddingTop: `${paddingTop}px`,
       paddingRight: `${paddingRight}px`,
@@ -214,7 +221,7 @@
         isRow,
         isRow ? paddingLeft : paddingTop,
         isRow ? paddingRight : paddingBottom,
-        gap);
+        isRow ? columnGap : rowGap);
     }
   }
 

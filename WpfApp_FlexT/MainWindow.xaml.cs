@@ -1,7 +1,6 @@
 ﻿using Microsoft.Web.WebView2.Core;
 using Microsoft.Win32;
 using QSoft.WPF.Panel;
-using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -41,6 +40,20 @@ namespace WpfApp_FlexT
             // The web page echoes measurements back with camelCase (JS-natural) property names.
             PropertyNameCaseInsensitive = true,
         };
+        // Same as WebMessageJsonOptions but indented, for showing/editing FlexPanelTestData as readable JSON
+        // in the content box (parsing a user edit back still uses the compact WebMessageJsonOptions above).
+        static readonly JsonSerializerOptions ContentEditorJsonOptions = new(WebMessageJsonOptions) { WriteIndented = true };
+        static readonly Brush ContentEditorNormalBackground = Brushes.White;
+        // Same pink the comparison ListView uses for a mismatched row (see MainWindow.xaml), reused here so
+        // "something is wrong" looks consistent across the window.
+        static readonly Brush ContentEditorErrorBackground = CreateFrozenBrush(0xFB, 0xD9, 0xD9);
+
+        static Brush CreateFrozenBrush(byte r, byte g, byte b)
+        {
+            var brush = new SolidColorBrush(Color.FromRgb(r, g, b));
+            brush.Freeze();
+            return brush;
+        }
 
         string? webPageDataJson;
         int requestSequence;
@@ -61,6 +74,12 @@ namespace WpfApp_FlexT
         // resized. A drag raises SizeChanged for every mouse move; the timer folds them into one update per tick, and
         // moves the update out of the layout pass that raises SizeChanged, where nothing can be measured yet.
         readonly DispatcherTimer resizeTimer = new() { Interval = TimeSpan.FromMilliseconds(50) };
+        // True while a test case selection (or the initial load) writes JSON into the content box, so
+        // textbox_content_TextChanged does not mistake that programmatic update for a user edit to apply.
+        bool settingContentText;
+        // Debounces content-box edits the same way resizeTimer debounces SizeChanged: re-parsing and re-rendering on
+        // every keystroke would be wasteful and would flash invalid-JSON errors while a bracket/quote is half-typed.
+        readonly DispatcherTimer contentEditTimer = new() { Interval = TimeSpan.FromMilliseconds(500) };
 
         public MainWindow()
         {
@@ -70,10 +89,11 @@ namespace WpfApp_FlexT
             flexpanel.Resources[SystemParameters.ToolTipPopupAnimationKey] = PopupAnimation.None;
             InitializeWebViewAsync();
             resizeTimer.Tick += ResizeTimer_Tick;
+            contentEditTimer.Tick += ContentEditTimer_Tick;
             SizeChanged += MainWindow_SizeChanged;
             // A popup stays where it is on the screen when the window is dragged away from under it.
             LocationChanged += (_, _) => CloseSuggestions();
-            Closed += (_, _) => resizeTimer.Stop();
+            Closed += (_, _) => { resizeTimer.Stop(); contentEditTimer.Stop(); };
             // Deferred to Loaded: before the window has an HWND/real size, UpdateLayout() inside
             // ApplyTestCase can't measure real WPF item rects (they'd all come back as 0,0,0,0).
             Loaded += (_, _) => LoadTestCases();
@@ -393,11 +413,69 @@ namespace WpfApp_FlexT
 
             if (combobox_testcase.SelectedItem is TestCaseItem item)
             {
-                textbox_content.Text = TestCaseText.Describe(item.FileName, item.Data);
+                SetContentText(JsonSerializer.Serialize(item.Data, ContentEditorJsonOptions));
                 textbox_content.ScrollToHome();
                 // Filtering selects the case that is already on screen again; that one needs no new render.
                 if (!ReferenceEquals(item.Data, currentTestData)) ApplyTestCase(item.Data);
             }
+        }
+
+        // Writes into the content box without textbox_content_TextChanged treating it as a user edit to parse/apply.
+        void SetContentText(string text)
+        {
+            settingContentText = true;
+            try
+            {
+                textbox_content.Text = text;
+            }
+            finally
+            {
+                settingContentText = false;
+            }
+            SetContentEditorValid(true);
+        }
+
+        // The content box doubles as a live editor: typing valid FlexPanelTestData JSON re-renders both WPF and the
+        // web page (see ContentEditTimer_Tick) without ever writing back to the test case file - switching test cases,
+        // stepping, or reloading always reverts to what is on disk. Debounced like window resizing (contentEditTimer),
+        // so parsing/re-rendering does not happen on every keystroke and does not flash invalid-JSON errors mid-edit.
+        void textbox_content_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (settingContentText) return;
+            contentEditTimer.Stop();
+            contentEditTimer.Start();
+        }
+
+        void ContentEditTimer_Tick(object? sender, EventArgs e)
+        {
+            contentEditTimer.Stop();
+
+            FlexPanelTestData? data;
+            try
+            {
+                data = JsonSerializer.Deserialize<FlexPanelTestData>(textbox_content.Text, WebMessageJsonOptions);
+            }
+            catch (JsonException ex)
+            {
+                SetContentEditorValid(false, ex.Message);
+                return;
+            }
+            if (data?.Parent is null || data.Childs is null)
+            {
+                SetContentEditorValid(false, "JSON 需要是完整的測試案例物件 (Parent/Childs 不可省略或為 null)");
+                return;
+            }
+
+            SetContentEditorValid(true);
+            ApplyTestCase(data);
+        }
+
+        // Tints the content box like a mismatched comparison row when its text is not valid FlexPanelTestData JSON,
+        // and shows why as a tooltip; the last successfully applied render is left on screen untouched either way.
+        void SetContentEditorValid(bool valid, string? error = null)
+        {
+            textbox_content.Background = valid ? ContentEditorNormalBackground : ContentEditorErrorBackground;
+            textbox_content.ToolTip = error;
         }
 
         void UpdateStepButtons()
@@ -582,6 +660,8 @@ namespace WpfApp_FlexT
 
             flexpanel.Padding = data.Padding;
             flexpanel.Gap = data.Gap;
+            flexpanel.RowGap = data.RowGap ?? double.NaN;
+            flexpanel.ColumnGap = data.ColumnGap ?? double.NaN;
             flexpanel.FlexWrap = data.Wrap;
             flexpanel.JustifyContent = data.JustifyContent;
             flexpanel.FlexDirection = data.Direction;
@@ -664,73 +744,6 @@ namespace WpfApp_FlexT
         }
     }
 
-    // Writes a test case out as the text of the content box: the file name, the settings of the panel and then the settings
-    // of its items, named as in the JSON and in the item tooltips, so the tester can see what was laid out without
-    // opening the file.
-    static class TestCaseText
-    {
-        // A non-breaking space keeps the settings of one item together, so the wrapped text only breaks between items.
-        const char Nbsp = '\u00A0';
-
-        public static string Describe(string fileName, FlexPanelTestData data)
-        {
-            var lines = new List<string>
-            {
-                fileName,
-                $"Direction={data.Direction}  Wrap={data.Wrap}  JustifyContent={data.JustifyContent}  AlignItems={data.AlignItems}  AlignContent={data.AlignContent}",
-                $"Padding={Format(data.Padding)}  Gap={Format(data.Gap)}  Scroll={Scroll(data.Parent)}  Items={data.Childs.Count}",
-            };
-
-            var settings = data.Childs.Select(DescribeChild).ToList();
-            var entries = new List<string>();
-            for (int first = 0; first < settings.Count;)
-            {
-                // A run of items with the same settings (a dozen identical ones, for example) is listed once.
-                // "~" rather than "-" for the range: the text may wrap after a hyphen, which would split the label.
-                int end = first + 1;
-                while (end < settings.Count && settings[end] == settings[first]) end++;
-                var label = end - first == 1 ? $"#{first}" : $"#{first}~#{end - 1} (x{end - first})";
-                entries.Add($"{label} {settings[first]}".Replace(' ', Nbsp));
-                first = end;
-            }
-            if (entries.Count > 0) lines.Add(string.Join($"{Nbsp}| ", entries));
-            return string.Join(Environment.NewLine, lines);
-        }
-
-        static string DescribeChild(FlexPanelTestDataChild child)
-        {
-            // Basis reads like the item tooltips: FlexPanel only honours a positive Basis, otherwise the item keeps its own size.
-            var settings = new List<string>
-            {
-                $"Basis={(child.Basis > 0 ? Format(child.Basis) : "auto")}",
-                $"Shrink={child.Shrink}",
-                $"Grow={child.Grow}",
-            };
-            if (child.AlignSelf != AlignSelf.Auto) settings.Add($"AlignSelf={child.AlignSelf}");
-            if (child.CrossSize is { } crossSize) settings.Add($"CrossSize={Format(crossSize)}");
-            if (child.MinMain is { } minMain) settings.Add($"MinMain={Format(minMain)}");
-            if (child.MaxMain is { } maxMain) settings.Add($"MaxMain={Format(maxMain)}");
-            if (child.Margin != default) settings.Add($"Margin={Format(child.Margin)}");
-            return string.Join(' ', settings);
-        }
-
-        static string Scroll(Parent parent) => (parent.EnableHorizontalScrollbar, parent.EnableVerticalScrollbar) switch
-        {
-            (true, true) => "HV",
-            (true, false) => "H",
-            (false, true) => "V",
-            _ => "None",
-        };
-
-        static string Format(double value) => value.ToString(CultureInfo.InvariantCulture);
-
-        // Like the XAML shorthand: one number when all four sides are equal, otherwise left, top, right, bottom.
-        static string Format(Thickness thickness) =>
-            thickness.Left == thickness.Top && thickness.Top == thickness.Right && thickness.Right == thickness.Bottom
-                ? Format(thickness.Left)
-                : $"{Format(thickness.Left)},{Format(thickness.Top)},{Format(thickness.Right)},{Format(thickness.Bottom)}";
-    }
-
     // Colors converted from webpage/style.css's OKLCH palette (Tailwind CSS v4 gray/neutral scale) so the WPF
     // FlexPanel matches the WebView2 rendering in both light and dark mode.
     static class FlexWebPalette
@@ -785,6 +798,11 @@ namespace WpfApp_FlexT
         public Parent Parent { get; set; } = new();
         public Thickness Padding { set; get; }
         public double Gap { set; get; }
+        // Overrides Gap on one axis only, like CSS's separate row-gap/column-gap: null keeps using Gap on
+        // that axis. row-gap is the physical vertical gap and column-gap the physical horizontal one, the
+        // same regardless of Direction (see FlexPanel.GetAxisGaps).
+        public double? RowGap { get; set; }
+        public double? ColumnGap { get; set; }
         public FlexWrap Wrap { get; set; }
         public JustifyContent JustifyContent { get; set; }
         public FlexDirection Direction { get; set; }
