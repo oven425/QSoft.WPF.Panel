@@ -16,13 +16,15 @@
         </Grid.RowDefinitions>
         <!-- Selection area. There are too many test cases for one list, so they are narrowed down first: by category (the
              part of the file name before its first "_") and by search keywords, which the search box suggests while they
-             are typed. The ComboBox lists what is left, and the content of the chosen test case is shown below it as
-             editable JSON (the same shape as the TestCase\*.json files): typing valid FlexPanelTestData JSON re-renders
-             both sides live (see MainWindow.xaml.cs's ContentEditTimer_Tick), but it is never written back to the file,
-             so switching test cases (or reloading) always reverts to what is on disk.
-             The content box has a fixed height (longer text scrolls) for the same reason as the result list below: a
+             are typed. The ComboBox lists what is left, and the settings of the chosen test case are shown below it twice:
+             as ComboBoxes/TextBoxes for those of the panel (Direction, Wrap, Gap, Padding, ...), and as editable JSON (the
+             same shape as the TestCase\*.json files), which also holds the settings of every item. Changing either one
+             re-renders both sides live and brings the other one up to date (see MainWindow.xaml.cs's
+             ApplyPropertyControls and ContentEditTimer_Tick), but nothing is ever written back to the file, so switching
+             test cases (or reloading) always reverts to what is on disk.
+             The content area has a fixed height (longer JSON text scrolls) for the same reason as the result list below: a
              change of height would resize the two panes, which would leave the web page laid out in a viewport that no
-             longer matches the WPF one. The window Height includes this area, so when the box gets another height the
+             longer matches the WPF one. The window Height includes this area, so when the area gets another height the
              window needs the same change to leave the panes the size they have now (429 x 326). -->
         <Grid Grid.Row="0" Margin="4,2">
             <Grid.RowDefinitions>
@@ -131,20 +133,134 @@
             </StackPanel>
 
             <TextBlock Grid.Row="2" Text="內容" Style="{StaticResource FieldLabel}" VerticalAlignment="Top" Margin="2,6,8,0"/>
-            <TextBox x:Name="textbox_content" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="4" Height="136" Margin="2" Padding="4,2"
-                     TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"
-                     FontFamily="Consolas" FontSize="12" Background="White"
-                     AutomationProperties.Name="測試案例內容 (JSON，可編輯，不會寫回檔案)"
-                     TextChanged="textbox_content_TextChanged"/>
+            <Grid Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <!-- The settings of the panel. They stay disabled until a test case is shown. A ComboBox or a CheckBox applies
+                     its change at once, a number box after a short typing pause (a number that is not valid or below 0 tints
+                     the box and is not applied). An empty RowGap/ColumnGap is null: the same as Gap. -->
+                <Grid x:Name="grid_properties" IsEnabled="False" VerticalAlignment="Top" Margin="0,0,4,0">
+                    <Grid.Resources>
+                        <Style x:Key="PropertyLabel" TargetType="TextBlock" BasedOn="{StaticResource FieldLabel}">
+                            <Setter Property="Margin" Value="2,0,6,0"/>
+                        </Style>
+                        <Style TargetType="ComboBox">
+                            <Setter Property="Margin" Value="1"/>
+                            <Setter Property="Padding" Value="4,1"/>
+                        </Style>
+                        <Style TargetType="TextBox">
+                            <Setter Property="Margin" Value="1"/>
+                            <Setter Property="Padding" Value="2,1"/>
+                            <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            <!-- With a Chinese IME on, the "." of a decimal number would be typed as "。". -->
+                            <Setter Property="InputMethod.IsInputMethodEnabled" Value="False"/>
+                        </Style>
+                        <!-- The hint in an empty number box, like the one of the search box; it follows the Text of its box through Tag. -->
+                        <Style x:Key="EmptyHint" TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="Gray"/>
+                            <Setter Property="Margin" Value="6,0,0,0"/>
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="IsHitTestVisible" Value="False"/>
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource Self}}" Value="">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Resources>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="120"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="Direction" Style="{StaticResource PropertyLabel}"/>
+                    <ComboBox x:Name="combobox_direction" Grid.Column="1" AutomationProperties.Name="Direction"
+                              SelectionChanged="property_SelectionChanged"/>
+                    <TextBlock Grid.Column="3" Text="Wrap" Style="{StaticResource PropertyLabel}"/>
+                    <ComboBox x:Name="combobox_wrap" Grid.Column="4" AutomationProperties.Name="Wrap"
+                              SelectionChanged="property_SelectionChanged"/>
+
+                    <TextBlock Grid.Row="1" Text="JustifyContent" Style="{StaticResource PropertyLabel}"/>
+                    <ComboBox x:Name="combobox_justifycontent" Grid.Row="1" Grid.Column="1" AutomationProperties.Name="JustifyContent"
+                              SelectionChanged="property_SelectionChanged"/>
+                    <TextBlock Grid.Row="1" Grid.Column="3" Text="AlignItems" Style="{StaticResource PropertyLabel}"/>
+                    <ComboBox x:Name="combobox_alignitems" Grid.Row="1" Grid.Column="4" AutomationProperties.Name="AlignItems"
+                              SelectionChanged="property_SelectionChanged"/>
+
+                    <TextBlock Grid.Row="2" Text="AlignContent" Style="{StaticResource PropertyLabel}"/>
+                    <ComboBox x:Name="combobox_aligncontent" Grid.Row="2" Grid.Column="1" AutomationProperties.Name="AlignContent"
+                              SelectionChanged="property_SelectionChanged"/>
+                    <TextBlock Grid.Row="2" Grid.Column="3" Text="Gap" Style="{StaticResource PropertyLabel}"/>
+                    <TextBox x:Name="textbox_gap" Grid.Row="2" Grid.Column="4" AutomationProperties.Name="Gap"
+                             ToolTip="Gap (px, 0 或以上): 項目之間的間距,也是 RowGap/ColumnGap 留空時的值"
+                             TextChanged="property_TextChanged"/>
+
+                    <TextBlock Grid.Row="3" Text="RowGap" Style="{StaticResource PropertyLabel}"/>
+                    <Grid Grid.Row="3" Grid.Column="1">
+                        <TextBox x:Name="textbox_rowgap" AutomationProperties.Name="RowGap"
+                                 ToolTip="RowGap (px, 0 或以上): 上下方向的間距,留空表示使用 Gap"
+                                 TextChanged="property_TextChanged"/>
+                        <TextBlock Text="同 Gap" Tag="{Binding Text, ElementName=textbox_rowgap}" Style="{StaticResource EmptyHint}"/>
+                    </Grid>
+                    <TextBlock Grid.Row="3" Grid.Column="3" Text="ColumnGap" Style="{StaticResource PropertyLabel}"/>
+                    <Grid Grid.Row="3" Grid.Column="4">
+                        <TextBox x:Name="textbox_columngap" AutomationProperties.Name="ColumnGap"
+                                 ToolTip="ColumnGap (px, 0 或以上): 左右方向的間距,留空表示使用 Gap"
+                                 TextChanged="property_TextChanged"/>
+                        <TextBlock Text="同 Gap" Tag="{Binding Text, ElementName=textbox_columngap}" Style="{StaticResource EmptyHint}"/>
+                    </Grid>
+
+                    <TextBlock Grid.Row="4" Text="Padding" Style="{StaticResource PropertyLabel}" ToolTip="Padding (px, 0 或以上): 由左至右依序為 左、上、右、下"/>
+                    <UniformGrid Grid.Row="4" Grid.Column="1" Columns="4">
+                        <TextBox x:Name="textbox_padding_left" AutomationProperties.Name="Padding Left" ToolTip="Padding Left (px, 0 或以上)"
+                                 TextChanged="property_TextChanged"/>
+                        <TextBox x:Name="textbox_padding_top" AutomationProperties.Name="Padding Top" ToolTip="Padding Top (px, 0 或以上)"
+                                 TextChanged="property_TextChanged"/>
+                        <TextBox x:Name="textbox_padding_right" AutomationProperties.Name="Padding Right" ToolTip="Padding Right (px, 0 或以上)"
+                                 TextChanged="property_TextChanged"/>
+                        <TextBox x:Name="textbox_padding_bottom" AutomationProperties.Name="Padding Bottom" ToolTip="Padding Bottom (px, 0 或以上)"
+                                 TextChanged="property_TextChanged"/>
+                    </UniformGrid>
+                    <StackPanel Grid.Row="4" Grid.Column="3" Grid.ColumnSpan="2" Orientation="Horizontal" VerticalAlignment="Center">
+                        <CheckBox x:Name="checkbox_scroll_horizontal" Content="水平捲軸" Margin="2,0,10,0"
+                                  AutomationProperties.Name="水平捲軸" ToolTip="Parent.EnableHorizontalScrollbar"
+                                  Checked="property_CheckedChanged" Unchecked="property_CheckedChanged"/>
+                        <CheckBox x:Name="checkbox_scroll_vertical" Content="垂直捲軸"
+                                  AutomationProperties.Name="垂直捲軸" ToolTip="Parent.EnableVerticalScrollbar"
+                                  Checked="property_CheckedChanged" Unchecked="property_CheckedChanged"/>
+                    </StackPanel>
+                </Grid>
+                <TextBox x:Name="textbox_content" Grid.Column="1" Height="136" Margin="2" Padding="4,2"
+                         TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"
+                         FontFamily="Consolas" FontSize="12" Background="White"
+                         AutomationProperties.Name="測試案例內容 (JSON，可編輯，不會寫回檔案)"
+                         TextChanged="textbox_content_TextChanged"/>
+            </Grid>
         </Grid>
-        <Grid Grid.Row="1">
+        <!-- WebView2 is a child window that always sits on whole pixels, whereas WPF would place the ScrollViewer at
+             a fractional position and size; rounding the layout makes the two panes (and their scrollbars) line up. -->
+        <Grid Grid.Row="1" UseLayoutRounding="True">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <ScrollViewer x:Name="scrollviewer_flexpanel" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Disabled">
-                <qpanel:FlexPanel x:Name="flexpanel"/>
+                <!-- The items keep the fractional positions the panel computes, which is what is compared with the CSS layout. -->
+                <qpanel:FlexPanel x:Name="flexpanel" UseLayoutRounding="False"/>
             </ScrollViewer>
             <Grid Grid.Column="1">
                 <Grid.RowDefinitions>

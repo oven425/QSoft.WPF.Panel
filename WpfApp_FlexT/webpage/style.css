@@ -61,8 +61,78 @@ body {
 .viewport {
   height: 100%;
   overflow: hidden;
-  /* WPF already reports the viewport without its scrollbars, so none may take room away from #box here. */
-  scrollbar-width: none;
+}
+
+/*
+  The scrollbars of #viewport look like those of the WPF ScrollViewer next to it (the default light WPF theme, in
+  both color schemes), and have the size app.js takes from WPF in --scrollbar-width/--scrollbar-height, so that
+  they take the same room from #box. The standard scrollbar-width/scrollbar-color are left unset, as they would
+  turn these rules off.
+*/
+.viewport::-webkit-scrollbar {
+  width: var(--scrollbar-width, 17px);
+  height: var(--scrollbar-height, 17px);
+  background: #f0f0f0;
+}
+
+.viewport::-webkit-scrollbar-corner {
+  background: #f0f0f0;
+}
+
+.viewport::-webkit-scrollbar-thumb {
+  background: #cdcdcd;
+}
+
+.viewport::-webkit-scrollbar-thumb:hover {
+  background: #a6a6a6;
+}
+
+.viewport::-webkit-scrollbar-thumb:active {
+  background: #606060;
+}
+
+/* The arrow buttons at both ends, as long as the scrollbar is thick. Each glyph is drawn on a 17 x 17 canvas that is
+   centered in the button, at the place and with the stroke of the WPF one. */
+.viewport::-webkit-scrollbar-button:single-button {
+  display: block;
+  background-color: #f0f0f0;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 17px 17px;
+}
+
+.viewport::-webkit-scrollbar-button:single-button:hover {
+  background-color: #dadada;
+}
+
+.viewport::-webkit-scrollbar-button:single-button:active {
+  background-color: #cdcdcd;
+}
+
+.viewport::-webkit-scrollbar-button:horizontal:single-button {
+  width: var(--scrollbar-height, 17px);
+  height: var(--scrollbar-height, 17px);
+}
+
+.viewport::-webkit-scrollbar-button:vertical:single-button {
+  width: var(--scrollbar-width, 17px);
+  height: var(--scrollbar-width, 17px);
+}
+
+.viewport::-webkit-scrollbar-button:horizontal:decrement {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='17' height='17'%3E%3Cpath fill='%239f9f9f' d='M9.35 5.01L6.05 8.56 9.21 11.95H10.97L7.81 8.56 11.11 5.01z'/%3E%3C/svg%3E");
+}
+
+.viewport::-webkit-scrollbar-button:horizontal:increment {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='17' height='17'%3E%3Cpath fill='%239f9f9f' d='M6 4.99L9.29 8.56 6.14 11.99H7.92L11.07 8.56 7.79 4.99z'/%3E%3C/svg%3E");
+}
+
+.viewport::-webkit-scrollbar-button:vertical:decrement {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='17' height='17'%3E%3Cpath fill='%239f9f9f' d='M5.99 9.3L9.25 6.11 12.36 9.16V10.96L9.25 7.91 5.99 11.1z'/%3E%3C/svg%3E");
+}
+
+.viewport::-webkit-scrollbar-button:vertical:increment {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='17' height='17'%3E%3Cpath fill='%239f9f9f' d='M5.99 6.06L9.25 9.24 12.36 6.2V8.01L9.25 11.05 5.99 7.87z'/%3E%3C/svg%3E");
 }
 
 /* Fills the viewport; the viewport scrolls (or clips) when the items overflow. */

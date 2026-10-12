@@ -1,6 +1,7 @@
 ﻿using Microsoft.Web.WebView2.Core;
 using Microsoft.Win32;
 using QSoft.WPF.Panel;
+using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -45,8 +46,9 @@ namespace WpfApp_FlexT
         static readonly JsonSerializerOptions ContentEditorJsonOptions = new(WebMessageJsonOptions) { WriteIndented = true };
         static readonly Brush ContentEditorNormalBackground = Brushes.White;
         // Same pink the comparison ListView uses for a mismatched row (see MainWindow.xaml), reused here so
-        // "something is wrong" looks consistent across the window.
-        static readonly Brush ContentEditorErrorBackground = CreateFrozenBrush(0xFB, 0xD9, 0xD9);
+        // "something is wrong" looks consistent across the window: the JSON box and the number boxes of the property
+        // controls are tinted with it while their text cannot be applied.
+        static readonly Brush InvalidInputBackground = CreateFrozenBrush(0xFB, 0xD9, 0xD9);
 
         static Brush CreateFrozenBrush(byte r, byte g, byte b)
         {
@@ -60,6 +62,9 @@ namespace WpfApp_FlexT
         int currentRequestId = -1;
         List<ItemRect>? lastWpfItemRects;
         FlexPanelTestData? currentTestData;
+        // The test case whose data is on screen. The tester may have edited that data since it was read from the file,
+        // so choosing the same test case again (which filtering does while the case still matches) must keep it.
+        TestCaseItem? currentTestCase;
         // Every test case found in the TestCase folder; the ComboBox lists the part of it that matches the filter.
         List<TestCaseItem> allTestCases = [];
         // The words the search box suggests: the parts of the test case descriptions ("Direction=Column", ...).
@@ -80,20 +85,32 @@ namespace WpfApp_FlexT
         // Debounces content-box edits the same way resizeTimer debounces SizeChanged: re-parsing and re-rendering on
         // every keystroke would be wasteful and would flash invalid-JSON errors while a bracket/quote is half-typed.
         readonly DispatcherTimer contentEditTimer = new() { Interval = TimeSpan.FromMilliseconds(500) };
+        // True while LoadPropertyControls writes into the property controls (the ComboBoxes, number boxes and CheckBoxes
+        // of the panel settings), so that their change events do not mistake that update for the tester editing a property.
+        bool loadingPropertyControls;
+        // Debounces typing in the number boxes like contentEditTimer does for the JSON text, so that "12" is not rendered
+        // as "1" first. Shorter, as a number is typed in a moment.
+        readonly DispatcherTimer propertyEditTimer = new() { Interval = TimeSpan.FromMilliseconds(300) };
 
         public MainWindow()
         {
             InitializeComponent();
+            combobox_direction.ItemsSource = Enum.GetValues<FlexDirection>();
+            combobox_wrap.ItemsSource = Enum.GetValues<FlexWrap>();
+            combobox_justifycontent.ItemsSource = Enum.GetValues<JustifyContent>();
+            combobox_alignitems.ItemsSource = Enum.GetValues<AlignItems>();
+            combobox_aligncontent.ItemsSource = Enum.GetValues<AlignContent>();
             // The tip's popup looks this key up through its PlacementTarget (a flex item), so setting it on the panel
             // removes the ~150 ms fade in/out (applied when the OS animates tooltips) for the item tips only.
             flexpanel.Resources[SystemParameters.ToolTipPopupAnimationKey] = PopupAnimation.None;
             InitializeWebViewAsync();
             resizeTimer.Tick += ResizeTimer_Tick;
             contentEditTimer.Tick += ContentEditTimer_Tick;
+            propertyEditTimer.Tick += PropertyEditTimer_Tick;
             SizeChanged += MainWindow_SizeChanged;
             // A popup stays where it is on the screen when the window is dragged away from under it.
             LocationChanged += (_, _) => CloseSuggestions();
-            Closed += (_, _) => { resizeTimer.Stop(); contentEditTimer.Stop(); };
+            Closed += (_, _) => { resizeTimer.Stop(); contentEditTimer.Stop(); propertyEditTimer.Stop(); };
             // Deferred to Loaded: before the window has an HWND/real size, UpdateLayout() inside
             // ApplyTestCase can't measure real WPF item rects (they'd all come back as 0,0,0,0).
             Loaded += (_, _) => LoadTestCases();
@@ -110,10 +127,12 @@ namespace WpfApp_FlexT
         // renders and measures #box's children (see webpage/app.js).
         sealed record MeasurementMessage(string? Type, int RequestId, List<ItemRect>? Items);
 
-        // The size WPF's ScrollViewer gave the FlexPanel. The web page lays #box out inside a viewport of exactly
-        // this size rather than the WebView2 control's own bounds, which are resized asynchronously (for example when
-        // the result list below changes height) and would otherwise race with the web page's measurement.
-        sealed record ViewportSize(double Width, double Height);
+        // The size WPF's ScrollViewer gave the FlexPanel, which leaves out its scrollbars, and the room those take: the
+        // width of the vertical one and the height of the horizontal one, each 0 while WPF shows none. The web page lays
+        // #box out inside a viewport of exactly this size rather than the WebView2 control's own bounds, which are
+        // resized asynchronously (for example when the result list below changes height) and would otherwise race with
+        // the web page's measurement. It shows a scrollbar of that size wherever WPF does, so both sides agree on that too.
+        sealed record ViewportSize(double Width, double Height, double VerticalScrollBarWidth, double HorizontalScrollBarHeight);
 
         // What WPF sends to the web page: the test data and the viewport it was laid out in, plus a RequestId so the
         // measurements the page echoes back can be matched to the WPF-side snapshot taken for that same render.
@@ -411,18 +430,23 @@ namespace WpfApp_FlexT
         {
             UpdateStepButtons();
 
-            if (combobox_testcase.SelectedItem is TestCaseItem item)
+            // Filtering selects the case that is already on screen again; that one keeps what is on screen, which the
+            // tester may have edited since it was read from the file.
+            if (combobox_testcase.SelectedItem is TestCaseItem item && !ReferenceEquals(item, currentTestCase))
             {
+                currentTestCase = item;
                 SetContentText(JsonSerializer.Serialize(item.Data, ContentEditorJsonOptions));
                 textbox_content.ScrollToHome();
-                // Filtering selects the case that is already on screen again; that one needs no new render.
-                if (!ReferenceEquals(item.Data, currentTestData)) ApplyTestCase(item.Data);
+                LoadPropertyControls(item.Data);
+                ApplyTestCase(item.Data);
             }
         }
 
-        // Writes into the content box without textbox_content_TextChanged treating it as a user edit to parse/apply.
+        // Writes into the content box without textbox_content_TextChanged treating it as a user edit to parse/apply. An
+        // edit that still waits for its debounce is dropped, as it would otherwise be applied to the new text.
         void SetContentText(string text)
         {
+            contentEditTimer.Stop();
             settingContentText = true;
             try
             {
@@ -467,6 +491,7 @@ namespace WpfApp_FlexT
             }
 
             SetContentEditorValid(true);
+            LoadPropertyControls(data);
             ApplyTestCase(data);
         }
 
@@ -474,8 +499,137 @@ namespace WpfApp_FlexT
         // and shows why as a tooltip; the last successfully applied render is left on screen untouched either way.
         void SetContentEditorValid(bool valid, string? error = null)
         {
-            textbox_content.Background = valid ? ContentEditorNormalBackground : ContentEditorErrorBackground;
+            textbox_content.Background = valid ? ContentEditorNormalBackground : InvalidInputBackground;
             textbox_content.ToolTip = error;
+        }
+
+        // The property controls show the panel settings of the data on screen, as the JSON text does, and changing one of
+        // them renders the data with that change, just like an edit of the JSON text does (ContentEditTimer_Tick).
+        void property_SelectionChanged(object sender, SelectionChangedEventArgs e) => ApplyPropertyControls();
+
+        void property_CheckedChanged(object sender, RoutedEventArgs e) => ApplyPropertyControls();
+
+        void property_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (loadingPropertyControls) return;
+            propertyEditTimer.Stop();
+            propertyEditTimer.Start();
+        }
+
+        void PropertyEditTimer_Tick(object? sender, EventArgs e) => ApplyPropertyControls();
+
+        // Renders the data on screen with the values of the property controls, and shows the result as JSON too. It is
+        // rendered as a copy, so that the data of the test case itself stays as read from the file.
+        void ApplyPropertyControls()
+        {
+            propertyEditTimer.Stop();
+            if (loadingPropertyControls || currentTestData is null) return;
+
+            var before = JsonSerializer.Serialize(currentTestData, WebMessageJsonOptions);
+            var data = JsonSerializer.Deserialize<FlexPanelTestData>(before, WebMessageJsonOptions)!;
+            ReadPropertyControls(data);
+            // Nothing changes when no value does, for example while the text of a number box is not valid.
+            if (JsonSerializer.Serialize(data, WebMessageJsonOptions) == before) return;
+
+            // Writing the text moves the JSON box back to its top; the tester may be looking at a lower part of it.
+            double scrollOffset = textbox_content.VerticalOffset;
+            SetContentText(JsonSerializer.Serialize(data, ContentEditorJsonOptions));
+            textbox_content.ScrollToVerticalOffset(scrollOffset);
+            ApplyTestCase(data);
+        }
+
+        // Copies the values of the property controls into data. A number box whose text is not valid is tinted, and the
+        // property it stands for is left as it is in data.
+        void ReadPropertyControls(FlexPanelTestData data)
+        {
+            if (combobox_direction.SelectedItem is FlexDirection direction) data.Direction = direction;
+            if (combobox_wrap.SelectedItem is FlexWrap wrap) data.Wrap = wrap;
+            if (combobox_justifycontent.SelectedItem is JustifyContent justifyContent) data.JustifyContent = justifyContent;
+            if (combobox_alignitems.SelectedItem is AlignItems alignItems) data.AlignItems = alignItems;
+            if (combobox_aligncontent.SelectedItem is AlignContent alignContent) data.AlignContent = alignContent;
+
+            data.Gap = ReadNumber(textbox_gap, data.Gap);
+            data.RowGap = ReadOptionalNumber(textbox_rowgap, data.RowGap);
+            data.ColumnGap = ReadOptionalNumber(textbox_columngap, data.ColumnGap);
+            var padding = data.Padding;
+            data.Padding = new Thickness(
+                ReadNumber(textbox_padding_left, padding.Left),
+                ReadNumber(textbox_padding_top, padding.Top),
+                ReadNumber(textbox_padding_right, padding.Right),
+                ReadNumber(textbox_padding_bottom, padding.Bottom));
+            data.Parent = new Parent
+            {
+                EnableHorizontalScrollbar = checkbox_scroll_horizontal.IsChecked == true,
+                EnableVerticalScrollbar = checkbox_scroll_vertical.IsChecked == true,
+            };
+        }
+
+        // Shows the settings of data in the property controls (the other half of ReadPropertyControls).
+        void LoadPropertyControls(FlexPanelTestData data)
+        {
+            propertyEditTimer.Stop();
+            loadingPropertyControls = true;
+            try
+            {
+                combobox_direction.SelectedItem = data.Direction;
+                combobox_wrap.SelectedItem = data.Wrap;
+                combobox_justifycontent.SelectedItem = data.JustifyContent;
+                combobox_alignitems.SelectedItem = data.AlignItems;
+                combobox_aligncontent.SelectedItem = data.AlignContent;
+                textbox_gap.Text = FormatNumber(data.Gap);
+                textbox_rowgap.Text = data.RowGap is { } rowGap ? FormatNumber(rowGap) : "";
+                textbox_columngap.Text = data.ColumnGap is { } columnGap ? FormatNumber(columnGap) : "";
+                textbox_padding_left.Text = FormatNumber(data.Padding.Left);
+                textbox_padding_top.Text = FormatNumber(data.Padding.Top);
+                textbox_padding_right.Text = FormatNumber(data.Padding.Right);
+                textbox_padding_bottom.Text = FormatNumber(data.Padding.Bottom);
+                checkbox_scroll_horizontal.IsChecked = data.Parent.EnableHorizontalScrollbar;
+                checkbox_scroll_vertical.IsChecked = data.Parent.EnableVerticalScrollbar;
+            }
+            finally
+            {
+                loadingPropertyControls = false;
+            }
+
+            TextBox[] numberBoxes = [textbox_gap, textbox_rowgap, textbox_columngap, textbox_padding_left,
+                textbox_padding_top, textbox_padding_right, textbox_padding_bottom];
+            foreach (var box in numberBoxes) SetNumberBoxValid(box, true);
+            grid_properties.IsEnabled = true;
+        }
+
+        // FlexPanel and CSS read a negative gap or padding differently (WPF cannot lay out a negative size, CSS clamps it
+        // to 0), so a number below 0 is not accepted, nor is one that is not finite. The text is always read with the
+        // invariant culture, like the JSON files.
+        static bool TryParseNumber(string text, out double number) =>
+            double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out number) && double.IsFinite(number) && number >= 0;
+
+        static string FormatNumber(double number) => number.ToString(CultureInfo.InvariantCulture);
+
+        // The number in the box, or fallback when its text is not valid.
+        double ReadNumber(TextBox box, double fallback)
+        {
+            bool valid = TryParseNumber(box.Text, out var number);
+            SetNumberBoxValid(box, valid);
+            return valid ? number : fallback;
+        }
+
+        // Like ReadNumber, but an empty box is null (RowGap/ColumnGap: the same as Gap).
+        double? ReadOptionalNumber(TextBox box, double? fallback)
+        {
+            if (string.IsNullOrWhiteSpace(box.Text))
+            {
+                SetNumberBoxValid(box, true);
+                return null;
+            }
+            bool valid = TryParseNumber(box.Text, out var number);
+            SetNumberBoxValid(box, valid);
+            return valid ? number : fallback;
+        }
+
+        static void SetNumberBoxValid(TextBox box, bool valid)
+        {
+            if (valid) box.ClearValue(Control.BackgroundProperty);
+            else box.Background = InvalidInputBackground;
         }
 
         void UpdateStepButtons()
@@ -632,9 +786,21 @@ namespace WpfApp_FlexT
 
         public void ShowInWebView(FlexPanelTestData data, int requestId)
         {
-            var viewport = new ViewportSize(scrollviewer_flexpanel.ViewportWidth, scrollviewer_flexpanel.ViewportHeight);
+            var viewport = new ViewportSize(
+                scrollviewer_flexpanel.ViewportWidth,
+                scrollviewer_flexpanel.ViewportHeight,
+                ScrollBarThickness(scrollviewer_flexpanel.ActualWidth, scrollviewer_flexpanel.ViewportWidth),
+                ScrollBarThickness(scrollviewer_flexpanel.ActualHeight, scrollviewer_flexpanel.ViewportHeight));
             webPageDataJson = JsonSerializer.Serialize(new WebPageEnvelope(requestId, viewport, data), WebMessageJsonOptions);
             PostWebPageData();
+        }
+
+        // What the scrollbar takes from the ScrollViewer is what is left of it beside the viewport; 0 while WPF shows none.
+        static double ScrollBarThickness(double scrollViewerSize, double viewportSize)
+        {
+            double thickness = scrollViewerSize - viewportSize;
+            // Less than half a pixel is rounding noise, not a scrollbar.
+            return thickness >= 0.5 ? thickness : 0;
         }
 
         void PostWebPageData()

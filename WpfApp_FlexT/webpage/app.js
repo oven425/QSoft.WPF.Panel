@@ -184,11 +184,20 @@
     // Same size WPF's ScrollViewer gave the FlexPanel; the WebView2 control's own (integer-rounded) size is not used.
     const viewportWidth = toNumber(read(viewportSize, 'Width'));
     const viewportHeight = toNumber(read(viewportSize, 'Height'));
+    // The room WPF's scrollbars take, which is 0 for one that WPF does not show. The viewport above is what is left
+    // beside them, so #viewport is that much larger: its scrollbars (see style.css) then fit around a client area of
+    // exactly that size, as they do in the ScrollViewer.
+    const scrollBarWidth = toNumber(read(viewportSize, 'VerticalScrollBarWidth'));
+    const scrollBarHeight = toNumber(read(viewportSize, 'HorizontalScrollBarHeight'));
+    viewport.style.setProperty('--scrollbar-width', `${scrollBarWidth}px`);
+    viewport.style.setProperty('--scrollbar-height', `${scrollBarHeight}px`);
     Object.assign(viewport.style, {
-      overflowX: scrollX ? 'auto' : 'hidden',
-      overflowY: scrollY ? 'auto' : 'hidden',
-      width: viewportWidth > 0 ? `${viewportWidth}px` : '',
-      height: viewportHeight > 0 ? `${viewportHeight}px` : '',
+      // A scrollbar is shown when WPF shows its own, not when the items happen to overflow here, so that both sides
+      // always agree on it. Otherwise it is clipped, like an axis whose scrollbar is disabled.
+      overflowX: scrollBarHeight > 0 ? 'scroll' : 'hidden',
+      overflowY: scrollBarWidth > 0 ? 'scroll' : 'hidden',
+      width: viewportWidth > 0 ? `${viewportWidth + scrollBarWidth}px` : '',
+      height: viewportHeight > 0 ? `${viewportHeight + scrollBarHeight}px` : '',
     });
     Object.assign(box.style, {
       // Mirrors how ScrollViewer measures its content: an axis with the scrollbar disabled constrains the
