@@ -65,12 +65,10 @@ namespace WpfApp_FlexT
         // The test case whose data is on screen. The tester may have edited that data since it was read from the file,
         // so choosing the same test case again (which filtering does while the case still matches) must keep it.
         TestCaseItem? currentTestCase;
-        // Every test case found in the TestCase folder; the ComboBox lists the part of it that matches the filter.
+        // Every test case found in the TestCase folder; the ListBox lists the part of it that matches the filter.
         List<TestCaseItem> allTestCases = [];
         // The words the search box suggests: the parts of the test case descriptions ("Direction=Column", ...).
         List<string> searchWords = [];
-        // True while AcceptSuggestion writes a word into the search box, so that this change does not open the list again.
-        bool acceptingSuggestion;
         // Opened and closed by hand from MouseEnter/MouseLeave instead of through ToolTipService, which waits out a show
         // delay and keeps the tip open while the mouse crosses the "safe area" between the item and the tip. Driving it
         // directly shows the tip the moment the mouse enters an item and hides it the moment the mouse leaves.
@@ -109,7 +107,6 @@ namespace WpfApp_FlexT
             propertyEditTimer.Tick += PropertyEditTimer_Tick;
             SizeChanged += MainWindow_SizeChanged;
             // A popup stays where it is on the screen when the window is dragged away from under it.
-            LocationChanged += (_, _) => CloseSuggestions();
             Closed += (_, _) => { resizeTimer.Stop(); contentEditTimer.Stop(); propertyEditTimer.Stop(); };
             // Deferred to Loaded: before the window has an HWND/real size, UpdateLayout() inside
             // ApplyTestCase can't measure real WPF item rects (they'd all come back as 0,0,0,0).
@@ -163,6 +160,9 @@ namespace WpfApp_FlexT
             public string SearchText { get; } = $"{System.IO.Path.GetFileName(FilePath)} {DisplayName}";
             // The comma separated parts of the description ("Direction=Column", "AlignItems=Center", ...): the words the search box suggests.
             public HashSet<string> Keywords { get; } = new(DisplayName.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries), StringComparer.OrdinalIgnoreCase);
+
+            // Also the name UI Automation reports for the item.
+            public override string ToString() => DisplayName;
         }
 
         // One entry of the category picker; a null Name stands for every category.
@@ -219,34 +219,29 @@ namespace WpfApp_FlexT
             allTestCases = items;
             // A part found in one test case only (the number of a Fuzz case, for example) is left out of the suggestions: the
             // list of test cases is the better way to pick a single one. A word with a space in it could not be a keyword.
-            searchWords = items
+            searchWords = [.. items
                 .SelectMany(t => t.Keywords)
                 .GroupBy(word => word, StringComparer.OrdinalIgnoreCase)
                 .Where(g => g.Count() > 1 && g.Key.IndexOfAny(KeywordSeparators) < 0)
                 .Select(g => g.Key)
-                .Order(StringComparer.OrdinalIgnoreCase)
-                .ToList();
+                .Order(StringComparer.OrdinalIgnoreCase)];
             var categories = new List<CategoryItem> { new(null, items.Count) };
             categories.AddRange(items
                 .GroupBy(t => t.Category)
                 .OrderBy(g => g.Key, StringComparer.OrdinalIgnoreCase)
                 .Select(g => new CategoryItem(g.Key, g.Count())));
             combobox_category.ItemsSource = categories;
-            // Picking "all" narrows nothing down and selects the first test case, as the plain ComboBox used to.
+            // Picking "all" narrows nothing down and selects the first test case.
             combobox_category.SelectedIndex = 0;
         }
 
         private void combobox_category_SelectionChanged(object sender, SelectionChangedEventArgs e) => ApplyFilter();
 
-        private void textbox_search_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            ApplyFilter();
-            UpdateSuggestions();
-        }
+
 
         // The test cases of the category (null for every category) that match every keyword.
-        IEnumerable<TestCaseItem> Search(string? category, string[] keywords) =>
-            allTestCases.Where(t => (category is null || t.Category == category) && keywords.All(k => Matches(t, k)));
+        IEnumerable<TestCaseItem> Search(string? category) =>
+            allTestCases.Where(t => (category is null || t.Category == category));
 
         // A keyword that is one of the suggested words matches that part of the description only ("Direction=Column" does
         // not match "Direction=ColumnReverse"), so the number shown beside a suggestion is the number of cases picking it
@@ -263,176 +258,29 @@ namespace WpfApp_FlexT
         void ApplyFilter()
         {
             var category = (combobox_category.SelectedItem as CategoryItem)?.Name;
-            var keywords = textbox_search.Text.Split(KeywordSeparators, StringSplitOptions.RemoveEmptyEntries);
-            var matches = Search(category, keywords).ToList();
+            var matches = Search(category).ToList();
 
-            var previous = combobox_testcase.SelectedItem as TestCaseItem;
-            combobox_testcase.ItemsSource = matches;
+            var previous = listbox_testcase.SelectedItem as TestCaseItem;
+            listbox_testcase.ItemsSource = matches;
             // The case on screen stays selected while it still matches, so narrowing the filter does not render it again.
-            combobox_testcase.SelectedItem = previous is not null && matches.Contains(previous) ? previous : matches.FirstOrDefault();
-            // A case that stays selected raises no SelectionChanged, yet its place in the shorter or longer list has changed.
+            listbox_testcase.SelectedItem = previous is not null && matches.Contains(previous) ? previous : matches.FirstOrDefault();
+            // A case that stays selected raises no SelectionChanged, yet its place in the shorter or longer list has changed,
+            // and the new list starts at its top.
             UpdateStepButtons();
-            textblock_count.Text = $"\u7b26\u5408 {matches.Count} / {allTestCases.Count} \u7b46"; // 符合 n / total 筆
+            if (listbox_testcase.SelectedItem is { } selected) listbox_testcase.ScrollIntoView(selected);
         }
 
-        private void textbox_search_GotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e) => UpdateSuggestions();
 
-        private void textbox_search_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e) => CloseSuggestions();
 
-        // The word at the caret changes when the caret moves. A list that is closed stays closed, so clicking into the
-        // text does not open it.
-        private void textbox_search_SelectionChanged(object sender, RoutedEventArgs e)
-        {
-            if (popup_suggestions.IsOpen) UpdateSuggestions();
-        }
-
-        // The arrow keys pick a suggestion and Enter or Tab takes it. The keyboard focus stays in the box all the time, so
-        // the typing can go on.
-        private void textbox_search_PreviewKeyDown(object sender, KeyEventArgs e)
-        {
-            bool isOpen = popup_suggestions.IsOpen;
-            switch (e.Key)
-            {
-                case Key.Down:
-                    if (isOpen) MoveSuggestion(1); else UpdateSuggestions(force: true);
-                    e.Handled = true;
-                    break;
-                case Key.Up when isOpen:
-                    MoveSuggestion(-1);
-                    e.Handled = true;
-                    break;
-                case Key.Enter or Key.Tab when isOpen && listbox_suggestions.SelectedItem is SuggestionItem suggestion:
-                    AcceptSuggestion(suggestion);
-                    e.Handled = true;
-                    break;
-                case Key.Escape when isOpen:
-                    CloseSuggestions();
-                    e.Handled = true;
-                    break;
-            }
-        }
-
-        // Taking a suggestion with the mouse. Handled here, before the list reacts: the items cannot take the keyboard
-        // focus anyway, but this keeps the box from ever losing it to a click.
-        private void listbox_suggestions_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            if (e.OriginalSource is DependencyObject source
-                && ItemsControl.ContainerFromElement(listbox_suggestions, source) is ListBoxItem { DataContext: SuggestionItem suggestion })
-            {
-                AcceptSuggestion(suggestion);
-                e.Handled = true;
-            }
-        }
-
-        // The word of the search text the caret is in or touches, as the start and the end of its characters.
-        (int Start, int End) CurrentWord()
-        {
-            var text = textbox_search.Text;
-            int caret = Math.Clamp(textbox_search.CaretIndex, 0, text.Length);
-            int start = caret;
-            while (start > 0 && !KeywordSeparators.Contains(text[start - 1])) start--;
-            int end = caret;
-            while (end < text.Length && !KeywordSeparators.Contains(text[end])) end++;
-            return (start, end);
-        }
-
-        // Opens the list under the search box with the words that could complete the word the caret is in, or closes it when
-        // there are none. The list belongs to the user typing: the text is also changed by code and by UI Automation, which
-        // must not pop it up, so it only opens while the box has the keyboard focus. With no word typed yet it lists every
-        // word that narrows the search down, but only for an empty box (the hint when the box is entered) or when the Down
-        // key asks for it.
-        void UpdateSuggestions(bool force = false)
-        {
-            var text = textbox_search.Text;
-            var (start, end) = CurrentWord();
-            var word = text[start..end];
-            if (acceptingSuggestion || !textbox_search.IsKeyboardFocused || textbox_search.SelectionLength > 0
-                || (word.Length == 0 && text.Length > 0 && !force))
-            {
-                CloseSuggestions();
-                return;
-            }
-
-            var otherKeywords = (text[..start] + ' ' + text[end..]).Split(KeywordSeparators, StringSplitOptions.RemoveEmptyEntries);
-            var suggestions = FindSuggestions(word, otherKeywords);
-            if (suggestions.Count == 0)
-            {
-                CloseSuggestions();
-                return;
-            }
-
-            listbox_suggestions.ItemsSource = suggestions;
-            listbox_suggestions.SelectedIndex = -1;
-            popup_suggestions.IsOpen = true;
-        }
-
-        // The words that contain the typed word, each with the number of test cases that have it on top of the other keywords.
-        List<SuggestionItem> FindSuggestions(string word, string[] otherKeywords)
-        {
-            var category = (combobox_category.SelectedItem as CategoryItem)?.Name;
-            var remaining = Search(category, otherKeywords).ToList();
-            var found = new List<(SuggestionItem Suggestion, int Rank)>();
-            foreach (var searchWord in searchWords)
-            {
-                int index = searchWord.IndexOf(word, StringComparison.OrdinalIgnoreCase);
-                // Not a completion of the word, the word itself, or a word the search has already.
-                if (index < 0
-                    || searchWord.Equals(word, StringComparison.OrdinalIgnoreCase)
-                    || otherKeywords.Contains(searchWord, StringComparer.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-
-                // A suggested word matches a part of the description exactly, as in Matches.
-                int count = remaining.Count(t => t.Keywords.Contains(searchWord));
-                // With nothing typed, only a word that narrows the search down is worth listing.
-                if (count == 0 || (word.Length == 0 && count == remaining.Count)) continue;
-
-                // Rank 0 where the typed word starts the suggestion or its value ("Row" in "Direction=Row"), 1 anywhere else.
-                found.Add((new SuggestionItem(searchWord, count), index == 0 || searchWord[index - 1] == '=' ? 0 : 1));
-            }
-            // The sort is stable, so each rank stays in the alphabetical order of the vocabulary, which groups the values of a setting.
-            return found.OrderBy(f => f.Rank).Select(f => f.Suggestion).ToList();
-        }
-
-        // Moves the pick through the list; above the first entry nothing is picked, which is where typing starts.
-        void MoveSuggestion(int offset)
-        {
-            int index = Math.Clamp(listbox_suggestions.SelectedIndex + offset, -1, listbox_suggestions.Items.Count - 1);
-            listbox_suggestions.SelectedIndex = index;
-            if (index >= 0) listbox_suggestions.ScrollIntoView(listbox_suggestions.SelectedItem);
-        }
-
-        // Writes the suggestion in place of the word the caret is in. At the end of the text a space follows it, ready for
-        // the next keyword.
-        void AcceptSuggestion(SuggestionItem suggestion)
-        {
-            var text = textbox_search.Text;
-            var (start, end) = CurrentWord();
-            var insert = end == text.Length ? suggestion.Text + ' ' : suggestion.Text;
-            acceptingSuggestion = true;
-            try
-            {
-                textbox_search.Text = text[..start] + insert + text[end..];
-                textbox_search.CaretIndex = start + insert.Length;
-            }
-            finally
-            {
-                acceptingSuggestion = false;
-            }
-            CloseSuggestions();
-            textbox_search.Focus();
-        }
-
-        void CloseSuggestions() => popup_suggestions.IsOpen = false;
-
-        private void combobox_testcase_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void listbox_testcase_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             UpdateStepButtons();
+            // The list only creates the items near the ones in view, so a case that stepping or filtering selected may be out of sight.
+            if (listbox_testcase.SelectedItem is { } selected) listbox_testcase.ScrollIntoView(selected);
 
             // Filtering selects the case that is already on screen again; that one keeps what is on screen, which the
             // tester may have edited since it was read from the file.
-            if (combobox_testcase.SelectedItem is TestCaseItem item && !ReferenceEquals(item, currentTestCase))
+            if (listbox_testcase.SelectedItem is TestCaseItem item && !ReferenceEquals(item, currentTestCase))
             {
                 currentTestCase = item;
                 SetContentText(JsonSerializer.Serialize(item.Data, ContentEditorJsonOptions));
@@ -634,9 +482,9 @@ namespace WpfApp_FlexT
 
         void UpdateStepButtons()
         {
-            int index = combobox_testcase.SelectedIndex;
+            int index = listbox_testcase.SelectedIndex;
             button_prev.IsEnabled = index > 0;
-            button_next.IsEnabled = index >= 0 && index < combobox_testcase.Items.Count - 1;
+            button_next.IsEnabled = index >= 0 && index < listbox_testcase.Items.Count - 1;
         }
 
         private void button_prev_Click(object sender, RoutedEventArgs e) => StepTestCase(-1);
@@ -646,10 +494,10 @@ namespace WpfApp_FlexT
         // Moves through the test cases the filter has left, so a whole category can be walked through case by case.
         void StepTestCase(int offset)
         {
-            int index = combobox_testcase.SelectedIndex + offset;
-            if (index >= 0 && index < combobox_testcase.Items.Count)
+            int index = listbox_testcase.SelectedIndex + offset;
+            if (index >= 0 && index < listbox_testcase.Items.Count)
             {
-                combobox_testcase.SelectedIndex = index;
+                listbox_testcase.SelectedIndex = index;
             }
         }
 
