@@ -225,14 +225,21 @@ namespace WpfApp_FlexT
                 .Where(g => g.Count() > 1 && g.Key.IndexOfAny(KeywordSeparators) < 0)
                 .Select(g => g.Key)
                 .Order(StringComparer.OrdinalIgnoreCase)];
-            var categories = new List<CategoryItem> { new(null, items.Count) };
-            categories.AddRange(items
-                .GroupBy(t => t.Category)
-                .OrderBy(g => g.Key, StringComparer.OrdinalIgnoreCase)
-                .Select(g => new CategoryItem(g.Key, g.Count())));
-            combobox_category.ItemsSource = categories;
-            // Picking "all" narrows nothing down and selects the first test case.
-            combobox_category.SelectedIndex = 0;
+
+            this.listbox_testcase.ItemsSource = allTestCases;
+            //var categories = new List<CategoryItem> { new(null, items.Count) };
+            //categories.AddRange(items
+            //    .GroupBy(t => t.Category)
+            //    .OrderBy(g => g.Key, StringComparer.OrdinalIgnoreCase)
+            //    .Select(g => new CategoryItem(g.Key, g.Count())));
+            //combobox_category.ItemsSource = categories;
+            //// Picking "all" narrows nothing down and selects the first test case.
+            //combobox_category.SelectedIndex = 0;
+
+            CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(listbox_testcase.ItemsSource);
+            PropertyGroupDescription groupDescription = new PropertyGroupDescription("Category");
+            view.GroupDescriptions.Add(groupDescription);
+            listbox_testcase.SelectedIndex = 0;
         }
 
         private void combobox_category_SelectionChanged(object sender, SelectionChangedEventArgs e) => ApplyFilter();
