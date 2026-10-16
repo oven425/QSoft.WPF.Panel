@@ -270,7 +270,8 @@ namespace QSoft.WPF.Panel
 
         FlexItem[] flexItems = [];
         FlexLine[] flexLines = [];
-        int measuredCount;
+        int[] visibleChildIndexes = [];
+        int measuredVisibleCount;
 
         static bool IsRow(FlexDirection direction)
             => direction == FlexDirection.Row || direction == FlexDirection.RowReverse;
@@ -370,7 +371,7 @@ namespace QSoft.WPF.Panel
         protected override Size MeasureOverride(Size availableSize)
         {
             var children = this.InternalChildren;
-            var count = children.Count;
+            var childCount = children.Count;
             var padding = this.Padding;
             var isRow = IsRow(this.FlexDirection);
             var padMain = isRow ? padding.Left + padding.Right : padding.Top + padding.Bottom;
@@ -382,16 +383,30 @@ namespace QSoft.WPF.Panel
             var childConstraint = MakeSize(isRow, innerMain, innerCross);
             GetAxisGaps(isRow, out var mainGap, out var crossGap);
 
-            if (flexItems.Length < count)
+            if (flexItems.Length < childCount)
             {
-                Array.Resize(ref flexItems, count * 2);
+                Array.Resize(ref flexItems, childCount * 2);
             }
-            measuredCount = count;
-
-            for (int i = 0; i < count; i++)
+            if (visibleChildIndexes.Length < childCount)
             {
-                var child = children[i];
-                ref var item = ref flexItems[i];
+                Array.Resize(ref visibleChildIndexes, childCount * 2);
+            }
+
+            measuredVisibleCount = 0;
+            for (int childIndex = 0; childIndex < childCount; childIndex++)
+            {
+                var child = children[childIndex];
+                if (child.Visibility == Visibility.Collapsed)
+                {
+                    child.Measure(new Size());
+                    continue;
+                }
+
+                var itemIndex = measuredVisibleCount;
+                visibleChildIndexes[itemIndex] = childIndex;
+                measuredVisibleCount++;
+
+                ref var item = ref flexItems[itemIndex];
                 ReadFlexProperties(child, isRow, ref item);
 
                 // Like Width (and CSS flex-basis), Basis is the size of the element without its margin.
@@ -414,7 +429,7 @@ namespace QSoft.WPF.Panel
             }
 
             // An unlimited main size (a ScrollViewer along that axis) never needs a line break.
-            var lineCount = CollectLines(count, this.FlexWrap != FlexWrap.NoWrap, innerMain, mainGap);
+            var lineCount = CollectLines(measuredVisibleCount, this.FlexWrap != FlexWrap.NoWrap, innerMain, mainGap);
             var maxLineMain = 0.0;
             var sumLineCross = 0.0;
             for (int l = 0; l < lineCount; l++)
@@ -446,7 +461,7 @@ namespace QSoft.WPF.Panel
                 var lineCross = 0.0;
                 for (int i = line.Start; i < line.End; i++)
                 {
-                    var child = children[i];
+                    var child = children[visibleChildIndexes[i]];
                     ref var item = ref flexItems[i];
                     // FrameworkElement arranges a child at least as large as its unclipped desired size, so a child that
                     // gets less room than it asked for must be measured again at that size to report the smaller size.
@@ -473,9 +488,23 @@ namespace QSoft.WPF.Panel
         protected override Size ArrangeOverride(Size finalSize)
         {
             var children = this.InternalChildren;
-            var count = children.Count;
-            if (count == 0) return finalSize;
-            if (count != measuredCount)
+            var childCount = children.Count;
+            if (childCount == 0) return finalSize;
+
+            var visibleCount = 0;
+            for (int childIndex = 0; childIndex < childCount; childIndex++)
+            {
+                if (children[childIndex].Visibility != Visibility.Collapsed)
+                {
+                    visibleCount++;
+                }
+                else
+                {
+                    children[childIndex].Arrange(new Rect());
+                }
+            }
+            if (visibleCount == 0) return finalSize;
+            if (visibleCount != measuredVisibleCount)
             {
                 InvalidateMeasure();
                 return finalSize;
@@ -496,12 +525,12 @@ namespace QSoft.WPF.Panel
             GetAxisGaps(isRow, out var mainGap, out var crossGap);
             var alignItems = this.AlignItems;
 
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < visibleCount; i++)
             {
-                ReadFlexProperties(children[i], isRow, ref flexItems[i]);
+                ReadFlexProperties(children[visibleChildIndexes[i]], isRow, ref flexItems[i]);
             }
 
-            var lineCount = CollectLines(count, isMultiLine, innerMain, mainGap);
+            var lineCount = CollectLines(visibleCount, isMultiLine, innerMain, mainGap);
             var sumLineCross = 0.0;
             for (int l = 0; l < lineCount; l++)
             {
@@ -511,7 +540,7 @@ namespace QSoft.WPF.Panel
                 line.Cross = 0;
                 for (int i = line.Start; i < line.End; i++)
                 {
-                    line.Cross = Math.Max(line.Cross, GetCrossSize(children[i], isRow));
+                    line.Cross = Math.Max(line.Cross, GetCrossSize(children[visibleChildIndexes[i]], isRow));
                 }
                 sumLineCross += line.Cross;
             }
@@ -563,7 +592,7 @@ namespace QSoft.WPF.Panel
                 var position = offset;
                 for (int i = line.Start; i < line.End; i++)
                 {
-                    var child = children[i];
+                    var child = children[visibleChildIndexes[i]];
                     var main = flexItems[i].Size;
                     var mainPos = isReverse ? padStart + innerMain - position - main : padStart + position;
 
